@@ -2,10 +2,22 @@ import hashlib
 import json
 import re
 from pathlib import Path
-from urllib.parse import urljoin, urlparse, parse_qs
+from urllib.parse import urlparse, parse_qs
 
 import requests
 from bs4 import BeautifulSoup
+from urllib.parse import urlparse
+
+def is_allowed_domain(url: str, allowed_domains: list[str]) -> bool:
+    try:
+        host = (urlparse(url).netloc or "").lower()
+    except Exception:
+        return False
+
+    if not host:
+        return False
+
+    return any(host == d or host.endswith("." + d) for d in allowed_domains)
 
 try:
     import firebase_admin
@@ -19,12 +31,12 @@ except Exception:
     def ArrayUnion(values):
         return values
 
-
 SERVICE_ACCOUNT_PATH = "serviceAccountKey.json"
-OUTPUT_JSON_PATH = Path("data/gundambase_items.json")
+OUTPUT_JSON_PATH = Path("data/gundamshop_items.json")
 
 LIST_URLS = [
-    "https://www.thegundambase.com/",
+    "https://www.gundamshop.co.kr/",
+    "https://www.gundamshop.co.kr/theme/Reserve.html?cate=0001&ordr=wol_panme&sort=DESC",
 ]
 
 HEADERS = {
@@ -36,10 +48,8 @@ HEADERS = {
     "Accept-Language": "ko-KR,ko;q=0.9,en;q=0.8",
 }
 
-MAX_ITEMS = 150
-
 ALLOWED_KEYWORDS = [
-    "mgsd", "mgex", "pg", "mg", "rg", "hg", "sd", "bb", "eg", "re/100",
+    "mgsd", "hg", "mg", "rg", "pg", "sd", "bb", "eg", "re/100",
     "full mechanics", "figure-rise", "figure rise", "30ms", "30mm",
     "건담", "자쿠", "유니콘", "프리덤", "스트라이크", "에어리얼",
     "즈고크", "사자비", "뉴건담", "시난주", "mk ii", "mk-ii",
@@ -47,10 +57,11 @@ ALLOWED_KEYWORDS = [
     "바르바토스", "캘리번", "데미", "루브리스", "저스티스", "데스티니",
     "엑시아", "더블오", "아스트레이", "톨기스", "윙건담", "짐",
     "짐 스나이퍼", "풀아머", "더블 제타", "더블제타", "알트리아",
-    "건담데칼", "bb전사", "sdw", "삼국창걸전",
+    "건담데칼",
 ]
 
 BLOCKED_KEYWORDS = [
+    "프라모델", "건프라", "모형",
     "티셔츠", "후드", "의류", "의상",
     "머그컵", "텀블러", "보틀", "컵",
     "키링", "열쇠고리", "아크릴", "스탠드", "스티커",
@@ -64,34 +75,178 @@ BLOCKED_KEYWORDS = [
     "넨도로이드", "봉제", "인형",
     "유의사항", "공지", "안내", "이벤트", "출처",
     "문의", "게시판", "운영시간", "영업시간",
-    "로그인", "회원가입", "장바구니", "주문조회", "고객센터",
-    "copyright",
+    "www", "http", "https", ".com", ".kr",
 ]
-
-BAD_EXACT_NAMES = {
-    "sale price now",
-    "sale price",
-    "price now",
-    "regular",
-}
 
 BROKEN_PATTERNS = [
     "�", "Ã", "Â", "°ç", "´ã", "¿", "½", "À", "Ã¬", "Ã¥",
-    "¼", "¹", "º", "³", "²", "¾", "Ð", "Ñ", "Õ", "Ö",
 ]
 
+GENERIC_BLOCK_EXACT = {
+    "프라모델",
+    "건프라",
+    "모형",
+    "건담 프라모델",
+    "건담프라모델",
+    "프라모델 키트",
+    "건담 키트",
+    "mgsd",
+    "hg",
+    "mg",
+    "rg",
+    "pg",
+    "sd",
+    "eg",
+    "bb",
+    "re/100",
+    "30ms",
+    "30mm",
+}
+
+STOPWORDS = [
+    "1", "144", "100", "60", "scale", "model", "kit",
+    "건담베이스", "건담샵", "루리웹",
+]
+
+GUNDAMBASE_BLOCKED_SUBSTRINGS = [
+    "원피스",
+    "포켓몬",
+    "짱구",
+    "명탐정 코난",
+    "코난",
+    "드래곤볼",
+    "나루토",
+    "귀멸",
+    "에반게리온",
+    "디지몬",
+    "유희왕",
+    "산리오",
+    "마블",
+    "디즈니",
+    "토이스토리",
+    "토토로",
+    "세일러문",
+    "프리큐어",
+    "소닉",
+    "도라에몽",
+    "스파이더맨",
+    "배트맨",
+    "슈퍼맨",
+    "가면라이더",
+    "울트라맨",
+    "업계",
+    "작가",
+    "부활절",
+]
+
+GUNDAMBASE_ALLOWED_HINTS = [
+    "건담", "자쿠", "유니콘", "프리덤", "스트라이크", "에어리얼",
+    "즈고크", "사자비", "뉴건담", "시난주", "엑시아",
+    "바르바토스", "캘리번", "루브리스", "데스티니",
+    "저스티스", "아스트레이", "더블오", "톨기스",
+    "윙건담", "짐", "건캐논", "건탱크",
+    "mgsd", "mgex", "pg", "mg", "rg", "hg", "sd", "bb", "eg",
+    "bb전사", "삼국창걸전", "30ms", "30mm", "figure-rise", "full mechanics",
+]
+
+LINE_BLOCK_PATTERNS = [
+    r"유의사항",
+    r"출처",
+    r"공지",
+    r"안내",
+    r"이벤트",
+    r"문의",
+    r"게시판",
+    r"운영시간",
+    r"영업시간",
+    r"고객센터",
+    r"이용약관",
+    r"개인정보",
+    r"청소년보호정책",
+    r"copyright",
+    r"예약\s*안내",
+    r"입고\s*안내",
+    r"회원",
+    r"로그인",
+    r"장바구니\s*보기",
+    r"주문조회",
+]
+
+SENTENCE_PATTERNS = [
+    r"올라오고\s*있습니다",
+    r"확인.*부탁",
+    r"확인.*바랍니다",
+    r"참고.*바랍니다",
+    r"판매.*진행",
+    r"매장.*상이",
+    r"점포.*상이",
+    r"구매.*가능",
+    r"방문.*부탁",
+    r"공지.*확인",
+    r"예정입니다",
+    r"부탁드립니다",
+    r"확인해주세요",
+    r"진행됩니다",
+    r"안내드립니다",
+    r"안내됩니다",
+    r"판매됩니다",
+    r"판매중입니다",
+    r"준비중입니다",
+]
+
+MAX_ITEMS = 150
+
+DETAIL_PARAM_HINTS = {
+    "it_id", "goodsno", "goods_no", "product_no", "item_no", "no", "idx", "id"
+}
+
+DETAIL_PATH_HINTS = [
+    "/shop/item.php",
+    "/shop/item.view.php",
+    "/shop/goods_view.php",
+    "/goods/view",
+    "/product/view",
+    "/item/view",
+    "/shop/detail",
+]
+
+def verify_detail_stock(product_url: str, headers: dict) -> str:
+    try:
+        html = fetch_html(product_url)
+        text = normalize_space(
+            BeautifulSoup(html, "html.parser").get_text(" ", strip=True)
+        ).lower()
+
+        soldout_keywords = [
+            "품절", "일시품절", "sold out", "out of stock", "재고없음", "재고 없음"
+        ]
+        selling_keywords = [
+            "판매중", "구매", "구매하기", "장바구니", "바로구매", "buy now", "add to cart"
+        ]
+
+        if any(k in text for k in soldout_keywords):
+            return "품절"
+
+        if any(k in text for k in selling_keywords):
+            return "판매중"
+
+        # 끝까지 못 찾으면 기본값은 판매중으로 두기보다
+        # 상품 상세페이지가 살아있고 품절 문구가 없으면 판매중 처리
+        return "판매중"
+    except Exception:
+        return "판매중"
 
 def sha1(text: str) -> str:
     return hashlib.sha1(text.encode("utf-8")).hexdigest()
 
 
 def normalize_space(text: str) -> str:
-    return re.sub(r"\s+", " ", str(text or "")).strip()
+    return re.sub(r"\s+", " ", text or "").strip()
 
 
 def normalize_line_breaks(text: str) -> str:
     return (
-        str(text or "")
+        (text or "")
         .replace("\r", "\n")
         .replace("\u00a0", " ")
         .replace("⠀", " ")
@@ -134,7 +289,7 @@ def fetch_html(url: str) -> str:
             text = fix_broken_korean(text)
             korean_chars = len(re.findall(r"[가-힣]", text))
             broken_chars = text.count("�")
-            if korean_chars >= 10 and broken_chars < 10:
+            if korean_chars >= 10 and broken_chars < 5:
                 return text
         except Exception:
             continue
@@ -148,6 +303,8 @@ def init_firestore():
         return None
 
     try:
+        from pathlib import Path
+
         if not Path(SERVICE_ACCOUNT_PATH).exists():
             print(f"[경고] {SERVICE_ACCOUNT_PATH} 없음 - Firestore 저장 생략")
             return None
@@ -163,7 +320,7 @@ def init_firestore():
 
 
 def normalize_name(name: str) -> str:
-    text = normalize_space(name).lower()
+    text = (name or "").lower().strip()
     text = text.replace("ver.", "ver")
     text = text.replace("version", "ver")
     text = re.sub(r"\b1/\d+\b", "", text)
@@ -173,19 +330,99 @@ def normalize_name(name: str) -> str:
     return text
 
 
-def absolute_url(href: str) -> str:
-    return urljoin("https://www.thegundambase.com", href or "")
+def tokenize_name(name: str) -> list:
+    text = normalize_name(name)
+    tokens = text.split()
+
+    result = []
+    for token in tokens:
+        if token in STOPWORDS:
+            continue
+        if len(token) <= 1:
+            continue
+        result.append(token)
+
+    return result
 
 
 def looks_broken_text(text: str) -> bool:
     if not text:
         return False
-    lower = text.lower()
-    if any(p.lower() in lower for p in BROKEN_PATTERNS):
+    return any(p in text for p in BROKEN_PATTERNS)
+
+
+def is_too_generic_product_name(name: str) -> bool:
+    text = normalize_name(name)
+    if not text:
         return True
-    if re.search(r"[¼¹º³²¾ÐÑÕÖ]", text):
+
+    if text in GENERIC_BLOCK_EXACT:
         return True
+
+    if "프라모델" in text:
+        return True
+
+    tokens = tokenize_name(name)
+    if len(tokens) <= 1:
+        return True
+
     return False
+
+
+def is_gundam_product_name(name: str) -> bool:
+    text = normalize_space(name).lower()
+    if not text:
+        return False
+
+    if looks_broken_text(text):
+        return False
+
+    if "프라모델" in text:
+        return False
+
+    if any(k in text for k in BLOCKED_KEYWORDS):
+        return False
+
+    if is_too_generic_product_name(name):
+        return False
+
+    if len(text) < 4 or len(text) > 100:
+        return False
+
+    if any(k in text for k in ALLOWED_KEYWORDS):
+        return True
+
+    return False
+
+
+def absolute_url(href: str) -> str:
+    if not href:
+        return ""
+    if href.startswith("http://") or href.startswith("https://"):
+        return href
+    if href.startswith("/"):
+        return "https://www.gundamshop.co.kr" + href
+    return "https://www.gundamshop.co.kr/" + href.lstrip("/")
+
+
+def detect_stock_text(text: str) -> str:
+    t = normalize_space(text).lower()
+
+    if "품절" in text or "sold out" in t or "out of stock" in t:
+        return "품절"
+
+    if "예약" in text or "입고예정" in text or "입고 예정" in text:
+        return "예약/입고예정"
+
+    if "판매중" in text or "장바구니" in text or "구매" in text:
+        return "판매중"
+
+    return "판매중"
+
+
+def extract_price(text: str) -> str:
+    m = re.search(r"([\d,]+)\s*원", text)
+    return f"{m.group(1)}원" if m else ""
 
 
 def cleanup_candidate_name(text: str) -> str:
@@ -194,120 +431,133 @@ def cleanup_candidate_name(text: str) -> str:
     name = re.sub(r"[\d,]+\s*원.*$", "", name).strip()
     name = re.sub(r"^No\.\d+\s*", "", name).strip()
     name = re.sub(r"^[✔✓•●·\-\*\[\]▶▷☞]+", "", name).strip()
-    name = re.sub(r"\[\d+\]\s*$", "", name).strip()
 
     name = re.sub(r"\(.*?(한정|제한|별매|안내|예약).*?\)", "", name)
     name = re.sub(r"\[.*?(한정|제한|별매|안내|예약).*?\]", "", name)
 
-    name = re.sub(r"\s{2,}", " ", name).strip()
     return normalize_space(name)
 
+
+def line_looks_like_product(line: str) -> bool:
+    text = normalize_space(line)
+    lower = text.lower()
+
+    if not text:
+        return False
+
+    if len(text) < 4 or len(text) > 100:
+        return False
+
+    if looks_broken_text(text):
+        return False
+
+    if any(block in text for block in BLOCKED_KEYWORDS):
+        return False
+
+    for pattern in LINE_BLOCK_PATTERNS:
+        if re.search(pattern, text, re.IGNORECASE):
+            return False
+
+    for pattern in SENTENCE_PATTERNS:
+        if re.search(pattern, text, re.IGNORECASE):
+            return False
+
+    if text.endswith((
+        "합니다",
+        "합니다.",
+        "있습니다",
+        "있습니다.",
+        "드립니다",
+        "드립니다.",
+        "바랍니다",
+        "바랍니다.",
+        "입니다",
+        "입니다.",
+        "됩니다",
+        "됩니다.",
+    )):
+        return False
+
+    if is_too_generic_product_name(text):
+        return False
+
+    if text.count(" ") >= 9:
+        return False
+
+    grade_keywords = ["mgsd", "hg", "mg", "rg", "pg", "sd", "bb", "eg", "re/100", "30ms", "30mm"]
+    model_name_keywords = [
+        "건담", "에어리얼", "자쿠", "유니콘", "프리덤", "스트라이크",
+        "즈고크", "사자비", "뉴건담", "시난주", "엑시아",
+        "바르바토스", "캘리번", "루브리스", "데스티니",
+        "저스티스", "아스트레이", "더블오", "톨기스",
+        "윙건담", "짐", "짐 스나이퍼", "건캐논", "건탱크",
+        "더블 제타", "더블제타", "건담 mk", "mk-ii", "알트리아",
+    ]
+
+    has_grade = any(k in lower for k in grade_keywords)
+    has_model_code = bool(re.search(r"\b(rx|msn|zgmf|gnt|gn|xxxg|oz|mbf)[- ]?\d", lower))
+    has_specific_name = any(k.lower() in lower for k in model_name_keywords)
+
+    if not (has_grade or has_model_code or has_specific_name):
+        return False
+
+    return True
+
+def is_valid_gundambase_item(name: str) -> bool:
+    text = normalize_space(name).lower()
+    if not text:
+        return False
+
+    if any(bad.lower() in text for bad in GUNDAMBASE_BLOCKED_SUBSTRINGS):
+        return False
+
+    if not any(hint.lower() in text for hint in GUNDAMBASE_ALLOWED_HINTS):
+        return False
+
+    return True
 
 def is_probable_product_href(href: str) -> bool:
     if not href:
         return False
 
-    lower = href.lower().strip()
+    lower = href.lower()
 
     if lower.startswith("javascript:") or lower.startswith("mailto:") or lower.startswith("#"):
         return False
 
     blocked_bits = [
-        "/board/",
         "/bbs/",
+        "/board/",
         "/search",
         "/member/",
         "/mypage/",
         "/cart",
         "/login",
         "/join",
+        "/theme/reserve.html",
+        "/theme/",
+        "/category",
+        "/cate=",
     ]
     if any(bit in lower for bit in blocked_bits):
         return False
 
-    if lower in ["https://www.thegundambase.com/", "https://www.thegundambase.com"]:
-        return False
+    if any(bit in lower for bit in DETAIL_PATH_HINTS):
+        return True
 
     parsed = urlparse(lower)
     query = parse_qs(parsed.query)
-    detail_keys = {"it_id", "goodsno", "goods_no", "product_no", "item_no", "id", "no", "idx"}
 
-    if any(k in query for k in detail_keys):
+    if any(key in query for key in DETAIL_PARAM_HINTS):
         return True
 
-    detail_path_bits = [
-        "/shop/item.php",
-        "/shop/item.view.php",
-        "/shop/goods_view.php",
-        "/goods/view",
-        "/product/view",
-        "/item/view",
-        "/shop/detail",
-        "/product/",
-        "/item/",
-        "/productdetail",
-    ]
-    if any(bit in lower for bit in detail_path_bits):
+    if re.search(r"/product/\d+", lower):
         return True
 
-    # 완화: thegundambase 내부 링크면 일단 후보 허용
-    if "thegundambase.com" in lower:
+    if re.search(r"/item/\d+", lower):
         return True
 
     return False
-
-
-def detect_stock_text(text: str) -> str:
-    t = normalize_space(text).lower()
-
-    if any(k in t for k in ["품절", "일시품절", "sold out", "out of stock", "재고없음", "재고 없음"]):
-        return "품절"
-
-    if any(k in t for k in ["예약", "예약중", "예약 판매", "입고예정", "입고 예정", "pre-order", "preorder"]):
-        return "예약/입고예정"
-
-    if any(k in t for k in ["판매중", "장바구니", "구매", "구매하기", "바로구매", "buy now", "add to cart"]):
-        return "판매중"
-
-    return "상태 확인 필요"
-
-
-def extract_price(text: str) -> str:
-    m = re.search(r"([\d,]+)\s*원", text)
-    return f"{m.group(1)}원" if m else ""
-
-
-def is_gundam_product_name(name: str) -> bool:
-    text = cleanup_candidate_name(name).lower()
-    if not text:
-        return False
-
-    if text in BAD_EXACT_NAMES:
-        return False
-
-    if len(text) < 3 or len(text) > 120:
-        return False
-
-    if looks_broken_text(text):
-        return False
-
-    if any(b in text for b in BLOCKED_KEYWORDS):
-        return False
-
-    if "프라모델" in text:
-        return False
-
-    if any(k in text for k in ALLOWED_KEYWORDS):
-        return True
-
-    if re.search(r"\b(mgsd|mgex|pg|mg|rg|hg|sd|bb|eg)\b", text):
-        return True
-
-    return False
-
-
-def find_parent_card(a):
-    return a.find_parent(["li", "div", "dd", "dl", "section", "article"])
 
 
 def pick_best_name_from_anchor(a) -> str:
@@ -315,9 +565,8 @@ def pick_best_name_from_anchor(a) -> str:
 
     selectors = [
         ".item_name", ".prd_name", ".goods_name", ".product_name",
-        ".name", ".tit", ".title", "strong", "b", "h3", "h4", "dt",
+        ".name", ".tit", ".title", "strong", "b", "h3", "h4",
     ]
-
     for selector in selectors:
         for node in a.select(selector):
             text = normalize_space(node.get_text(" ", strip=True))
@@ -328,7 +577,7 @@ def pick_best_name_from_anchor(a) -> str:
     if direct_text:
         candidates.append(direct_text)
 
-    parent = find_parent_card(a)
+    parent = a.find_parent(["li", "div", "dd", "dl"])
     if parent:
         for selector in selectors:
             node = parent.select_one(selector)
@@ -337,20 +586,9 @@ def pick_best_name_from_anchor(a) -> str:
                 if text:
                     candidates.append(text)
 
-        parent_text = normalize_space(parent.get_text(" ", strip=True))
-        if parent_text:
-            candidates.append(parent_text)
-
     for text in candidates:
         cleaned = cleanup_candidate_name(text)
-        if not cleaned:
-            continue
-        if is_gundam_product_name(cleaned):
-            return cleaned
-
-    for text in candidates:
-        cleaned = cleanup_candidate_name(text)
-        if len(cleaned) >= 3 and not looks_broken_text(cleaned):
+        if line_looks_like_product(cleaned) and is_gundam_product_name(cleaned):
             return cleaned
 
     return ""
@@ -363,13 +601,14 @@ def pick_stock_text_from_anchor(a) -> str:
     if direct:
         texts.append(direct)
 
-    parent = find_parent_card(a)
+    parent = a.find_parent(["li", "div", "dd", "dl"])
     if parent:
         parent_text = normalize_space(parent.get_text(" ", strip=True))
         if parent_text:
             texts.append(parent_text)
 
-    return detect_stock_text(" ".join(texts))
+    merged = " ".join(texts)
+    return detect_stock_text(merged)
 
 
 def pick_price_from_anchor(a) -> str:
@@ -379,9 +618,9 @@ def pick_price_from_anchor(a) -> str:
     if direct:
         texts.append(direct)
 
-    parent = find_parent_card(a)
+    parent = a.find_parent(["li", "div", "dd", "dl"])
     if parent:
-        price_selectors = [".price", ".cost", ".amount", ".money", ".won", "strong", "dd"]
+        price_selectors = [".price", ".cost", ".amount", ".money", ".won", "strong"]
         for selector in price_selectors:
             for node in parent.select(selector):
                 text = normalize_space(node.get_text(" ", strip=True))
@@ -400,24 +639,14 @@ def candidate_blocks_from_html(html: str):
     blocks = []
     seen = set()
 
-    anchor_count = 0
-    href_pass_count = 0
-    name_pass_count = 0
-
     for a in soup.find_all("a", href=True):
-        anchor_count += 1
-
         href = absolute_url(a.get("href", ""))
-        raw_text = normalize_space(a.get_text(" ", strip=True))
-
         if not is_probable_product_href(href):
             continue
-        href_pass_count += 1
 
         name = pick_best_name_from_anchor(a)
         if not name:
             continue
-        name_pass_count += 1
 
         key = f"{href}|{normalize_name(name)}"
         if key in seen:
@@ -430,14 +659,6 @@ def candidate_blocks_from_html(html: str):
             "stockText": pick_stock_text_from_anchor(a),
             "price": pick_price_from_anchor(a),
         })
-
-        if len(blocks) <= 20:
-            print(f"[DEBUG] 후보 링크: {href} / 이름: {name} / 원문: {raw_text}")
-
-    print(f"[DEBUG] 전체 a[href] 수: {anchor_count}")
-    print(f"[DEBUG] href 통과 수: {href_pass_count}")
-    print(f"[DEBUG] 이름 통과 수: {name_pass_count}")
-    print(f"[DEBUG] blocks 수: {len(blocks)}")
 
     return blocks
 
@@ -455,41 +676,33 @@ def extract_products_from_listing(url: str):
         price = block.get("price", "")
         stock_text = block.get("stockText", "")
 
-        lower_href = href.lower().strip()
-
-        if href.strip() == url.strip():
+        if "bnkrmall.co.kr" not in href:
             continue
 
-        if not href:
+        if not line_looks_like_product(name):
             continue
 
-        if lower_href.endswith("/search") or "/search" in lower_href:
-            continue
-
-        if len(name) < 3:
-            continue
-
-        if name.lower() in BAD_EXACT_NAMES:
-            continue
-
-        if looks_broken_text(name):
-            continue
-
-        if any(b in name.lower() for b in BLOCKED_KEYWORDS):
+        if not is_valid_gundambase_item(name):
             continue
 
         if not is_gundam_product_name(name):
             continue
 
-        if not stock_text:
-            stock_text = "상태 확인 필요"
+        if not href:
+            continue
 
         key = f"{href}|{normalize_name(name)}"
         if key in seen:
             continue
         seen.add(key)
 
-        print(f"[DEBUG] 최종 후보: {name} -> {href} / 상태: {stock_text} / 가격: {price}")
+        print(f"후보: {name} -> {href}")
+
+        if not is_allowed_domain(href, ["thegundambase.com", "www.thegundambase.com"]):
+            continue
+
+        if not stock_text or stock_text == "상태 확인 필요":
+            stock_text = verify_detail_stock(href, HEADERS)
 
         items.append({
             "name": name,
@@ -500,7 +713,6 @@ def extract_products_from_listing(url: str):
             "sourcePage": url,
         })
 
-    print(f"[DEBUG] 최종 items 개수: {len(items)}")
     return items
 
 
@@ -534,7 +746,6 @@ def add_event(db, item_id, name, change_type):
         "changeType": change_type,
         "createdAt": firestore.SERVER_TIMESTAMP,
     })
-
 
 def update_verification_fields(doc_ref):
     latest_snap = doc_ref.get()
@@ -574,16 +785,16 @@ def save_item(db, item):
         "price": item["price"],
         "stockText": item["stockText"],
         "status": item["stockText"],
-        "source": "gundambase",
+        "source": "gundamshop",
         "sourceType": "product",
-        "site": "건담베이스",
-        "mallName": "건담베이스",
+        "site": "건담샵",
+        "mallName": "건담샵",
         "country": "KR",
         "region": "KR",
         "productUrl": item["url"],
         "url": item["url"],
         "sourcePage": item["sourcePage"],
-        "verificationSources": ArrayUnion(["gundambase"]),
+        "verificationSources": ArrayUnion(["gundamshop"]),
         "updatedAt": firestore.SERVER_TIMESTAMP,
         "lastSeenAt": firestore.SERVER_TIMESTAMP,
     }
@@ -615,16 +826,16 @@ def save_items_json(items, output_path=OUTPUT_JSON_PATH):
             "price": item["price"],
             "stockText": item["stockText"],
             "status": item["stockText"],
-            "source": "gundambase",
+            "source": "gundamshop",
             "sourceType": "product",
-            "site": "건담베이스",
-            "mallName": "건담베이스",
+            "site": "건담샵",
+            "mallName": "건담샵",
             "country": "KR",
             "region": "KR",
             "productUrl": item["url"],
             "url": item["url"],
             "sourcePage": item["sourcePage"],
-            "verificationSources": ["gundambase"],
+            "verificationSources": ["gundamshop"],
         })
 
     output_path.write_text(
@@ -640,15 +851,11 @@ def main():
     all_items = []
     for url in LIST_URLS:
         try:
-            print(f"[시작] 목록 요청: {url}")
             items = extract_products_from_listing(url)
             print(f"[목록] {url}")
             print(f"  후보 개수: {len(items)}")
-            for item in items[:10]:
-                print(
-                    f"   - {item['name']} / {item['stockText']} / "
-                    f"{item['price']} / {item['url']}"
-                )
+            for item in items[:5]:
+                print(f"   - {item['name']} / {item['stockText']} / {item['price']} / {item['url']}")
             all_items.extend(items)
         except Exception as e:
             print(f"[실패] {url} -> {e}")
@@ -664,8 +871,6 @@ def main():
 
     dedup = dedup[:MAX_ITEMS]
 
-    print(f"[DEBUG] 최종 저장 대상 수: {len(dedup)}")
-
     save_items_json(dedup)
 
     saved = 0
@@ -680,7 +885,7 @@ def main():
     else:
         print("[경고] Firestore 저장은 생략하고 JSON만 생성함")
 
-    print(f"[완료] GundamBase 완료 / 총 추출 {len(dedup)}개 / Firestore 저장 {saved}개")
+    print(f"[완료] 건담샵 완료 / 총 추출 {len(dedup)}개 / Firestore 저장 {saved}개")
 
 
 if __name__ == "__main__":
