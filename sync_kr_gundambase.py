@@ -1,18 +1,27 @@
 import hashlib
+import json
 import re
+from pathlib import Path
 from urllib.parse import urlparse, parse_qs
 
 import requests
 from bs4 import BeautifulSoup
-import firebase_admin
-from firebase_admin import credentials, firestore
-from firebase_admin.firestore import ArrayUnion
-from pathlib import Path
-import json
 
-OUTPUT_JSON_PATH = Path("data/gundambase_items.json")
+try:
+    import firebase_admin
+    from firebase_admin import credentials, firestore
+    from firebase_admin.firestore import ArrayUnion
+except Exception:
+    firebase_admin = None
+    credentials = None
+    firestore = None
+
+    def ArrayUnion(values):
+        return values
+
 
 SERVICE_ACCOUNT_PATH = "serviceAccountKey.json"
+OUTPUT_JSON_PATH = Path("data/gundamshop_items.json")
 
 LIST_URLS = [
     "https://www.gundamshop.co.kr/",
@@ -88,7 +97,7 @@ STOPWORDS = [
     "건담베이스", "건담샵", "루리웹",
 ]
 
-GUNDAMBASE_BLOCKED_SUBSTRINGS = [
+GUNDAMSHOP_BLOCKED_SUBSTRINGS = [
     "원피스",
     "포켓몬",
     "짱구",
@@ -119,7 +128,7 @@ GUNDAMBASE_BLOCKED_SUBSTRINGS = [
     "부활절",
 ]
 
-GUNDAMBASE_ALLOWED_HINTS = [
+GUNDAMSHOP_ALLOWED_HINTS = [
     "건담", "자쿠", "유니콘", "프리덤", "스트라이크", "에어리얼",
     "즈고크", "사자비", "뉴건담", "시난주", "엑시아",
     "바르바토스", "캘리번", "루브리스", "데스티니",
@@ -190,37 +199,6 @@ DETAIL_PATH_HINTS = [
     "/shop/detail",
 ]
 
-def save_items_json(items, output_path=OUTPUT_JSON_PATH):
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-
-    payload = []
-    for item in items:
-        item_id = sha1(item["url"] + "|" + item["name"])
-        payload.append({
-            "itemId": item_id,
-            "name": item["name"],
-            "title": item["title"],
-            "canonicalName": normalize_name(item["name"]),
-            "price": item["price"],
-            "stockText": item["stockText"],
-            "status": item["stockText"],
-            "source": "gundambase",
-            "sourceType": "product",
-            "site": "건담베이스",
-            "mallName": "건담베이스",
-            "country": "KR",
-            "region": "KR",
-            "productUrl": item["url"],
-            "url": item["url"],
-            "sourcePage": item["sourcePage"],
-            "verificationSources": ["gundambase"],
-        })
-
-    output_path.write_text(
-        json.dumps(payload, ensure_ascii=False, indent=2),
-        encoding="utf-8",
-    )
-    print(f"[저장] JSON 저장 완료: {output_path} / {len(payload)}개")
 
 def sha1(text: str) -> str:
     return hashlib.sha1(text.encode("utf-8")).hexdigest()
@@ -289,8 +267,6 @@ def init_firestore():
         return None
 
     try:
-        from pathlib import Path
-
         if not Path(SERVICE_ACCOUNT_PATH).exists():
             print(f"[경고] {SERVICE_ACCOUNT_PATH} 없음 - Firestore 저장 생략")
             return None
@@ -489,18 +465,20 @@ def line_looks_like_product(line: str) -> bool:
 
     return True
 
-def is_valid_gundambase_item(name: str) -> bool:
+
+def is_valid_gundamshop_item(name: str) -> bool:
     text = normalize_space(name).lower()
     if not text:
         return False
 
-    if any(bad.lower() in text for bad in GUNDAMBASE_BLOCKED_SUBSTRINGS):
+    if any(bad.lower() in text for bad in GUNDAMSHOP_BLOCKED_SUBSTRINGS):
         return False
 
-    if not any(hint.lower() in text for hint in GUNDAMBASE_ALLOWED_HINTS):
+    if not any(hint.lower() in text for hint in GUNDAMSHOP_ALLOWED_HINTS):
         return False
 
     return True
+
 
 def is_probable_product_href(href: str) -> bool:
     if not href:
@@ -665,7 +643,7 @@ def extract_products_from_listing(url: str):
         if not line_looks_like_product(name):
             continue
 
-        if not is_valid_gundambase_item(name):
+        if not is_valid_gundamshop_item(name):
             continue
 
         if not is_gundam_product_name(name):
@@ -717,6 +695,9 @@ def determine_change(existing, new_data):
 
 
 def add_event(db, item_id, name, change_type):
+    if db is None or firestore is None:
+        return
+
     db.collection("stock_events").add({
         "itemId": item_id,
         "name": name,
@@ -745,6 +726,9 @@ def update_verification_fields(doc_ref):
 
 
 def save_item(db, item):
+    if db is None or firestore is None:
+        return False
+
     item_id = sha1(item["url"] + "|" + item["name"])
     canonical_name = normalize_name(item["name"])
 
@@ -784,11 +768,44 @@ def save_item(db, item):
 
     doc_ref.set(data, merge=True)
     update_verification_fields(doc_ref)
+    return True
+
+
+def save_items_json(items, output_path=OUTPUT_JSON_PATH):
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+
+    payload = []
+    for item in items:
+        item_id = sha1(item["url"] + "|" + item["name"])
+        payload.append({
+            "itemId": item_id,
+            "name": item["name"],
+            "title": item["title"],
+            "canonicalName": normalize_name(item["name"]),
+            "price": item["price"],
+            "stockText": item["stockText"],
+            "status": item["stockText"],
+            "source": "gundamshop",
+            "sourceType": "product",
+            "site": "건담샵",
+            "mallName": "건담샵",
+            "country": "KR",
+            "region": "KR",
+            "productUrl": item["url"],
+            "url": item["url"],
+            "sourcePage": item["sourcePage"],
+            "verificationSources": ["gundamshop"],
+        })
+
+    output_path.write_text(
+        json.dumps(payload, ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
+    print(f"[저장] JSON 저장 완료: {output_path} / {len(payload)}개")
 
 
 def main():
     db = init_firestore()
-    save_items_json(dedup)
 
     all_items = []
     for url in LIST_URLS:
@@ -811,16 +828,23 @@ def main():
         seen.add(key)
         dedup.append(item)
 
-    saved = 0
-    for item in dedup[:MAX_ITEMS]:
-        try:
-            save_item(db, item)
-            saved += 1
-            print(f"저장: {item['name']} / {item['stockText']} / {item['price']}")
-        except Exception as e:
-            print(f"저장 실패: {item['name']} -> {e}")
+    dedup = dedup[:MAX_ITEMS]
 
-    print(f"[완료] 건담샵 완료 / 총 저장 {saved}개")
+    save_items_json(dedup)
+
+    saved = 0
+    if db is not None:
+        for item in dedup:
+            try:
+                if save_item(db, item):
+                    saved += 1
+                    print(f"저장: {item['name']} / {item['stockText']} / {item['price']}")
+            except Exception as e:
+                print(f"저장 실패: {item['name']} -> {e}")
+    else:
+        print("[경고] Firestore 저장은 생략하고 JSON만 생성함")
+
+    print(f"[완료] 건담샵 완료 / 총 추출 {len(dedup)}개 / Firestore 저장 {saved}개")
 
 
 if __name__ == "__main__":
