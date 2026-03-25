@@ -681,7 +681,7 @@ def candidate_blocks_from_html(html: str):
 
     for a in soup.find_all("a", href=True):
         href = absolute_url(a.get("href", ""))
-        if not is_probable_product_href(href):
+        if not href:
             continue
 
         name = pick_best_name_from_anchor(a)
@@ -699,7 +699,7 @@ def candidate_blocks_from_html(html: str):
             "stockText": pick_stock_text_from_anchor(a),
             "price": pick_price_from_anchor(a),
         })
-
+    print(f"[DEBUG] 링크 발견: {href} / 텍스트: {a.get_text(strip=True)}")
     return blocks
 
 
@@ -737,10 +737,7 @@ def extract_products_from_listing(url: str):
         if name.lower() in BAD_EXACT_NAMES:
             continue
 
-        if not line_looks_like_product(name):
-            continue
-
-        if not is_gundam_product_name(name):
+        if len(name) < 3:
             continue
 
         if not href:
@@ -764,7 +761,7 @@ def extract_products_from_listing(url: str):
             "url": href,
             "sourcePage": url,
         })
-
+    print(f"[DEBUG] 최종 items 개수: {len(items)}")
     return items
 
 
