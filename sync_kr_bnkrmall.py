@@ -25,7 +25,7 @@ OUTPUT_JSON_PATH = Path("data/gundamshop_items.json")
 
 BASE_URL = "https://www.bnkrmall.co.kr"
 LIST_URLS = [
-    "https://www.bnkrmall.co.kr",
+    "https://www.bnkrmall.co.kr/main/index.do",
 ]
 
 HEADERS = {
@@ -808,6 +808,7 @@ def main():
     db = init_firestore()
 
     all_items = []
+
     for url in LIST_URLS:
         try:
             items = extract_products_from_listing(url)
@@ -830,7 +831,11 @@ def main():
 
     dedup = dedup[:MAX_ITEMS]
 
-    save_items_json(dedup)
+    try:
+        save_items_json(dedup)
+    except Exception as e:
+        print(f"[오류] JSON 저장 실패 -> {e}")
+        raise
 
     saved = 0
     if db is not None:
@@ -844,8 +849,7 @@ def main():
     else:
         print("[경고] Firestore 저장은 생략하고 JSON만 생성함")
 
-    print(f"[완료] 건담샵 완료 / 총 추출 {len(dedup)}개 / Firestore 저장 {saved}개")
-
+    print(f"[완료] BNKRMALL 완료 / 총 추출 {len(dedup)}개 / Firestore 저장 {saved}개")
 
 if __name__ == "__main__":
     main()
