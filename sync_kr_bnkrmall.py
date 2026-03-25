@@ -23,7 +23,7 @@ except Exception:
 SERVICE_ACCOUNT_PATH = "serviceAccountKey.json"
 OUTPUT_JSON_PATH = Path("data/gundamshop_items.json")
 
-BASE_URL = ""https://www.bnkrmall.co.kr"
+BASE_URL = "https://www.bnkrmall.co.kr"
 LIST_URLS = [
     "https://www.bnkrmall.co.kr",
 ]
