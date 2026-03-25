@@ -1,3 +1,5 @@
+import json
+from pathlib import Path
 import hashlib
 import re
 from collections import defaultdict
@@ -159,7 +161,27 @@ def should_block_name(name: str, data: dict) -> bool:
             return True
 
     return False
+    
+def load_json_file(path):
+    path = Path(path)
+    if not path.exists():
+        print(f"[경고] JSON 파일 없음: {path}")
+        return []
 
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except Exception as e:
+        print(f"[경고] JSON 파일 읽기 실패: {path} -> {e}")
+        return []
+        
+def save_merged_json(items, output_path="data/aggregated_item_kr.json"):
+    output = Path(output_path)
+    output.parent.mkdir(parents=True, exist_ok=True)
+    output.write_text(
+        json.dumps(items, ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
+    print(f"[저장] 병합 JSON 저장 완료: {output} / {len(items)}개")
 
 def normalize_name(name: str) -> str:
     text = normalize_space(name).lower()
