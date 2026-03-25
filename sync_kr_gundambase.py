@@ -249,10 +249,25 @@ def fetch_html(url: str) -> str:
 
 
 def init_firestore():
-    if not firebase_admin._apps:
-        cred = credentials.Certificate(SERVICE_ACCOUNT_PATH)
-        firebase_admin.initialize_app(cred)
-    return firestore.client()
+    if firebase_admin is None or credentials is None or firestore is None:
+        print("[경고] firebase_admin 미설치 - Firestore 저장 생략")
+        return None
+
+    try:
+        from pathlib import Path
+
+        if not Path(SERVICE_ACCOUNT_PATH).exists():
+            print(f"[경고] {SERVICE_ACCOUNT_PATH} 없음 - Firestore 저장 생략")
+            return None
+
+        if not firebase_admin._apps:
+            cred = credentials.Certificate(SERVICE_ACCOUNT_PATH)
+            firebase_admin.initialize_app(cred)
+
+        return firestore.client()
+    except Exception as e:
+        print(f"[경고] Firestore 초기화 건너뜀: {e}")
+        return None
 
 
 def normalize_name(name: str) -> str:
