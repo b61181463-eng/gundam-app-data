@@ -23,9 +23,8 @@ except Exception:
 SERVICE_ACCOUNT_PATH = "serviceAccountKey.json"
 OUTPUT_JSON_PATH = Path("data/gundambase_items.json")
 
-BASE_URL = "https://www.thegundambase.com"
 LIST_URLS = [
-    "https://www.thegundambase.com",
+    "https://www.thegundambase.com/",
 ]
 
 HEADERS = {
@@ -39,29 +38,46 @@ HEADERS = {
 
 MAX_ITEMS = 150
 
-ALLOWED_HINTS = [
+ALLOWED_KEYWORDS = [
+    "mgsd", "mgex", "pg", "mg", "rg", "hg", "sd", "bb", "eg", "re/100",
+    "full mechanics", "figure-rise", "figure rise", "30ms", "30mm",
     "건담", "자쿠", "유니콘", "프리덤", "스트라이크", "에어리얼",
-    "즈고크", "사자비", "뉴건담", "시난주", "엑시아", "바르바토스",
-    "캘리번", "루브리스", "데스티니", "저스티스", "아스트레이",
-    "더블오", "톨기스", "윙건담", "짐", "건캐논", "건탱크",
-    "mgsd", "mgex", "pg", "mg", "rg", "hg", "sd", "bb", "eg",
-    "re/100", "full mechanics", "figure-rise", "30ms", "30mm",
+    "즈고크", "사자비", "뉴건담", "시난주", "mk ii", "mk-ii",
+    "rx 78", "rx-78", "건캐논", "건탱크", "돔", "겔구그", "구프",
+    "바르바토스", "캘리번", "데미", "루브리스", "저스티스", "데스티니",
+    "엑시아", "더블오", "아스트레이", "톨기스", "윙건담", "짐",
+    "짐 스나이퍼", "풀아머", "더블 제타", "더블제타", "알트리아",
+    "건담데칼", "bb전사", "sdw", "삼국창걸전",
 ]
 
-BLOCKED_HINTS = [
-    "티셔츠", "머그컵", "포스터", "아크릴", "키링", "스티커", "가방",
-    "타월", "쿠션", "노트", "볼펜", "문구", "인형", "봉제", "도서",
-    "프라모델", "건프라", "모형", "공지", "안내", "이벤트", "문의",
-    "게시판", "로그인", "장바구니 보기",
+BLOCKED_KEYWORDS = [
+    "티셔츠", "후드", "의류", "의상",
+    "머그컵", "텀블러", "보틀", "컵",
+    "키링", "열쇠고리", "아크릴", "스탠드", "스티커",
+    "포스터", "브로마이드", "엽서",
+    "노트", "문구", "필통", "펜", "볼펜",
+    "쿠션", "담요", "타월", "수건",
+    "케이스", "파우치", "가방",
+    "과자", "식품", "음료",
+    "잡지", "도서", "책",
+    "카드", "트레이딩 카드",
+    "넨도로이드", "봉제", "인형",
+    "유의사항", "공지", "안내", "이벤트", "출처",
+    "문의", "게시판", "운영시간", "영업시간",
+    "로그인", "회원가입", "장바구니", "주문조회", "고객센터",
+    "copyright",
 ]
 
-DETAIL_PARAM_HINTS = {"product_no", "goodsno", "goods_no", "it_id", "item_no", "id", "no", "uid"}
-DETAIL_PATH_HINTS = [
-    "/product/",
-    "/shopdetail",
-    "/goods_view",
-    "/item/",
-    "/view",
+BAD_EXACT_NAMES = {
+    "sale price now",
+    "sale price",
+    "price now",
+    "regular",
+}
+
+BROKEN_PATTERNS = [
+    "�", "Ã", "Â", "°ç", "´ã", "¿", "½", "À", "Ã¬", "Ã¥",
+    "¼", "¹", "º", "³", "²", "¾", "Ð", "Ñ", "Õ", "Ö",
 ]
 
 
@@ -73,14 +89,57 @@ def normalize_space(text: str) -> str:
     return re.sub(r"\s+", " ", str(text or "")).strip()
 
 
-def normalize_name(name: str) -> str:
-    text = normalize_space(name).lower()
-    text = text.replace("ver.", "ver").replace("version", "ver")
-    text = re.sub(r"\b1/\d+\b", "", text)
-    text = re.sub(r"\b\d+/\d+\b", "", text)
-    text = re.sub(r"[\[\]\(\)\-_/.,:+]+", " ", text)
-    text = re.sub(r"\s+", " ", text).strip()
-    return text
+def normalize_line_breaks(text: str) -> str:
+    return (
+        str(text or "")
+        .replace("\r", "\n")
+        .replace("\u00a0", " ")
+        .replace("⠀", " ")
+        .replace("\t", " ")
+    )
+
+
+def fix_broken_korean(text: str) -> str:
+    if not text:
+        return ""
+    text = text.replace("\ufffd", " ")
+    text = text.replace("�", " ")
+    text = re.sub(r"[\x00-\x08\x0b\x0c\x0e-\x1f]", " ", text)
+    return normalize_line_breaks(text)
+
+
+def fetch_html(url: str) -> str:
+    res = requests.get(url, headers=HEADERS, timeout=20)
+    res.raise_for_status()
+
+    candidates = []
+    if res.encoding:
+        candidates.append(res.encoding)
+    if res.apparent_encoding:
+        candidates.append(res.apparent_encoding)
+    candidates.extend(["utf-8", "cp949", "euc-kr"])
+
+    tried = set()
+
+    for enc in candidates:
+        if not enc:
+            continue
+        enc_lower = enc.lower()
+        if enc_lower in tried:
+            continue
+        tried.add(enc_lower)
+
+        try:
+            text = res.content.decode(enc, errors="replace")
+            text = fix_broken_korean(text)
+            korean_chars = len(re.findall(r"[가-힣]", text))
+            broken_chars = text.count("�")
+            if korean_chars >= 10 and broken_chars < 10:
+                return text
+        except Exception:
+            continue
+
+    return fix_broken_korean(res.text)
 
 
 def init_firestore():
@@ -103,56 +162,96 @@ def init_firestore():
         return None
 
 
-def fetch_html(url: str) -> str:
-    res = requests.get(url, headers=HEADERS, timeout=20)
-    res.raise_for_status()
-    if not res.encoding or res.encoding.lower() == "iso-8859-1":
-        res.encoding = res.apparent_encoding or "utf-8"
-    return res.text
+def normalize_name(name: str) -> str:
+    text = normalize_space(name).lower()
+    text = text.replace("ver.", "ver")
+    text = text.replace("version", "ver")
+    text = re.sub(r"\b1/\d+\b", "", text)
+    text = re.sub(r"\b\d+/\d+\b", "", text)
+    text = re.sub(r"[\[\]\(\)\-_/.,:+]+", " ", text)
+    text = re.sub(r"\s+", " ", text).strip()
+    return text
 
 
 def absolute_url(href: str) -> str:
-    return urljoin(BASE_URL, href or "")
+    return urljoin("https://www.thegundambase.com", href or "")
 
 
-def looks_like_product_url(url: str) -> bool:
-    if not url:
+def looks_broken_text(text: str) -> bool:
+    if not text:
         return False
-
-    lower = url.lower()
-    if lower.startswith("javascript:") or lower.startswith("mailto:") or lower.startswith("#"):
-        return False
-
-    parsed = urlparse(lower)
-    qs = parse_qs(parsed.query)
-
-    if any(hint in lower for hint in DETAIL_PATH_HINTS):
+    lower = text.lower()
+    if any(p.lower() in lower for p in BROKEN_PATTERNS):
         return True
-
-    if any(k in qs for k in DETAIL_PARAM_HINTS):
+    if re.search(r"[¼¹º³²¾ÐÑÕÖ]", text):
         return True
-
-    if re.search(r"/product/\d+", lower):
-        return True
-
     return False
 
 
-def is_gundam_product_name(name: str) -> bool:
-    text = normalize_space(name).lower()
-    if not text:
+def cleanup_candidate_name(text: str) -> str:
+    name = normalize_space(text)
+
+    name = re.sub(r"[\d,]+\s*원.*$", "", name).strip()
+    name = re.sub(r"^No\.\d+\s*", "", name).strip()
+    name = re.sub(r"^[✔✓•●·\-\*\[\]▶▷☞]+", "", name).strip()
+    name = re.sub(r"\[\d+\]\s*$", "", name).strip()
+
+    name = re.sub(r"\(.*?(한정|제한|별매|안내|예약).*?\)", "", name)
+    name = re.sub(r"\[.*?(한정|제한|별매|안내|예약).*?\]", "", name)
+
+    name = re.sub(r"\s{2,}", " ", name).strip()
+    return normalize_space(name)
+
+
+def is_probable_product_href(href: str) -> bool:
+    if not href:
         return False
 
-    if len(text) < 2 or len(text) > 120:
+    lower = href.lower().strip()
+
+    if lower.startswith("javascript:") or lower.startswith("mailto:") or lower.startswith("#"):
         return False
 
-    if any(b in text for b in BLOCKED_HINTS):
+    blocked_bits = [
+        "/board/",
+        "/bbs/",
+        "/search",
+        "/member/",
+        "/mypage/",
+        "/cart",
+        "/login",
+        "/join",
+    ]
+    if any(bit in lower for bit in blocked_bits):
         return False
 
-    if any(a in text for a in ALLOWED_HINTS):
+    if lower in ["https://www.thegundambase.com/", "https://www.thegundambase.com"]:
+        return False
+
+    parsed = urlparse(lower)
+    query = parse_qs(parsed.query)
+    detail_keys = {"it_id", "goodsno", "goods_no", "product_no", "item_no", "id", "no", "idx"}
+
+    if any(k in query for k in detail_keys):
         return True
 
-    if re.search(r"\b(mg|rg|hg|pg|sd|eg|bb|mgsd)\b", text):
+    detail_path_bits = [
+        "/shop/item.php",
+        "/shop/item.view.php",
+        "/shop/goods_view.php",
+        "/goods/view",
+        "/product/view",
+        "/item/view",
+        "/shop/detail",
+        "/product/",
+        "/item/",
+        "/productdetail",
+    ]
+    if any(bit in lower for bit in detail_path_bits):
+        return True
+
+    # 완화: thegundambase 내부 링크면 일단 후보 허용
+    if "thegundambase.com" in lower:
         return True
 
     return False
@@ -161,142 +260,236 @@ def is_gundam_product_name(name: str) -> bool:
 def detect_stock_text(text: str) -> str:
     t = normalize_space(text).lower()
 
-    if "품절" in t or "sold out" in t or "out of stock" in t:
+    if any(k in t for k in ["품절", "일시품절", "sold out", "out of stock", "재고없음", "재고 없음"]):
         return "품절"
-    if "예약" in t or "입고예정" in t or "입고 예정" in t:
+
+    if any(k in t for k in ["예약", "예약중", "예약 판매", "입고예정", "입고 예정", "pre-order", "preorder"]):
         return "예약/입고예정"
-    if "판매중" in t or "구매" in t or "장바구니" in t or "buy" in t:
+
+    if any(k in t for k in ["판매중", "장바구니", "구매", "구매하기", "바로구매", "buy now", "add to cart"]):
         return "판매중"
-    return "판매중"
+
+    return "상태 확인 필요"
 
 
 def extract_price(text: str) -> str:
     m = re.search(r"([\d,]+)\s*원", text)
-    if m:
-        return f"{m.group(1)}원"
-
-    m = re.search(r"([\d,]+)", text)
-    if m:
-        return f"{m.group(1)}원"
-
-    return ""
+    return f"{m.group(1)}원" if m else ""
 
 
-def pick_best_name(block) -> str:
+def is_gundam_product_name(name: str) -> bool:
+    text = cleanup_candidate_name(name).lower()
+    if not text:
+        return False
+
+    if text in BAD_EXACT_NAMES:
+        return False
+
+    if len(text) < 3 or len(text) > 120:
+        return False
+
+    if looks_broken_text(text):
+        return False
+
+    if any(b in text for b in BLOCKED_KEYWORDS):
+        return False
+
+    if "프라모델" in text:
+        return False
+
+    if any(k in text for k in ALLOWED_KEYWORDS):
+        return True
+
+    if re.search(r"\b(mgsd|mgex|pg|mg|rg|hg|sd|bb|eg)\b", text):
+        return True
+
+    return False
+
+
+def find_parent_card(a):
+    return a.find_parent(["li", "div", "dd", "dl", "section", "article"])
+
+
+def pick_best_name_from_anchor(a) -> str:
+    candidates = []
+
     selectors = [
         ".item_name", ".prd_name", ".goods_name", ".product_name",
         ".name", ".tit", ".title", "strong", "b", "h3", "h4", "dt",
     ]
 
-    for sel in selectors:
-        node = block.select_one(sel)
-        if node:
+    for selector in selectors:
+        for node in a.select(selector):
             text = normalize_space(node.get_text(" ", strip=True))
-            if is_gundam_product_name(text):
-                return text
+            if text:
+                candidates.append(text)
 
-    all_text = normalize_space(block.get_text(" ", strip=True))
-    if is_gundam_product_name(all_text):
-        return all_text[:120]
+    direct_text = normalize_space(a.get_text(" ", strip=True))
+    if direct_text:
+        candidates.append(direct_text)
+
+    parent = find_parent_card(a)
+    if parent:
+        for selector in selectors:
+            node = parent.select_one(selector)
+            if node:
+                text = normalize_space(node.get_text(" ", strip=True))
+                if text:
+                    candidates.append(text)
+
+        parent_text = normalize_space(parent.get_text(" ", strip=True))
+        if parent_text:
+            candidates.append(parent_text)
+
+    for text in candidates:
+        cleaned = cleanup_candidate_name(text)
+        if not cleaned:
+            continue
+        if is_gundam_product_name(cleaned):
+            return cleaned
+
+    for text in candidates:
+        cleaned = cleanup_candidate_name(text)
+        if len(cleaned) >= 3 and not looks_broken_text(cleaned):
+            return cleaned
 
     return ""
 
 
-def pick_best_link(block) -> str:
-    candidates = []
+def pick_stock_text_from_anchor(a) -> str:
+    texts = []
 
-    for a in block.select("a[href]"):
-        href = absolute_url(a.get("href", ""))
-        if not href:
-            continue
+    direct = normalize_space(a.get_text(" ", strip=True))
+    if direct:
+        texts.append(direct)
 
-        score = 0
-        if looks_like_product_url(href):
-            score += 100
-        if a.select_one("img"):
-            score += 10
+    parent = find_parent_card(a)
+    if parent:
+        parent_text = normalize_space(parent.get_text(" ", strip=True))
+        if parent_text:
+            texts.append(parent_text)
 
-        txt = normalize_space(a.get_text(" ", strip=True)).lower()
-        for kw in ["view", "detail", "보기", "상품", "구매"]:
-            if kw in txt:
-                score += 5
-
-        candidates.append((score, href))
-
-    if not candidates:
-        return ""
-
-    candidates.sort(key=lambda x: x[0], reverse=True)
-    return candidates[0][1]
+    return detect_stock_text(" ".join(texts))
 
 
-def pick_price(block) -> str:
-    selectors = [".price", ".cost", ".amount", ".money", ".won", "dd"]
-    for sel in selectors:
-        node = block.select_one(sel)
-        if node:
-            price = extract_price(node.get_text(" ", strip=True))
-            if price:
-                return price
+def pick_price_from_anchor(a) -> str:
+    texts = []
 
-    return extract_price(block.get_text(" ", strip=True))
+    direct = normalize_space(a.get_text(" ", strip=True))
+    if direct:
+        texts.append(direct)
+
+    parent = find_parent_card(a)
+    if parent:
+        price_selectors = [".price", ".cost", ".amount", ".money", ".won", "strong", "dd"]
+        for selector in price_selectors:
+            for node in parent.select(selector):
+                text = normalize_space(node.get_text(" ", strip=True))
+                if text:
+                    texts.append(text)
+
+        parent_text = normalize_space(parent.get_text(" ", strip=True))
+        if parent_text:
+            texts.append(parent_text)
+
+    return extract_price(" ".join(texts))
 
 
-def pick_stock_text(block) -> str:
-    return detect_stock_text(block.get_text(" ", strip=True))
-
-
-def extract_products_from_listing(url: str):
-    html = fetch_html(url)
+def candidate_blocks_from_html(html: str):
     soup = BeautifulSoup(html, "html.parser")
-
-    selectors = [
-        ".prdList li",
-        ".product_list li",
-        ".goods_list li",
-        ".item_list li",
-        ".itemList li",
-        ".productList li",
-        ".goodsList li",
-        ".goods_box",
-        ".item_box",
-        ".product_box",
-        "li:has(a[href])",
-        "div:has(a[href])",
-    ]
-
-    cards = []
-    for sel in selectors:
-        found = soup.select(sel)
-        if len(found) >= 3:
-            cards = found
-            break
-
-    if not cards:
-        cards = soup.select("a[href]")
-
-    items = []
+    blocks = []
     seen = set()
 
-    for card in cards:
-        name = pick_best_name(card)
+    anchor_count = 0
+    href_pass_count = 0
+    name_pass_count = 0
+
+    for a in soup.find_all("a", href=True):
+        anchor_count += 1
+
+        href = absolute_url(a.get("href", ""))
+        raw_text = normalize_space(a.get_text(" ", strip=True))
+
+        if not is_probable_product_href(href):
+            continue
+        href_pass_count += 1
+
+        name = pick_best_name_from_anchor(a)
         if not name:
             continue
-
-        href = pick_best_link(card)
-        if not href:
-            continue
-
-        if not looks_like_product_url(href):
-            continue
-
-        stock_text = pick_stock_text(card)
-        price = pick_price(card)
+        name_pass_count += 1
 
         key = f"{href}|{normalize_name(name)}"
         if key in seen:
             continue
         seen.add(key)
+
+        blocks.append({
+            "url": href,
+            "text": name,
+            "stockText": pick_stock_text_from_anchor(a),
+            "price": pick_price_from_anchor(a),
+        })
+
+        if len(blocks) <= 20:
+            print(f"[DEBUG] 후보 링크: {href} / 이름: {name} / 원문: {raw_text}")
+
+    print(f"[DEBUG] 전체 a[href] 수: {anchor_count}")
+    print(f"[DEBUG] href 통과 수: {href_pass_count}")
+    print(f"[DEBUG] 이름 통과 수: {name_pass_count}")
+    print(f"[DEBUG] blocks 수: {len(blocks)}")
+
+    return blocks
+
+
+def extract_products_from_listing(url: str):
+    html = fetch_html(url)
+    blocks = candidate_blocks_from_html(html)
+
+    items = []
+    seen = set()
+
+    for block in blocks:
+        name = cleanup_candidate_name(block["text"])
+        href = block["url"]
+        price = block.get("price", "")
+        stock_text = block.get("stockText", "")
+
+        lower_href = href.lower().strip()
+
+        if href.strip() == url.strip():
+            continue
+
+        if not href:
+            continue
+
+        if lower_href.endswith("/search") or "/search" in lower_href:
+            continue
+
+        if len(name) < 3:
+            continue
+
+        if name.lower() in BAD_EXACT_NAMES:
+            continue
+
+        if looks_broken_text(name):
+            continue
+
+        if any(b in name.lower() for b in BLOCKED_KEYWORDS):
+            continue
+
+        if not is_gundam_product_name(name):
+            continue
+
+        if not stock_text:
+            stock_text = "상태 확인 필요"
+
+        key = f"{href}|{normalize_name(name)}"
+        if key in seen:
+            continue
+        seen.add(key)
+
+        print(f"[DEBUG] 최종 후보: {name} -> {href} / 상태: {stock_text} / 가격: {price}")
 
         items.append({
             "name": name,
@@ -307,6 +500,7 @@ def extract_products_from_listing(url: str):
             "sourcePage": url,
         })
 
+    print(f"[DEBUG] 최종 items 개수: {len(items)}")
     return items
 
 
@@ -446,11 +640,15 @@ def main():
     all_items = []
     for url in LIST_URLS:
         try:
+            print(f"[시작] 목록 요청: {url}")
             items = extract_products_from_listing(url)
             print(f"[목록] {url}")
             print(f"  후보 개수: {len(items)}")
-            for item in items[:5]:
-                print(f"   - {item['name']} / {item['stockText']} / {item['price']} / {item['url']}")
+            for item in items[:10]:
+                print(
+                    f"   - {item['name']} / {item['stockText']} / "
+                    f"{item['price']} / {item['url']}"
+                )
             all_items.extend(items)
         except Exception as e:
             print(f"[실패] {url} -> {e}")
@@ -465,6 +663,8 @@ def main():
         dedup.append(item)
 
     dedup = dedup[:MAX_ITEMS]
+
+    print(f"[DEBUG] 최종 저장 대상 수: {len(dedup)}")
 
     save_items_json(dedup)
 
