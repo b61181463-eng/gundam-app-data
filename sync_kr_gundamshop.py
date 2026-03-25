@@ -509,7 +509,7 @@ def detect_stock_text(text: str) -> str:
     if any(k in t for k in selling_keywords):
         return "판매중"
 
-    return "상태 확인 필요"
+    return ""
 
 def extract_price(text: str) -> str:
     m = re.search(r"([\d,]+)\s*원", text)
