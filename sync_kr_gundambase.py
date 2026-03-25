@@ -733,7 +733,7 @@ def extract_products_from_listing(url: str):
             continue
 
         if not stock_text or stock_text == "상태 확인 필요":
-            stock_text = verify_detail_stock(href, HEADERS)
+            stock_text = verify_detail_stock(href)
 
         items.append({
             "name": name,
