@@ -7,6 +7,10 @@ from bs4 import BeautifulSoup
 import firebase_admin
 from firebase_admin import credentials, firestore
 from firebase_admin.firestore import ArrayUnion
+from pathlib import Path
+import json
+
+OUTPUT_JSON_PATH = Path("data/gundambase_items.json")
 
 SERVICE_ACCOUNT_PATH = "serviceAccountKey.json"
 
@@ -186,6 +190,37 @@ DETAIL_PATH_HINTS = [
     "/shop/detail",
 ]
 
+def save_items_json(items, output_path=OUTPUT_JSON_PATH):
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+
+    payload = []
+    for item in items:
+        item_id = sha1(item["url"] + "|" + item["name"])
+        payload.append({
+            "itemId": item_id,
+            "name": item["name"],
+            "title": item["title"],
+            "canonicalName": normalize_name(item["name"]),
+            "price": item["price"],
+            "stockText": item["stockText"],
+            "status": item["stockText"],
+            "source": "gundambase",
+            "sourceType": "product",
+            "site": "건담베이스",
+            "mallName": "건담베이스",
+            "country": "KR",
+            "region": "KR",
+            "productUrl": item["url"],
+            "url": item["url"],
+            "sourcePage": item["sourcePage"],
+            "verificationSources": ["gundambase"],
+        })
+
+    output_path.write_text(
+        json.dumps(payload, ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
+    print(f"[저장] JSON 저장 완료: {output_path} / {len(payload)}개")
 
 def sha1(text: str) -> str:
     return hashlib.sha1(text.encode("utf-8")).hexdigest()
@@ -753,6 +788,7 @@ def save_item(db, item):
 
 def main():
     db = init_firestore()
+    save_items_json(dedup)
 
     all_items = []
     for url in LIST_URLS:
