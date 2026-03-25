@@ -20,6 +20,38 @@ def is_allowed_domain(url: str, allowed_domains: list[str]) -> bool:
 
     return any(host == d or host.endswith("." + d) for d in allowed_domains)
 
+
+def verify_detail_stock(product_url: str) -> str:
+    try:
+        html = fetch_html(product_url)
+        text = normalize_space(
+            BeautifulSoup(html, "html.parser").get_text(" ", strip=True)
+        ).lower()
+
+        soldout_keywords = [
+            "품절", "일시품절", "sold out", "out of stock", "재고없음", "재고 없음"
+        ]
+        reserve_keywords = [
+            "예약", "예약중", "예약 판매", "입고예정", "입고 예정", "pre-order", "preorder"
+        ]
+        selling_keywords = [
+            "판매중", "구매", "구매하기", "장바구니", "바로구매", "buy now", "add to cart"
+        ]
+
+        if any(k in text for k in soldout_keywords):
+            return "품절"
+
+        if any(k in text for k in reserve_keywords):
+            return "예약/입고예정"
+
+        if any(k in text for k in selling_keywords):
+            return "판매중"
+
+        # 상세 페이지가 열리는데 품절 문구가 없으면 일단 판매중 처리
+        return "판매중"
+    except Exception:
+        return "판매중"
+
 SERVICE_ACCOUNT_PATH = "serviceAccountKey.json"
 
 LIST_URLS = [
