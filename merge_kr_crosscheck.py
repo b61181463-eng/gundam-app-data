@@ -176,9 +176,12 @@ def build_source_list(item: Dict[str, Any]) -> List[str]:
     return cleaned
 
 
-def make_group_key(item: Dict[str, Any]) -> str:
-    canonical_name = normalize_name(item.get("canonicalName") or item.get("name") or item.get("title") or "")
-    return canonical_name
+def make_group_key(item):
+    canonical_name = normalize_name(
+        item.get("canonicalName") or item.get("name") or item.get("title") or ""
+    )
+    mall_name = normalize_space(item.get("mallName") or item.get("site") or "")
+    return f"{canonical_name}|{mall_name}"
 
 
 def choose_better_item(a: Dict[str, Any], b: Dict[str, Any]) -> Dict[str, Any]:
