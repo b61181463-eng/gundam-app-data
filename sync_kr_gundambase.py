@@ -729,12 +729,12 @@ def extract_products_from_listing(url: str):
 
         print(f"후보: {name} -> {href}")
 
-        if not is_allowed_domain(href, ["thegundambase.com", "www.thegundambase.com"]):
-            continue
-
         if not stock_text or stock_text == "상태 확인 필요":
             stock_text = verify_detail_stock(href)
 
+        if not is_allowed_domain(href, ["thegundambase.com", "www.thegundambase.com"]):
+            continue
+        
         items.append({
             "name": name,
             "title": name,
