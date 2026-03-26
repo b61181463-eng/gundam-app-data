@@ -3,6 +3,7 @@ import json
 import firebase_admin
 from firebase_admin import credentials, firestore
 from pathlib import Path
+from collections import defaultdict
 
 def init_firestore():
     if not firebase_admin._apps:
