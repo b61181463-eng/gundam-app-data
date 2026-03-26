@@ -1,31 +1,17 @@
 import hashlib
+import json
 import re
 from collections import defaultdict
+from pathlib import Path
 from urllib.parse import urlparse
 
-import firebase_admin
-from firebase_admin import credentials, firestore
+INPUT_JSON_FILES = [
+    "data/gundamshop_items.json",
+    "data/gundambase_items.json",
+    "data/bnkrmall_items.json",
+]
 
-SERVICE_ACCOUNT_PATH = "serviceAccountKey.json"
-
-SOURCE_COLLECTION = "aggregated_items"
-TARGET_COLLECTION = "aggregated_items_merged"
-
-
-def init_firestore():
-    if not firebase_admin._apps:
-        cred = credentials.Certificate(SERVICE_ACCOUNT_PATH)
-        firebase_admin.initialize_app(cred)
-    return firestore.client()
-
-
-def sha1(text: str) -> str:
-    return hashlib.sha1(text.encode("utf-8")).hexdigest()
-
-
-def normalize_space(text: str) -> str:
-    return re.sub(r"\s+", " ", str(text or "")).strip()
-
+OUTPUT_JSON_PATH = Path("data/aggregated_item_kr.json")
 
 BAD_EXACT_NAMES = {
     "26.95 regular",
@@ -108,7 +94,49 @@ ALLOWED_HOSTS = {
     "www.bnkrmall.co.kr",
     "ruliweb.com",
     "www.ruliweb.com",
+    "bandai.co.kr",
+    "www.bandai.co.kr",
+    "bandaimall.co.kr",
+    "www.bandaimall.co.kr",
 }
+
+
+def sha1(text: str) -> str:
+    return hashlib.sha1(text.encode("utf-8")).hexdigest()
+
+
+def normalize_space(text: str) -> str:
+    return re.sub(r"\s+", " ", str(text or "")).strip()
+
+
+def normalize_name(name: str) -> str:
+    text = normalize_space(name).lower()
+    text = text.replace("ver.", "ver")
+    text = text.replace("version", "ver")
+    text = re.sub(r"\b1/\d+\b", "", text)
+    text = re.sub(r"\b\d+/\d+\b", "", text)
+    text = re.sub(r"[\[\]\(\)\-_/.,:+]+", " ", text)
+    text = re.sub(r"\s+", " ", text).strip()
+    return text
+
+
+def load_json_file(path: str) -> list[dict]:
+    p = Path(path)
+    if not p.exists():
+        print(f"[경고] 입력 JSON 없음: {path}")
+        return []
+
+    try:
+        with open(p, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        if isinstance(data, list):
+            print(f"[로드] {path} / {len(data)}개")
+            return data
+        print(f"[경고] 리스트 형식 아님: {path}")
+        return []
+    except Exception as e:
+        print(f"[경고] JSON 읽기 실패: {path} -> {e}")
+        return []
 
 
 def should_block_name(name: str, data: dict) -> bool:
@@ -163,27 +191,11 @@ def should_block_name(name: str, data: dict) -> bool:
     return False
 
 
-def normalize_name(name: str) -> str:
-    text = normalize_space(name).lower()
-    text = text.replace("ver.", "ver")
-    text = text.replace("version", "ver")
-    text = re.sub(r"\b1/\d+\b", "", text)
-    text = re.sub(r"\b\d+/\d+\b", "", text)
-    text = re.sub(r"[\[\]\(\)\-_/.,:+]+", " ", text)
-    text = re.sub(r"\s+", " ", text).strip()
-    return text
-
-
 def choose_best_link(data: dict) -> str:
-    candidates = [
-        data.get("productUrl"),
-        data.get("url"),
-        data.get("link"),
-    ]
-    for value in candidates:
-        text = normalize_space(value)
-        if text:
-            return text
+    for key in ["productUrl", "url", "link"]:
+        value = normalize_space(data.get(key))
+        if value:
+            return value
     return ""
 
 
@@ -266,7 +278,6 @@ def is_notice_group(group: list[dict]) -> bool:
 def choose_status(group: list[dict]) -> str:
     priority = ["판매중", "품절", "예약/입고예정"]
 
-    # product 우선
     product_statuses = []
     for item in group:
         source_type = normalize_space(item.get("sourceType")).lower()
@@ -279,7 +290,6 @@ def choose_status(group: list[dict]) -> str:
             if status == p:
                 return status
 
-    # 전체 fallback
     statuses = []
     for item in group:
         status = normalize_space(item.get("status") or item.get("stockText"))
@@ -373,8 +383,6 @@ def build_merged_doc(group: list[dict]) -> tuple[str, dict]:
             for item in group
             if normalize_space(item.get("itemId"))
         ],
-        "updatedAt": firestore.SERVER_TIMESTAMP,
-        "lastSeenAt": firestore.SERVER_TIMESTAMP,
     }
 
     if not data["productUrl"] and notice_links:
@@ -386,16 +394,16 @@ def build_merged_doc(group: list[dict]) -> tuple[str, dict]:
 
 
 def main():
-    db = init_firestore()
+    source_items = []
+    for path in INPUT_JSON_FILES:
+        source_items.extend(load_json_file(path))
 
-    source_docs = list(db.collection(SOURCE_COLLECTION).stream())
-    print(f"원본 문서 수: {len(source_docs)}")
+    print(f"원본 항목 수: {len(source_items)}")
 
     groups = defaultdict(list)
 
-    for doc in source_docs:
+    for data in source_items:
         try:
-            data = doc.to_dict() or {}
             name = choose_best_name(data)
             canonical = normalize_name(name)
             mall = normalize_space(data.get("mallName") or data.get("site") or "")
@@ -411,32 +419,12 @@ def main():
             groups[group_key].append(data)
 
         except Exception as e:
-            print(f"문서 처리 실패: {e}")
+            print(f"항목 처리 실패: {e}")
             continue
 
     print(f"병합 그룹 수: {len(groups)}")
 
-    existing_merged = list(db.collection(TARGET_COLLECTION).stream())
-    print(f"기존 병합 문서 수: {len(existing_merged)}")
-
-    batch = db.batch()
-    op_count = 0
-
-    for doc in existing_merged:
-        batch.delete(doc.reference)
-        op_count += 1
-
-        if op_count >= 400:
-            batch.commit()
-            batch = db.batch()
-            op_count = 0
-
-    if op_count > 0:
-        batch.commit()
-        batch = db.batch()
-        op_count = 0
-
-    saved_count = 0
+    results = []
     blocked_count = 0
 
     for _, group in groups.items():
@@ -452,10 +440,7 @@ def main():
             blocked_count += 1
             continue
 
-        ref = db.collection(TARGET_COLLECTION).document(merged_id)
-        batch.set(ref, merged_data)
-        op_count += 1
-        saved_count += 1
+        results.append(merged_data)
 
         print(
             f"병합 저장: {merged_data['name']} / "
@@ -464,15 +449,12 @@ def main():
             f"{merged_data['productUrl']}"
         )
 
-        if op_count >= 400:
-            batch.commit()
-            batch = db.batch()
-            op_count = 0
+    OUTPUT_JSON_PATH.parent.mkdir(parents=True, exist_ok=True)
+    with open(OUTPUT_JSON_PATH, "w", encoding="utf-8") as f:
+        json.dump(results, f, ensure_ascii=False, indent=2)
 
-    if op_count > 0:
-        batch.commit()
-
-    print(f"[완료] 병합 완료 / 총 저장 {saved_count}개 / 차단 {blocked_count}개")
+    print(f"[완료] 병합 완료 / 총 저장 {len(results)}개 / 차단 {blocked_count}개")
+    print(f"[저장] JSON 저장 완료: {OUTPUT_JSON_PATH}")
 
 
 if __name__ == "__main__":
