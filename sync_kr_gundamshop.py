@@ -824,14 +824,15 @@ def extract_products_from_listing(url: str):
 
         print(f"후보: {name} -> {href} / 상태: {stock_text}")
 
-        if not is_allowed_domain(href, ["gundamshop.co.kr", "www.gundamshop.co.kr"]):
-            continue
-
+        
         if len(name) < 3:
             continue
 
         if not stock_text or stock_text == "상태 확인 필요":
             stock_text = verify_detail_stock(href, HEADERS)
+
+        if not is_allowed_domain(href, ["gundamshop.co.kr", "www.gundamshop.co.kr"]):
+            continue
 
         items.append({
             "name": name,
