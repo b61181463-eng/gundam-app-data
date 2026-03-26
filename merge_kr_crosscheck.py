@@ -1,14 +1,313 @@
 import hashlib
-import json
 import re
-from pathlib import Path
-from typing import Any, Dict, List, Optional
+from collections import defaultdict
 from urllib.parse import urlparse
 
-def is_allowed_final_url(item: dict) -> bool:
-    url = (item.get("productUrl") or item.get("url") or "").strip()
-    mall = (item.get("mallName") or item.get("site") or "").lower()
+import firebase_admin
+from firebase_admin import credentials, firestore
 
+SERVICE_ACCOUNT_PATH = "serviceAccountKey.json"
+
+SOURCE_COLLECTION = "aggregated_items"
+TARGET_COLLECTION = "aggregated_items_merged"
+
+
+def init_firestore():
+    if not firebase_admin._apps:
+        cred = credentials.Certificate(SERVICE_ACCOUNT_PATH)
+        firebase_admin.initialize_app(cred)
+    return firestore.client()
+
+
+def sha1(text: str) -> str:
+    return hashlib.sha1(text.encode("utf-8")).hexdigest()
+
+
+def normalize_space(text: str) -> str:
+    return re.sub(r"\s+", " ", str(text or "")).strip()
+
+
+BAD_EXACT_NAMES = {
+    "26.95 regular",
+    "16.95 sale price now",
+    "sale price now",
+    "sale price",
+    "regular",
+    "건담샵에서 예약중인 예약상품 - 건담샵",
+    "건담샵에서 예약중인 예약상품",
+    "[hg]1/144 ¼¼¹óºñ gnhw/b",
+}
+
+BAD_SUBSTRINGS = [
+    "sale price",
+    "price now",
+    "regular",
+    "zagtoon",
+    "method",
+    "samg",
+    "toei animation",
+    "level-5",
+    "hisago amazake-no",
+    "예약중인",
+    "예약상품",
+    "건담샵에서 예약중인",
+    "ⓒ",
+    "©",
+    "원피스",
+    "포켓몬",
+    "짱구",
+    "명탐정 코난",
+    "코난",
+    "드래곤볼",
+    "나루토",
+    "귀멸",
+    "에반게리온",
+    "디지몬",
+    "유희왕",
+    "산리오",
+    "마블",
+    "디즈니",
+    "토이스토리",
+    "토토로",
+    "세일러문",
+    "프리큐어",
+    "소닉",
+    "도라에몽",
+    "스파이더맨",
+    "배트맨",
+    "슈퍼맨",
+    "가면라이더",
+    "울트라맨",
+    "업계",
+    "작가",
+    "부활절",
+    "¼",
+    "¹",
+    "º",
+    "³",
+    "²",
+    "¾",
+]
+
+ALLOWED_HINTS = [
+    "건담", "자쿠", "유니콘", "프리덤", "스트라이크", "에어리얼",
+    "즈고크", "사자비", "뉴건담", "시난주", "엑시아",
+    "바르바토스", "캘리번", "루브리스", "데스티니",
+    "저스티스", "아스트레이", "더블오", "톨기스",
+    "윙건담", "짐", "건캐논", "건탱크",
+    "mgsd", "mgex", "pg", "mg", "rg", "hg", "sd", "bb", "eg",
+    "bb전사", "삼국창걸전", "30ms", "30mm",
+]
+
+ALLOWED_HOSTS = {
+    "gundamshop.co.kr",
+    "www.gundamshop.co.kr",
+    "thegundambase.com",
+    "www.thegundambase.com",
+    "bnkrmall.co.kr",
+    "www.bnkrmall.co.kr",
+    "ruliweb.com",
+    "www.ruliweb.com",
+}
+
+
+def should_block_name(name: str, data: dict) -> bool:
+    text = normalize_space(name).lower()
+
+    source = normalize_space(data.get("source")).lower()
+    site = normalize_space(data.get("site")).lower()
+    mall = normalize_space(data.get("mallName")).lower()
+
+    if not text:
+        return True
+
+    if text in BAD_EXACT_NAMES:
+        return True
+
+    if "ⓒ" in text or "©" in text:
+        return True
+
+    if any(bad in text for bad in BAD_SUBSTRINGS):
+        return True
+
+    if re.search(r"[¼¹º³²¾ÐÑÕÖ]", text):
+        return True
+
+    if re.fullmatch(r"[\d.,]+\s*(regular|sale price now|sale price|price now)", text):
+        return True
+
+    if re.search(r"[\d.,]+\s*(regular|sale price|price now)", text):
+        return True
+
+    if re.fullmatch(r"[a-z0-9\s.,/\-]+", text):
+        if not any(ok in text for ok in ["gundam", "hg", "mg", "rg", "pg", "sd", "mgsd", "mgex"]):
+            return True
+
+    if len(text) < 4:
+        return True
+
+    if not any(hint.lower() in text for hint in ALLOWED_HINTS):
+        if (
+            source in {"gundamshop", "bnkrmall", "gundambase_notice", "gundambase"}
+            or "건담샵" in site
+            or "반다이" in site
+            or "건담베이스" in site
+            or "루리웹" in site
+            or "건담샵" in mall
+            or "반다이" in mall
+            or "건담베이스" in mall
+            or "루리웹" in mall
+        ):
+            return True
+
+    return False
+
+
+def normalize_name(name: str) -> str:
+    text = normalize_space(name).lower()
+    text = text.replace("ver.", "ver")
+    text = text.replace("version", "ver")
+    text = re.sub(r"\b1/\d+\b", "", text)
+    text = re.sub(r"\b\d+/\d+\b", "", text)
+    text = re.sub(r"[\[\]\(\)\-_/.,:+]+", " ", text)
+    text = re.sub(r"\s+", " ", text).strip()
+    return text
+
+
+def choose_best_link(data: dict) -> str:
+    candidates = [
+        data.get("productUrl"),
+        data.get("url"),
+        data.get("link"),
+    ]
+    for value in candidates:
+        text = normalize_space(value)
+        if text:
+            return text
+    return ""
+
+
+def choose_best_name(data: dict) -> str:
+    for key in ["name", "title", "canonicalName"]:
+        value = normalize_space(data.get(key))
+        if value:
+            return value
+    return ""
+
+
+def choose_best_price(group: list[dict]) -> str:
+    for item in group:
+        price = normalize_space(item.get("price"))
+        if price:
+            return price
+    return ""
+
+
+def choose_best_image(group: list[dict]) -> str:
+    for item in group:
+        image = normalize_space(item.get("imageUrl"))
+        if image:
+            return image
+    return ""
+
+
+def choose_best_notice_date(group: list[dict]) -> str:
+    for item in group:
+        date = normalize_space(item.get("noticeDate"))
+        if date:
+            return date
+    return ""
+
+
+def choose_best_source_item(group: list[dict]) -> dict:
+    for item in group:
+        source_type = normalize_space(item.get("sourceType")).lower()
+        link = choose_best_link(item)
+        if source_type == "product" and link:
+            return item
+
+    for item in group:
+        link = choose_best_link(item)
+        if link:
+            return item
+
+    return group[0]
+
+
+def collect_verification_sources(group: list[dict]) -> list[str]:
+    result = []
+    seen = set()
+
+    for item in group:
+        raw = item.get("verificationSources")
+        if isinstance(raw, list):
+            for source in raw:
+                text = normalize_space(source)
+                if text and text not in seen:
+                    seen.add(text)
+                    result.append(text)
+
+        source = normalize_space(item.get("source"))
+        if source and source not in seen:
+            seen.add(source)
+            result.append(source)
+
+    return result
+
+
+def is_notice_group(group: list[dict]) -> bool:
+    for item in group:
+        source_type = normalize_space(item.get("sourceType")).lower()
+        if source_type == "notice_item":
+            return True
+    return False
+
+
+def choose_status(group: list[dict]) -> str:
+    priority = ["판매중", "품절", "예약/입고예정"]
+
+    # product 우선
+    product_statuses = []
+    for item in group:
+        source_type = normalize_space(item.get("sourceType")).lower()
+        status = normalize_space(item.get("status") or item.get("stockText"))
+        if source_type == "product" and status:
+            product_statuses.append(status)
+
+    for p in priority:
+        for status in product_statuses:
+            if status == p:
+                return status
+
+    # 전체 fallback
+    statuses = []
+    for item in group:
+        status = normalize_space(item.get("status") or item.get("stockText"))
+        if status:
+            statuses.append(status)
+
+    for p in priority:
+        for status in statuses:
+            if status == p:
+                return status
+
+    return "상태 확인 필요"
+
+
+def choose_source_type(group: list[dict]) -> str:
+    if is_notice_group(group):
+        has_product = any(
+            normalize_space(item.get("sourceType")).lower() == "product"
+            for item in group
+        )
+        if has_product:
+            return "product"
+        return "notice_item"
+    return "product"
+
+
+def is_allowed_final_url(item: dict) -> bool:
+    url = normalize_space(item.get("productUrl") or item.get("url") or item.get("link"))
     if not url:
         return False
 
@@ -17,357 +316,163 @@ def is_allowed_final_url(item: dict) -> bool:
     except Exception:
         return False
 
-    # mall/source 기준으로 허용 도메인 강제
-    if "건담샵" in mall or "gundamshop" in mall:
-        return host == "gundamshop.co.kr" or host.endswith(".gundamshop.co.kr")
-
-    if "건담베이스" in mall or "gundambase" in mall:
-        return host == "thegundambase.com" or host.endswith(".thegundambase.com")
-
-    if "비엔케이알몰" in mall or "bnkrmall" in mall:
-        return host == "bnkrmall.co.kr" or host.endswith(".bnkrmall.co.kr")
-
-    # 알 수 없는 mall은 일단 막기
-    return False
-    
-try:
-    import firebase_admin
-    from firebase_admin import credentials, firestore
-except Exception:
-    firebase_admin = None
-    credentials = None
-    firestore = None
-
-
-SERVICE_ACCOUNT_PATH = "serviceAccountKey.json"
-
-INPUT_JSON_FILES = [
-    "data/gundambase_items.json",
-    "data/gundamshop_items.json",
-    "data/bnkrmall_items.json",
-]
-
-OUTPUT_JSON_PATH = "data/aggregated_item_kr.json"
-TARGET_COLLECTION = "aggregated_items"
-
-
-def sha1(text: str) -> str:
-    return hashlib.sha1(text.encode("utf-8")).hexdigest()
-
-
-def normalize_space(text: str) -> str:
-    text = str(text or "").replace("\xa0", " ")
-    return re.sub(r"\s+", " ", text).strip()
-
-
-def normalize_name(name: str) -> str:
-    text = normalize_space(name).lower()
-
-    text = text.replace("ver.", "ver")
-    text = text.replace("version", "ver")
-
-    # 스케일 표기 제거
-    text = re.sub(r"\b1/\d+\b", "", text)
-    text = re.sub(r"\b\d+/\d+\b", "", text)
-
-    # 특수문자 정리
-    text = re.sub(r"[\[\]\(\)\-_/.,:+]+", " ", text)
-    text = re.sub(r"\s+", " ", text).strip()
-    return text
-
-
-def normalize_price(price: Any) -> str:
-    text = normalize_space(str(price or ""))
-    if not text:
-        return ""
-
-    m = re.search(r"([\d,]+)\s*원", text)
-    if m:
-        return f"{m.group(1)}원"
-
-    m = re.search(r"([\d,]+)", text)
-    if m:
-        return f"{m.group(1)}원"
-
-    return text
-
-
-def normalize_status(status: Any) -> str:
-    text = normalize_space(str(status or ""))
-
-    if not text:
-        return "확인필요"
-
-    lower = text.lower()
-
-    if "품절" in text or "sold out" in lower or "out of stock" in lower:
-        return "품절"
-
-    if "예약" in text or "입고예정" in text or "입고 예정" in text:
-        return "예약/입고예정"
-
-    if "판매중" in text or "구매" in text or "장바구니" in text or "buy" in lower:
-        return "판매중"
-
-    return text
-
-
-def load_json_file(path: str) -> List[Dict[str, Any]]:
-    p = Path(path)
-    if not p.exists():
-        print(f"[경고] 입력 JSON 없음: {path}")
-        return []
-
-    try:
-        data = json.loads(p.read_text(encoding="utf-8"))
-        if isinstance(data, list):
-            print(f"[로드] {path} / {len(data)}개")
-            return data
-        print(f"[경고] 리스트 형식 아님: {path}")
-        return []
-    except Exception as e:
-        print(f"[경고] JSON 읽기 실패: {path} -> {e}")
-        return []
-
-
-def init_firestore():
-    if firebase_admin is None or credentials is None or firestore is None:
-        print("[경고] firebase_admin 미설치 - Firestore 저장 생략")
-        return None
-
-    try:
-        key_path = Path(SERVICE_ACCOUNT_PATH)
-
-        if not key_path.exists():
-            print(f"[경고] {SERVICE_ACCOUNT_PATH} 없음 - Firestore 저장 생략")
-            return None
-
-        if not firebase_admin._apps:
-            cred = credentials.Certificate(str(key_path))
-            firebase_admin.initialize_app(cred)
-
-        return firestore.client()
-    except Exception as e:
-        print(f"[경고] Firestore 초기화 건너뜀: {e}")
-        return None
-
-
-def build_source_list(item: Dict[str, Any]) -> List[str]:
-    sources = item.get("verificationSources") or item.get("sources") or []
-
-    if isinstance(sources, str):
-        sources = [sources]
-
-    if not sources:
-        one = normalize_space(item.get("source", ""))
-        if one:
-            sources = [one]
-
-    cleaned = []
-    seen = set()
-    for s in sources:
-        s = normalize_space(s)
-        if not s:
-            continue
-        if s in seen:
-            continue
-        seen.add(s)
-        cleaned.append(s)
-    return cleaned
-
-
-def make_group_key(item):
-    canonical_name = normalize_name(
-        item.get("canonicalName") or item.get("name") or item.get("title") or ""
-    )
-    mall_name = normalize_space(item.get("mallName") or item.get("site") or "")
-    return f"{canonical_name}|{mall_name}"
-
-
-def choose_better_item(a: Dict[str, Any], b: Dict[str, Any]) -> Dict[str, Any]:
-    """
-    같은 상품군 안에서 대표 레코드 선택.
-    우선순위:
-    1) 판매중
-    2) 가격 정보 있음
-    3) 이름 길이 적당히 긴 것
-    """
-    def score(x: Dict[str, Any]) -> int:
-        s = 0
-        status = normalize_status(x.get("status") or x.get("stockText"))
-        price = normalize_price(x.get("price"))
-        name = normalize_space(x.get("name") or x.get("title"))
-
-        if status == "판매중":
-            s += 100
-        elif status == "예약/입고예정":
-            s += 60
-        elif status == "품절":
-            s += 30
-
-        if price:
-            s += 20
-
-        s += min(len(name), 40)
-        return s
-
-    return a if score(a) >= score(b) else b
-
-
-def merge_items(items: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-    grouped: Dict[str, Dict[str, Any]] = {}
-
-    for raw in items:
-        name = normalize_space(raw.get("name") or raw.get("title"))
-        if not name:
-            continue
-
-        key = make_group_key(raw)
-        if not key:
-            continue
-
-        current = {
-            "name": name,
-            "title": normalize_space(raw.get("title") or name),
-            "canonicalName": normalize_name(raw.get("canonicalName") or name),
-            "price": normalize_price(raw.get("price")),
-            "stockText": normalize_status(raw.get("stockText") or raw.get("status")),
-            "status": normalize_status(raw.get("status") or raw.get("stockText")),
-            "source": normalize_space(raw.get("source") or ""),
-            "sourceType": normalize_space(raw.get("sourceType") or "product"),
-            "site": normalize_space(raw.get("site") or raw.get("mallName") or ""),
-            "mallName": normalize_space(raw.get("mallName") or raw.get("site") or ""),
-            "country": normalize_space(raw.get("country") or "KR"),
-            "region": normalize_space(raw.get("region") or "KR"),
-            "productUrl": normalize_space(raw.get("productUrl") or raw.get("url")),
-            "url": normalize_space(raw.get("url") or raw.get("productUrl")),
-            "sourcePage": normalize_space(raw.get("sourcePage") or ""),
-            "verificationSources": build_source_list(raw),
-        }
-
-        if key not in grouped:
-            grouped[key] = current
-            continue
-
-        prev = grouped[key]
-        best = choose_better_item(prev, current)
-
-        merged_sources = []
-        seen_sources = set()
-        for s in prev.get("verificationSources", []) + current.get("verificationSources", []):
-            s = normalize_space(s)
-            if not s or s in seen_sources:
-                continue
-            seen_sources.add(s)
-            merged_sources.append(s)
-
-        best["verificationSources"] = merged_sources
-
-        # 비어있던 필드는 채우기
-        for field in [
-            "price",
-            "productUrl",
-            "url",
-            "sourcePage",
-            "site",
-            "mallName",
-            "source",
-            "title",
-        ]:
-            if not normalize_space(best.get(field)):
-                alt = prev.get(field) or current.get(field) or ""
-                best[field] = normalize_space(alt)
-
-        grouped[key] = best
-
-    merged_list = []
-    for canonical_name, item in grouped.items():
-        sources = item.get("verificationSources", [])
-        verification_count = len(sources)
-        verification_status = "cross_checked" if verification_count >= 2 else "single_source"
-
-        item_id_base = (item.get("url") or item.get("name") or canonical_name)
-        item_id = sha1(item_id_base + "|" + canonical_name)
-
-        merged_item = {
-            "itemId": item_id,
-            "name": item.get("name", ""),
-            "title": item.get("title", ""),
-            "canonicalName": canonical_name,
-            "price": item.get("price", ""),
-            "stockText": item.get("stockText", ""),
-            "status": item.get("status", ""),
-            "source": item.get("source", ""),
-            "sourceType": item.get("sourceType", "product"),
-            "site": item.get("site", ""),
-            "mallName": item.get("mallName", ""),
-            "country": item.get("country", "KR"),
-            "region": item.get("region", "KR"),
-            "productUrl": item.get("productUrl", ""),
-            "url": item.get("url", ""),
-            "sourcePage": item.get("sourcePage", ""),
-            "verificationSources": sources,
-            "verificationCount": verification_count,
-            "verificationStatus": verification_status,
-        }
-        merged_list.append(merged_item)
-
-    merged_list.sort(key=lambda x: (x.get("name", ""), x.get("mallName", "")))
-    return merged_list
-
-
-def save_merged_json(items: List[Dict[str, Any]], output_path: str = OUTPUT_JSON_PATH):
-    output = Path(output_path)
-    output.parent.mkdir(parents=True, exist_ok=True)
-    output.write_text(
-        json.dumps(items, ensure_ascii=False, indent=2),
-        encoding="utf-8",
-    )
-    print(f"[저장] 병합 JSON 저장 완료: {output_path} / {len(items)}개")
-
-
-def save_to_firestore(db, items: List[Dict[str, Any]]) -> int:
-    if db is None or firestore is None:
-        print("[경고] Firestore 저장 생략")
-        return 0
-
-    saved = 0
-    for item in items:
-        try:
-            doc_id = item["itemId"]
-            payload = dict(item)
-            payload["updatedAt"] = firestore.SERVER_TIMESTAMP
-            db.collection(TARGET_COLLECTION).document(doc_id).set(payload, merge=True)
-            saved += 1
-        except Exception as e:
-            print(f"[경고] Firestore 저장 실패: {item.get('name', '')} -> {e}")
-
-    print(f"[저장] Firestore 저장 완료 / {saved}개")
-    return saved
+    return host in ALLOWED_HOSTS
+
+
+def build_merged_doc(group: list[dict]) -> tuple[str, dict]:
+    best = choose_best_source_item(group)
+
+    name = choose_best_name(best)
+    canonical = normalize_name(name)
+    best_link = choose_best_link(best)
+    status = choose_status(group)
+    verification_sources = collect_verification_sources(group)
+    source_type = choose_source_type(group)
+
+    mall_name = normalize_space(best.get("mallName")) or normalize_space(best.get("site")) or "알 수 없음"
+    site = normalize_space(best.get("site")) or mall_name
+
+    merged_id_base = f"{canonical}|{mall_name}" or name or best_link or sha1(str(group))
+    merged_id = sha1(merged_id_base)
+
+    notice_links = []
+    for item in group:
+        if normalize_space(item.get("sourceType")).lower() == "notice_item":
+            link = choose_best_link(item)
+            if link and link not in notice_links:
+                notice_links.append(link)
+
+    data = {
+        "itemId": merged_id,
+        "name": name,
+        "title": normalize_space(best.get("title")) or name,
+        "canonicalName": canonical,
+        "price": choose_best_price(group),
+        "stockText": status,
+        "status": status,
+        "source": normalize_space(best.get("source")),
+        "sourceType": source_type,
+        "site": site,
+        "mallName": mall_name,
+        "country": normalize_space(best.get("country")) or "KR",
+        "region": normalize_space(best.get("region")) or "KR",
+        "productUrl": best_link,
+        "url": best_link,
+        "link": best_link,
+        "imageUrl": choose_best_image(group),
+        "noticeDate": choose_best_notice_date(group),
+        "noticeLinks": notice_links,
+        "verificationSources": verification_sources,
+        "verificationCount": len(verification_sources),
+        "verificationStatus": (
+            "cross_checked" if len(verification_sources) >= 2 else "single_source"
+        ),
+        "isNotice": is_notice_group(group),
+        "mergedFromIds": [
+            normalize_space(item.get("itemId"))
+            for item in group
+            if normalize_space(item.get("itemId"))
+        ],
+        "updatedAt": firestore.SERVER_TIMESTAMP,
+        "lastSeenAt": firestore.SERVER_TIMESTAMP,
+    }
+
+    if not data["productUrl"] and notice_links:
+        data["productUrl"] = notice_links[0]
+        data["url"] = notice_links[0]
+        data["link"] = notice_links[0]
+
+    return merged_id, data
 
 
 def main():
     db = init_firestore()
 
-    source_items: List[Dict[str, Any]] = []
+    source_docs = list(db.collection(SOURCE_COLLECTION).stream())
+    print(f"원본 문서 수: {len(source_docs)}")
 
-    for path in INPUT_JSON_FILES:
-        source_items.extend(load_json_file(path))
+    groups = defaultdict(list)
 
-    print(f"[정보] 전체 입력 개수: {len(source_items)}개")
+    for doc in source_docs:
+        try:
+            data = doc.to_dict() or {}
+            name = choose_best_name(data)
+            canonical = normalize_name(name)
+            mall = normalize_space(data.get("mallName") or data.get("site") or "")
 
-    merged_items = merge_items(source_items)
-    before_count = len(merged_items)
+            if not canonical or not mall:
+                continue
 
-    merged_items = [item for item in merged_items if is_allowed_final_url(item)]
+            if should_block_name(name, data):
+                print(f"차단됨(그룹단계): {name}")
+                continue
 
-    print(f"[정리] 외부 URL 제거: {before_count} -> {len(merged_items)}")
-    print(f"[정보] 병합 결과 개수: {len(merged_items)}개")
+            group_key = f"{canonical}|{mall}"
+            groups[group_key].append(data)
 
-    save_merged_json(merged_items, OUTPUT_JSON_PATH)
-    save_to_firestore(db, merged_items)
+        except Exception as e:
+            print(f"문서 처리 실패: {e}")
+            continue
 
-    print("[완료] KR 병합 완료")
+    print(f"병합 그룹 수: {len(groups)}")
+
+    existing_merged = list(db.collection(TARGET_COLLECTION).stream())
+    print(f"기존 병합 문서 수: {len(existing_merged)}")
+
+    batch = db.batch()
+    op_count = 0
+
+    for doc in existing_merged:
+        batch.delete(doc.reference)
+        op_count += 1
+
+        if op_count >= 400:
+            batch.commit()
+            batch = db.batch()
+            op_count = 0
+
+    if op_count > 0:
+        batch.commit()
+        batch = db.batch()
+        op_count = 0
+
+    saved_count = 0
+    blocked_count = 0
+
+    for _, group in groups.items():
+        merged_id, merged_data = build_merged_doc(group)
+
+        if should_block_name(merged_data.get("name", ""), merged_data):
+            print(f"차단됨(병합단계): {merged_data.get('name')}")
+            blocked_count += 1
+            continue
+
+        if not is_allowed_final_url(merged_data):
+            print(f"외부 URL 차단: {merged_data.get('name')} / {merged_data.get('productUrl')}")
+            blocked_count += 1
+            continue
+
+        ref = db.collection(TARGET_COLLECTION).document(merged_id)
+        batch.set(ref, merged_data)
+        op_count += 1
+        saved_count += 1
+
+        print(
+            f"병합 저장: {merged_data['name']} / "
+            f"{merged_data['mallName']} / "
+            f"{merged_data['status']} / "
+            f"{merged_data['productUrl']}"
+        )
+
+        if op_count >= 400:
+            batch.commit()
+            batch = db.batch()
+            op_count = 0
+
+    if op_count > 0:
+        batch.commit()
+
+    print(f"[완료] 병합 완료 / 총 저장 {saved_count}개 / 차단 {blocked_count}개")
 
 
 if __name__ == "__main__":
