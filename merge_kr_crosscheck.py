@@ -354,6 +354,11 @@ def main():
     print(f"[정보] 전체 입력 개수: {len(source_items)}개")
 
     merged_items = merge_items(source_items)
+    before_count = len(merged_items)
+
+    merged_items = [item for item in merged_items if is_allowed_final_url(item)]
+
+    print(f"[정리] 외부 URL 제거: {before_count} -> {len(merged_items)}")
     print(f"[정보] 병합 결과 개수: {len(merged_items)}개")
 
     save_merged_json(merged_items, OUTPUT_JSON_PATH)
