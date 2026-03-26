@@ -399,6 +399,29 @@ def is_too_generic_product_name(name: str) -> bool:
 
     return False
 
+bad_name_patterns = [
+    "go to ",
+    "scale model",
+    "reborn one hundred",
+    "hi-resolution model",
+    "full mechanics",
+]
+
+lower_name = name.lower()
+
+if any(p in lower_name for p in bad_name_patterns):
+    continue
+
+# 메뉴/카테고리형 영어 문구 차단
+if "go to" in lower_name:
+    continue
+
+if lower_name.count("scale model") >= 1:
+    continue
+
+# 영어만 길게 이어지는 메뉴 텍스트 차단
+if re.fullmatch(r"[a-z0-9\s\-/]+", lower_name) and "gundam" not in lower_name:
+    continue
 
 def is_gundam_product_name(name: str) -> bool:
     text = normalize_space(name).lower()
