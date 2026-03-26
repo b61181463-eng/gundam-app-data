@@ -1,9 +1,23 @@
-import hashlib
+import os
 import json
-import re
-from collections import defaultdict
-from pathlib import Path
-from urllib.parse import urlparse
+import firebase_admin
+from firebase_admin import credentials, firestore
+
+def init_firestore():
+    if not firebase_admin._apps:
+        firebase_json = os.environ.get("FIREBASE_SERVICE_ACCOUNT_JSON")
+
+        if firebase_json:
+            # GitHub Actions / 환경변수용
+            cred_dict = json.loads(firebase_json)
+            cred = credentials.Certificate(cred_dict)
+        else:
+            # 로컬 실행용
+            cred = credentials.Certificate("serviceAccountKey.json")
+
+        firebase_admin.initialize_app(cred)
+
+    return firestore.client()
 
 INPUT_JSON_FILES = [
     "data/gundamshop_items.json",
