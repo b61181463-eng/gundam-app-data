@@ -3,7 +3,33 @@ import json
 import re
 from pathlib import Path
 from typing import Any, Dict, List, Optional
+from urllib.parse import urlparse
 
+def is_allowed_final_url(item: dict) -> bool:
+    url = (item.get("productUrl") or item.get("url") or "").strip()
+    mall = (item.get("mallName") or item.get("site") or "").lower()
+
+    if not url:
+        return False
+
+    try:
+        host = (urlparse(url).netloc or "").lower()
+    except Exception:
+        return False
+
+    # mall/source 기준으로 허용 도메인 강제
+    if "건담샵" in mall or "gundamshop" in mall:
+        return host == "gundamshop.co.kr" or host.endswith(".gundamshop.co.kr")
+
+    if "건담베이스" in mall or "gundambase" in mall:
+        return host == "thegundambase.com" or host.endswith(".thegundambase.com")
+
+    if "비엔케이알몰" in mall or "bnkrmall" in mall:
+        return host == "bnkrmall.co.kr" or host.endswith(".bnkrmall.co.kr")
+
+    # 알 수 없는 mall은 일단 막기
+    return False
+    
 try:
     import firebase_admin
     from firebase_admin import credentials, firestore
