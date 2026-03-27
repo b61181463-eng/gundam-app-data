@@ -3,7 +3,7 @@ name: Run KR Crawlers
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 */3 * * *"
+    - cron: "*/5 * * * *"
 
 permissions:
   contents: write
