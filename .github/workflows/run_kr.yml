@@ -31,6 +31,10 @@ jobs:
           mkdir -p data
           mkdir -p logs
 
+      - name: Create Firebase key
+        run: |
+          echo '${{ secrets.FIREBASE_KEY }}' > serviceAccountKey.json
+
       - name: Run GundamBase crawler
         run: python sync_kr_gundambase.py
 
