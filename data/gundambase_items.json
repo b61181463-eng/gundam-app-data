@@ -364,6 +364,20 @@
     "productUrl": "https://www.thegundambase.com/products/eg-wing-gundam"
   },
   {
+    "itemId": "https://www.thegundambase.com/products/mg-v-dash-gundam-ver-ka|mg v dash gundam ver ka",
+    "name": "MG V-DASH GUNDAM VER KA",
+    "title": "MG V-DASH GUNDAM VER KA",
+    "canonicalName": "mg v dash gundam ver ka",
+    "price": "",
+    "stockText": "품절",
+    "status": "품절",
+    "source": "gundambase",
+    "site": "건담베이스",
+    "mallName": "건담베이스",
+    "url": "https://www.thegundambase.com/products/mg-v-dash-gundam-ver-ka",
+    "productUrl": "https://www.thegundambase.com/products/mg-v-dash-gundam-ver-ka"
+  },
+  {
     "itemId": "https://www.thegundambase.com/products/sdw-benjamin-v2-gundam|sdw benjamin v2 gundam",
     "name": "SDW BENJAMIN V2 GUNDAM",
     "title": "SDW BENJAMIN V2 GUNDAM",
@@ -376,20 +390,6 @@
     "mallName": "건담베이스",
     "url": "https://www.thegundambase.com/products/sdw-benjamin-v2-gundam",
     "productUrl": "https://www.thegundambase.com/products/sdw-benjamin-v2-gundam"
-  },
-  {
-    "itemId": "https://www.thegundambase.com/products/mg-fa-78-1-full-armor-gundam|mg fa 78 1 full armor gundam",
-    "name": "MG FA-78-1 FULL ARMOR GUNDAM",
-    "title": "MG FA-78-1 FULL ARMOR GUNDAM",
-    "canonicalName": "mg fa 78 1 full armor gundam",
-    "price": "",
-    "stockText": "품절",
-    "status": "품절",
-    "source": "gundambase",
-    "site": "건담베이스",
-    "mallName": "건담베이스",
-    "url": "https://www.thegundambase.com/products/mg-fa-78-1-full-armor-gundam",
-    "productUrl": "https://www.thegundambase.com/products/mg-fa-78-1-full-armor-gundam"
   },
   {
     "itemId": "https://www.thegundambase.com/products/white-legend-mgex-strike-freedom-twilight-coating|【🟢𝐏𝐑𝐄𝐎𝐑𝐃𝐄𝐑 may 2026】 white legend 白色传说 真暮光白 mgex strike freedom twilight coating",
@@ -621,8 +621,8 @@
     "title": "HG GUNDAM CALIBARN",
     "canonicalName": "hg gundam calibarn",
     "price": "",
-    "stockText": "판매중",
-    "status": "판매중",
+    "stockText": "품절",
+    "status": "품절",
     "source": "gundambase",
     "site": "건담베이스",
     "mallName": "건담베이스",
@@ -635,8 +635,8 @@
     "title": "【🔵𝐁𝐀𝐂𝐊𝐎𝐑𝐃𝐄𝐑 AUG-2026】 MG GUNDAM VIDAR",
     "canonicalName": "【🔵𝐁𝐀𝐂𝐊𝐎𝐑𝐃𝐄𝐑 aug 2026】 mg gundam vidar",
     "price": "",
-    "stockText": "판매중",
-    "status": "판매중",
+    "stockText": "품절",
+    "status": "품절",
     "source": "gundambase",
     "site": "건담베이스",
     "mallName": "건담베이스",
