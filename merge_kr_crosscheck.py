@@ -344,6 +344,28 @@ def is_allowed_final_url(item: dict) -> bool:
 
     return host in ALLOWED_HOSTS
 
+def is_valid_gundam_item(item):
+    text = (
+        f"{item.get('name','')} "
+        f"{item.get('title','')} "
+        f"{item.get('stockText','')}"
+    ).upper()
+
+    # ❌ 제거 대상
+    exclude = [
+        "공지", "NOTICE", "EVENT", "이벤트",
+        "쿠폰", "사은품", "증정", "배송", "안내",
+        "문의", "교환", "반품", "결제",
+    ]
+
+    for e in exclude:
+        if e in text:
+            return False
+
+    # ✅ 반드시 포함
+    include = ["PG", "MG", "RG", "HG", "SD", "MGEX", "MGSD"]
+
+    return any(i in text for i in include)
 
 def build_merged_doc(group: list[dict]) -> tuple[str, dict]:
     best = choose_best_source_item(group)
