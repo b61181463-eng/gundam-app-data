@@ -337,7 +337,7 @@ def merge_items(all_items):
 
         offers_with_price = [
             o for o in grouped[key]["offers"]
-            if o.get("price") is not None
+            if o.get("price") is not None and o.get("product_url")
         ]
 
         if offers_with_price:
@@ -364,7 +364,7 @@ def merge_items(all_items):
             grouped[key]["status_summary"] = "상태 확인중"
 
     return list(grouped.values())
-
+    
 def main():
     db = init_firestore()
 
