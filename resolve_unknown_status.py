@@ -1,4 +1,3 @@
-# resolve_unknown_status.py
 # -*- coding: utf-8 -*-
 
 import os
@@ -6,7 +5,6 @@ import re
 import json
 import time
 import requests
-from urllib.parse import urljoin
 
 HEADERS = {
     "User-Agent": (
@@ -19,8 +17,10 @@ HEADERS = {
     "Pragma": "no-cache",
 }
 
-DATA_DIR = os.path.join("assets", "data")
-INPUT_FILE = os.path.join(DATA_DIR, "stores_kr_all.json")   # 네 통합 raw 파일명에 맞게 바꿔도 됨
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DATA_DIR = os.path.join(BASE_DIR, "assets", "data")
+
+INPUT_FILE = os.path.join(DATA_DIR, "stores_kr_all.json")
 OUTPUT_FILE = os.path.join(DATA_DIR, "stores_kr_all_resolved.json")
 
 IN_STOCK_PATTERNS = [
@@ -68,8 +68,10 @@ def load_json(path):
     if not os.path.exists(path):
         print(f"[ERROR] 파일 없음: {path}")
         return []
+
     with open(path, "r", encoding="utf-8") as f:
         data = json.load(f)
+
     if isinstance(data, list):
         return data
     if isinstance(data, dict) and "items" in data:
@@ -90,7 +92,7 @@ def fetch_page_text(url):
         res = requests.get(url, headers=HEADERS, timeout=25)
         res.raise_for_status()
         html = res.text
-        # HTML 전체에서 텍스트만 거칠게 추출
+
         text = re.sub(r"<script.*?>.*?</script>", " ", html, flags=re.S | re.I)
         text = re.sub(r"<style.*?>.*?</style>", " ", text, flags=re.S | re.I)
         text = re.sub(r"<[^>]+>", " ", text)
@@ -108,20 +110,20 @@ def resolve_status(item):
     title = normalize_text(item.get("title", ""))
     price = item.get("price")
     product_url = normalize_text(item.get("product_url") or item.get("url") or "")
-    combined_seed = f"{title} {current_status}"
+    seed_text = f"{title} {current_status}"
 
-    # 1차: 기존 텍스트 안에서 다시 한번 판별
-    if has_any_pattern(combined_seed, OUT_OF_STOCK_PATTERNS):
+    if has_any_pattern(seed_text, OUT_OF_STOCK_PATTERNS):
         item["status"] = "품절"
         return item
-    if has_any_pattern(combined_seed, PREORDER_PATTERNS):
+
+    if has_any_pattern(seed_text, PREORDER_PATTERNS):
         item["status"] = "예약중"
         return item
-    if has_any_pattern(combined_seed, IN_STOCK_PATTERNS):
+
+    if has_any_pattern(seed_text, IN_STOCK_PATTERNS):
         item["status"] = "판매중"
         return item
 
-    # 2차: 상세페이지 판별
     if product_url:
         page_text = fetch_page_text(product_url)
 
@@ -137,12 +139,10 @@ def resolve_status(item):
             item["status"] = "판매중"
             return item
 
-        # 상세페이지에 장바구니/구매하기가 있으면 판매중으로 보는 보정
         if ("장바구니" in page_text) or ("구매하기" in page_text):
             item["status"] = "판매중"
             return item
 
-    # 3차: 가격 기반 최종 보정
     if price is not None:
         item["status"] = "판매중"
     else:
@@ -154,11 +154,11 @@ def main():
     items = load_json(INPUT_FILE)
     print(f"전체 상품 수: {len(items)}")
 
-    unknown_before = [x for x in items if normalize_text(x.get("status")) == "상태 확인중"]
-    print(f"상태 확인중(수정 전): {len(unknown_before)}")
+    before_unknown = [x for x in items if normalize_text(x.get("status")) == "상태 확인중"]
+    print(f"상태 확인중(수정 전): {len(before_unknown)}")
 
-    resolved = []
-    changed = 0
+    resolved_items = []
+    changed_count = 0
 
     for idx, item in enumerate(items, 1):
         old_status = normalize_text(item.get("status"))
@@ -166,19 +166,19 @@ def main():
         new_status = normalize_text(item.get("status"))
 
         if old_status != new_status:
-            changed += 1
-            print(f"[{idx}] {item.get('title','')[:80]} :: {old_status} -> {new_status}")
+            changed_count += 1
+            print(f"[{idx}] {item.get('title', '')[:80]} :: {old_status} -> {new_status}")
 
-        resolved.append(item)
-        time.sleep(0.3)  # 사이트 부담 줄이기
+        resolved_items.append(item)
+        time.sleep(0.3)
 
-    unknown_after = [x for x in resolved if normalize_text(x.get("status")) == "상태 확인중"]
+    after_unknown = [x for x in resolved_items if normalize_text(x.get("status")) == "상태 확인중"]
 
-    save_json(OUTPUT_FILE, resolved)
+    save_json(OUTPUT_FILE, resolved_items)
 
     print("")
-    print(f"상태 변경된 상품 수: {changed}")
-    print(f"상태 확인중(수정 후): {len(unknown_after)}")
+    print(f"상태 변경된 상품 수: {changed_count}")
+    print(f"상태 확인중(수정 후): {len(after_unknown)}")
     print(f"저장 완료: {OUTPUT_FILE}")
 
 if __name__ == "__main__":
