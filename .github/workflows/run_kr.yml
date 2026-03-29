@@ -44,6 +44,15 @@ jobs:
       - name: Run BNKRMALL crawler
         run: python sync_kr_bnkrmall.py
 
+      - name: Run HobbyFactory crawler
+        run: python sync_kr_hobbyfactory.py
+
+      - name: Run GundamCity crawler
+        run: python sync_kr_gundamcity.py
+
+      - name: Run Modelsale crawler
+        run: python sync_kr_modelsale.py
+
       - name: Run merge
         run: python merge_kr_crosscheck.py
 
