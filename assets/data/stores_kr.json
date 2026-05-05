@@ -1,0 +1,44 @@
+[
+  {
+    "name": "건담베이스 코리아",
+    "base_url": "https://www.gundam-base.co.kr",
+    "list_url": "https://www.gundam-base.co.kr/product/list.html?cate_no=24",
+    "type": "official",
+    "country": "KR"
+  },
+  {
+    "name": "건담샵",
+    "base_url": "https://www.gundamshop.co.kr",
+    "list_url": "https://www.gundamshop.co.kr/product/list.html?cate_no=24",
+    "type": "shop",
+    "country": "KR"
+  },
+  {
+    "name": "하비팩토리",
+    "base_url": "https://www.hobbyfactory.co.kr",
+    "list_url": "https://www.hobbyfactory.co.kr/product/list.html?cate_no=24",
+    "type": "shop",
+    "country": "KR"
+  },
+  {
+    "name": "건담몰",
+    "base_url": "https://www.gundammall.co.kr",
+    "list_url": "https://www.gundammall.co.kr/product/list.html?cate_no=24",
+    "type": "shop",
+    "country": "KR"
+  },
+  {
+    "name": "건담프라자",
+    "base_url": "https://www.gundamplaza.co.kr",
+    "list_url": "https://www.gundamplaza.co.kr/product/list.html?cate_no=24",
+    "type": "shop",
+    "country": "KR"
+  },
+  {
+    "name": "하비코리아",
+    "base_url": "https://www.hobbykorea.com",
+    "list_url": "https://www.hobbykorea.com/product/list.html?cate_no=24",
+    "type": "shop",
+    "country": "KR"
+  }
+]

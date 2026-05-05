@@ -1,0 +1,34 @@
+{
+  "sites": {
+    "gundambase": {
+      "name": "건담베이스",
+      "country": "KR",
+      "enabled": true
+    },
+    "gundamshop": {
+      "name": "건담샵",
+      "country": "KR",
+      "enabled": true
+    },
+    "bnkrmall": {
+      "name": "반케이알몰",
+      "country": "KR",
+      "enabled": true
+    },
+    "hobbyfactory": {
+      "name": "하비팩토리",
+      "country": "KR",
+      "enabled": true
+    },
+    "gundamcity": {
+      "name": "건담시티",
+      "country": "KR",
+      "enabled": true
+    },
+    "modelsale": {
+      "name": "네이버 하비 코리아",
+      "country": "KR",
+      "enabled": true
+    }
+  }
+}

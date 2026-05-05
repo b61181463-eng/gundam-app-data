@@ -1,0 +1,49 @@
+{
+  "project_info": {
+    "project_number": "714513387400",
+    "firebase_url": "https://gundam-stock-app-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "gundam-stock-app",
+    "storage_bucket": "gundam-stock-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:714513387400:android:9c372cdb5605b48d31b43d",
+        "android_client_info": {
+          "package_name": "com.example.gundam_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA1jedZ1at3Y_KdAOvPKez0Gxg78dijq-s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:714513387400:android:12e0909a7604d68931b43d",
+        "android_client_info": {
+          "package_name": "com.example.gundam_stock"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA1jedZ1at3Y_KdAOvPKez0Gxg78dijq-s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

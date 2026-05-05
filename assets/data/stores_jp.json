@@ -1,0 +1,44 @@
+[
+  {
+    "name": "프리미엄 반다이 JP",
+    "base_url": "https://p-bandai.jp",
+    "list_url": "https://p-bandai.jp/item/item-1000/",
+    "type": "official",
+    "country": "JP"
+  },
+  {
+    "name": "건담베이스 도쿄",
+    "base_url": "https://www.gundam-base.net",
+    "list_url": "https://www.gundam-base.net/products/",
+    "type": "official",
+    "country": "JP"
+  },
+  {
+    "name": "아미아미",
+    "base_url": "https://www.amiami.jp",
+    "list_url": "https://www.amiami.jp/top/search/list?s_keywords=gundam",
+    "type": "shop",
+    "country": "JP"
+  },
+  {
+    "name": "하비서치",
+    "base_url": "https://www.1999.co.jp",
+    "list_url": "https://www.1999.co.jp/search?typ1_c=109&cat=gunpla",
+    "type": "shop",
+    "country": "JP"
+  },
+  {
+    "name": "HLJ (HobbyLink Japan)",
+    "base_url": "https://www.hlj.com",
+    "list_url": "https://www.hlj.com/gundam",
+    "type": "shop",
+    "country": "JP"
+  },
+  {
+    "name": "라쿠텐 건담 검색",
+    "base_url": "https://search.rakuten.co.jp",
+    "list_url": "https://search.rakuten.co.jp/search/mall/gundam/",
+    "type": "market",
+    "country": "JP"
+  }
+]

@@ -1,0 +1,37 @@
+[
+  {
+    "name": "Gundam Base Taiwan",
+    "base_url": "https://www.gundam-base.net",
+    "list_url": "https://www.gundam-base.net/products/",
+    "type": "official",
+    "country": "TW"
+  },
+  {
+    "name": "Shopee 대만 (건담 검색)",
+    "base_url": "https://shopee.tw",
+    "list_url": "https://shopee.tw/search?keyword=gundam",
+    "type": "market",
+    "country": "TW"
+  },
+  {
+    "name": "Ruten (露天拍賣)",
+    "base_url": "https://www.ruten.com.tw",
+    "list_url": "https://www.ruten.com.tw/find/?q=gundam",
+    "type": "market",
+    "country": "TW"
+  },
+  {
+    "name": "PChome 24h 쇼핑",
+    "base_url": "https://24h.pchome.com.tw",
+    "list_url": "https://ecshweb.pchome.com.tw/search/v3.3/?q=gundam",
+    "type": "market",
+    "country": "TW"
+  },
+  {
+    "name": "HobbyLink Japan (글로벌 배송)",
+    "base_url": "https://www.hlj.com",
+    "list_url": "https://www.hlj.com/gundam",
+    "type": "shop",
+    "country": "TW"
+  }
+]

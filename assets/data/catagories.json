@@ -1,0 +1,26 @@
+[
+  {
+    "id": "all",
+    "name": "전체"
+  },
+  {
+    "id": "hg",
+    "name": "HG"
+  },
+  {
+    "id": "rg",
+    "name": "RG"
+  },
+  {
+    "id": "mg",
+    "name": "MG"
+  },
+  {
+    "id": "pg",
+    "name": "PG"
+  },
+  {
+    "id": "etc",
+    "name": "기타"
+  }
+]

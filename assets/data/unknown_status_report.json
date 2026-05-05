@@ -1,0 +1,17 @@
+{
+  "before_unknown_count": 0,
+  "after_unknown_count": 0,
+  "changed_count": 0,
+  "status_count": {
+    "판매중": 0,
+    "품절": 0,
+    "예약중": 0,
+    "입고예정": 0,
+    "상태 확인중": 0,
+    "": 6
+  },
+  "reason_count": {
+    "이미 판별됨": 6
+  },
+  "unresolved_examples": []
+}

@@ -1,0 +1,44 @@
+[
+  {
+    "name": "Premium Bandai US",
+    "base_url": "https://p-bandai.com",
+    "list_url": "https://p-bandai.com/us/search?keyword=gundam",
+    "type": "official",
+    "country": "US"
+  },
+  {
+    "name": "Gundam Planet",
+    "base_url": "https://www.gundamplanet.com",
+    "list_url": "https://www.gundamplanet.com/gundam-model-kits.html",
+    "type": "shop",
+    "country": "US"
+  },
+  {
+    "name": "USA Gundam Store",
+    "base_url": "https://www.usagundamstore.com",
+    "list_url": "https://www.usagundamstore.com/collections/gundam-model-kits",
+    "type": "shop",
+    "country": "US"
+  },
+  {
+    "name": "Newtype USA",
+    "base_url": "https://newtype.us",
+    "list_url": "https://newtype.us/c/modelkits/gundam",
+    "type": "shop",
+    "country": "US"
+  },
+  {
+    "name": "Amazon US (Gundam)",
+    "base_url": "https://www.amazon.com",
+    "list_url": "https://www.amazon.com/s?k=gundam+model+kit",
+    "type": "market",
+    "country": "US"
+  },
+  {
+    "name": "eBay (Gundam)",
+    "base_url": "https://www.ebay.com",
+    "list_url": "https://www.ebay.com/sch/i.html?_nkw=gundam",
+    "type": "market",
+    "country": "US"
+  }
+]

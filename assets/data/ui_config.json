@@ -1,0 +1,6 @@
+{
+  "show_price": true,
+  "show_stock": true,
+  "show_site": true,
+  "default_country": "KR"
+}

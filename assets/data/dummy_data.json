@@ -1,0 +1,20 @@
+[
+  {
+    "itemId": "test1",
+    "name": "MG 건담 발바토스",
+    "price": "45000원",
+    "status": "판매중",
+    "mallName": "테스트몰",
+    "resolvedUrl": "https://example.com",
+    "isRestocked": false
+  },
+  {
+    "itemId": "test2",
+    "name": "HG 건담 에어리얼",
+    "price": "18000원",
+    "status": "품절",
+    "mallName": "테스트몰",
+    "resolvedUrl": "https://example.com",
+    "isRestocked": false
+  }
+]

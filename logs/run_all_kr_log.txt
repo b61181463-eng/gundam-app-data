@@ -1,0 +1,988 @@
+====================================== 
+[2026-03-25 20:28:13.09] KR ì „ì²´ ì‘ì—… ì‹œì‘ 
+[1/4] GundamBase ì‹œì‘ 
+[¸ñ·Ï] https://www.gundamshop.co.kr/
+  ÈÄº¸ °³¼ö: 0
+[¸ñ·Ï] https://www.gundamshop.co.kr/theme/Reserve.html?cate=0001&ordr=wol_panme&sort=DESC
+  ÈÄº¸ °³¼ö: 0
+Traceback (most recent call last):
+  File "C:\Users\b6118\gundam_app\sync_kr_gundambase.py", line 776, in <module>
+    main()
+  File "C:\Users\b6118\gundam_app\sync_kr_gundambase.py", line 772, in main
+    print(f"\u2705 °Ç´ã¼¥ ¿Ï·á / ÃÑ ÀúÀå {saved}°³")
+UnicodeEncodeError: 'cp949' codec can't encode character '\u2705' in position 0: illegal multibyte sequence
+[2026-03-25 20:28:15.72] ì˜¤ë¥˜ ë°œìƒ - ì‘ì—… ì¤‘ë‹¨ 
+ 
+====================================== 
+[2026-03-25 20:28:19.07] KR ì „ì²´ ì‘ì—… ì‹œì‘ 
+[1/4] GundamBase ì‹œì‘ 
+[¸ñ·Ï] https://www.gundamshop.co.kr/
+  ÈÄº¸ °³¼ö: 0
+[¸ñ·Ï] https://www.gundamshop.co.kr/theme/Reserve.html?cate=0001&ordr=wol_panme&sort=DESC
+  ÈÄº¸ °³¼ö: 0
+Traceback (most recent call last):
+  File "C:\Users\b6118\gundam_app\sync_kr_gundambase.py", line 776, in <module>
+    main()
+  File "C:\Users\b6118\gundam_app\sync_kr_gundambase.py", line 772, in main
+    print(f"\u2705 °Ç´ã¼¥ ¿Ï·á / ÃÑ ÀúÀå {saved}°³")
+UnicodeEncodeError: 'cp949' codec can't encode character '\u2705' in position 0: illegal multibyte sequence
+[2026-03-25 20:28:21.16] ì˜¤ë¥˜ ë°œìƒ - ì‘ì—… ì¤‘ë‹¨ 
+ 
+====================================== 
+[2026-03-25 20:32:34.54] Start KR prerequisite work 
+[1/4] GundamBase Stars 
+[¸ñ·Ï] https://www.gundamshop.co.kr/
+  ÈÄº¸ °³¼ö: 0
+[¸ñ·Ï] https://www.gundamshop.co.kr/theme/Reserve.html?cate=0001&ordr=wol_panme&sort=DESC
+  ÈÄº¸ °³¼ö: 0
+Traceback (most recent call last):
+  File "C:\Users\b6118\gundam_app\sync_kr_gundambase.py", line 776, in <module>
+    main()
+  File "C:\Users\b6118\gundam_app\sync_kr_gundambase.py", line 772, in main
+    print(f"\u2705 °Ç´ã¼¥ ¿Ï·á / ÃÑ ÀúÀå {saved}°³")
+UnicodeEncodeError: 'cp949' codec can't encode character '\u2705' in position 0: illegal multibyte sequence
+[2026-03-25 20:32:37.05] An error occurred - work stoppage 
+ 
+====================================== 
+[2026-03-25 20:36:14.44] Start KR prerequisite work 
+[1/4] GundamBase Stars 
+[¸ñ·Ï] https://www.gundamshop.co.kr/
+  ÈÄº¸ °³¼ö: 0
+[¸ñ·Ï] https://www.gundamshop.co.kr/theme/Reserve.html?cate=0001&ordr=wol_panme&sort=DESC
+  ÈÄº¸ °³¼ö: 0
+Traceback (most recent call last):
+  File "C:\Users\b6118\gundam_app\sync_kr_gundambase.py", line 776, in <module>
+    main()
+  File "C:\Users\b6118\gundam_app\sync_kr_gundambase.py", line 772, in main
+    print(f"\u2705 °Ç´ã¼¥ ¿Ï·á / ÃÑ ÀúÀå {saved}°³")
+UnicodeEncodeError: 'cp949' codec can't encode character '\u2705' in position 0: illegal multibyte sequence
+[2026-03-25 20:36:17.37] An error occurred - work stoppage 
+ 
+====================================== 
+[2026-03-25 20:37:39.48] Start KR prerequisite work 
+[1/4] GundamBase Stars 
+[¸ñ·Ï] https://www.gundamshop.co.kr/
+  ÈÄº¸ °³¼ö: 0
+[¸ñ·Ï] https://www.gundamshop.co.kr/theme/Reserve.html?cate=0001&ordr=wol_panme&sort=DESC
+  ÈÄº¸ °³¼ö: 0
+Traceback (most recent call last):
+  File "C:\Users\b6118\gundam_app\sync_kr_gundambase.py", line 776, in <module>
+    main()
+  File "C:\Users\b6118\gundam_app\sync_kr_gundambase.py", line 772, in main
+    print(f"\u2705 °Ç´ã¼¥ ¿Ï·á / ÃÑ ÀúÀå {saved}°³")
+UnicodeEncodeError: 'cp949' codec can't encode character '\u2705' in position 0: illegal multibyte sequence
+[2026-03-25 20:37:41.90] An error occurred - work stoppage 
+ 
+====================================== 
+[2026-03-25 20:39:02.22] Start KR prerequisite work 
+[1/4] GundamBase Stars 
+[¸ñ·Ï] https://www.gundamshop.co.kr/
+  ÈÄº¸ °³¼ö: 0
+[¸ñ·Ï] https://www.gundamshop.co.kr/theme/Reserve.html?cate=0001&ordr=wol_panme&sort=DESC
+  ÈÄº¸ °³¼ö: 0
+Traceback (most recent call last):
+  File "C:\Users\b6118\gundam_app\sync_kr_gundambase.py", line 776, in <module>
+    main()
+  File "C:\Users\b6118\gundam_app\sync_kr_gundambase.py", line 772, in main
+    print(f"\u2705 °Ç´ã¼¥ ¿Ï·á / ÃÑ ÀúÀå {saved}°³")
+UnicodeEncodeError: 'cp949' codec can't encode character '\u2705' in position 0: illegal multibyte sequence
+[2026-03-25 20:39:04.51] An error occurred - work stoppage 
+ 
+====================================== 
+[2026-03-25 20:40:56.73] Start KR prerequisite work 
+[1/4] GundamBase Stars 
+[¸ñ·Ï] https://www.gundamshop.co.kr/
+  ÈÄº¸ °³¼ö: 0
+[¸ñ·Ï] https://www.gundamshop.co.kr/theme/Reserve.html?cate=0001&ordr=wol_panme&sort=DESC
+  ÈÄº¸ °³¼ö: 0
+[¿Ï·á] °Ç´ã¼¥ ¿Ï·á / ÃÑ ÀúÀå 0°³
+[2/4] GundamShop Stars 
+[¸ñ·Ï] https://www.gundamshop.co.kr/
+  ÈÄº¸ °³¼ö: 0
+[¸ñ·Ï] https://www.gundamshop.co.kr/theme/Reserve.html?cate=0001&ordr=wol_panme&sort=DESC
+  ÈÄº¸ °³¼ö: 0
+ÃÖÁ¾ ÀúÀå ´ë»ó ¼ö: 0
+[¿Ï·á] °Ç´ã¼¥ ¿Ï·á / ÃÑ ÀúÀå 0°³
+[3/4] BNKRMALL Stars 
+ÈÄº¸: SDCS/SDEX -> https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&brandIdx=186&soldout=Y&endGoods=Y / »óÅÂ: »óÅÂ È®ÀÎ ÇÊ¿ä
+ÈÄº¸: ±âµ¿Àü»ç °Ç´ã ¼ö¼ºÀÇ ¸¶³à -> https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&seriesIdx=658&soldout=Y&endGoods=Y / »óÅÂ: »óÅÂ È®ÀÎ ÇÊ¿ä
+ÈÄº¸: ±âµ¿Àü»ç °Ç´ã -> https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&seriesIdx=280&soldout=Y&endGoods=Y / »óÅÂ: »óÅÂ È®ÀÎ ÇÊ¿ä
+ÈÄº¸: ±âµ¿Àü»ç °Ç´ã ¿ª½ÀÀÇ »ş¾Æ -> https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&seriesIdx=281&soldout=Y&endGoods=Y / »óÅÂ: »óÅÂ È®ÀÎ ÇÊ¿ä
+ÈÄº¸: ±âµ¿Àü»ç °Ç´ã UC -> https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&seriesIdx=282&soldout=Y&endGoods=Y / »óÅÂ: »óÅÂ È®ÀÎ ÇÊ¿ä
+ÈÄº¸: ±âµ¿Àü»ç °Ç´ã SEED -> https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&seriesIdx=284&soldout=Y&endGoods=Y / »óÅÂ: »óÅÂ È®ÀÎ ÇÊ¿ä
+ÈÄº¸: ±âµ¿Àü»ç °Ç´ã OO -> https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&seriesIdx=285&soldout=Y&endGoods=Y / »óÅÂ: »óÅÂ È®ÀÎ ÇÊ¿ä
+ÈÄº¸: ±âµ¿Àü»ç °Ç´ã Ã¶Ç÷ÀÇ ¿ÀÆİ½º -> https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&seriesIdx=286&soldout=Y&endGoods=Y / »óÅÂ: »óÅÂ È®ÀÎ ÇÊ¿ä
+ÈÄº¸: »ï±¹Ã¢°ÉÀü/SD°Ç´ã ¿ùµå È÷¾î·ÎÁî -> https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&seriesIdx=288,58&soldout=Y&endGoods=Y / »óÅÂ: »óÅÂ È®ÀÎ ÇÊ¿ä
+ÈÄº¸: HG ÀÚÄí (GQ) -> https://www.bnkrmall.co.kr/goods/detail.do?gno=43264580 / »óÅÂ: »óÅÂ È®ÀÎ ÇÊ¿ä
+ÈÄº¸: ENTRY GRADE À® °Ç´ã -> https://www.bnkrmall.co.kr/goods/detail.do?gno=21075377 / »óÅÂ: »óÅÂ È®ÀÎ ÇÊ¿ä
+ÈÄº¸: Figure-rise ½Ã¸®Áî -> https://www.bnkrmall.co.kr/goods/category.do?cate=1577&page=1&cateName=%EC%95%A0%EB%8B%88%ED%94%84%EB%9D%BC&brandIdx=202,203,407,386&soldout=Y&endGoods=Y / »óÅÂ: »óÅÂ È®ÀÎ ÇÊ¿ä
+ÈÄº¸: Figure-rise LABO -> https://www.bnkrmall.co.kr/goods/category.do?cate=1577&page=1&cateName=%EC%95%A0%EB%8B%88%ED%94%84%EB%9D%BC&brandIdx=204&soldout=Y&endGoods=Y / »óÅÂ: »óÅÂ È®ÀÎ ÇÊ¿ä
+ÈÄº¸: ±âµ¿Àü»ç °Ç´ã -> https://www.bnkrmall.co.kr/goods/category.do?cate=1607&page=1&cateName=%ED%94%BC%EA%B7%9C%EC%96%B4&seriesIdx=280&soldout=Y&endGoods=Y / »óÅÂ: »óÅÂ È®ÀÎ ÇÊ¿ä
+ÈÄº¸: ³ªÀÇ È÷¾î·Î ¾ÆÄ«µ¥¹Ì¾Æ -> https://www.bnkrmall.co.kr/goods/category.do?cate=1608&page=1&cateName=%ED%94%BC%EA%B7%9C%EC%96%B4&seriesIdx=338&soldout=Y&endGoods=Y / »óÅÂ: »óÅÂ È®ÀÎ ÇÊ¿ä
+ÈÄº¸: QMSV MINI Z °Ç´ã & °Ç´ã ¸¶Å© II -> https://www.bnkrmall.co.kr/goods/detail.do?gno=29334090 / »óÅÂ: »óÅÂ È®ÀÎ ÇÊ¿ä
+ÈÄº¸: ¸ŞÅ»·Îº¸Æ®È¥ (SIDE MS) »çÀÚºñ -> https://www.bnkrmall.co.kr/../goods/detail.do?gno=81733587 / »óÅÂ: Ç°Àı
+ÈÄº¸: ¸ŞÅ»·Îº¸Æ®È¥ (SIDE MS) Åç±â½º -> https://www.bnkrmall.co.kr/../goods/detail.do?gno=53299012 / »óÅÂ: Ç°Àı
+ÈÄº¸: ¿øÁ¶ SD °Ç´ã¿ùµå ¹ö¼³ ³ªÀÌÆ® °Ç´ã -> https://www.bnkrmall.co.kr/../goods/detail.do?gno=67695874 / »óÅÂ: Ç°Àı
+ÈÄº¸: ·Îº¸Æ®È¥ (Ka signature) Å©½Ã °Ç´ã / Æä³Ú·ÎÆä Àü¿ë ÆÇ³Ú ¹Ì»çÀÏ ¿É¼Ç ÆÄÃ÷ ¼¼Æ® -> https://www.bnkrmall.co.kr/../goods/detail.do?gno=81617634 / »óÅÂ: Ç°Àı
+ÈÄº¸: ·Îº¸Æ®È¥ (Ka signature) (SIDE MS) RX-105 Å©½Ã °Ç´ã (±âµ¿Àü»ç °Ç´ã ¼¶±¤ÀÇ ÇÏ»ç¿şÀÌ Å°¸£ÄÉÀÇ ¸¶³à Ver.) -> https://www.bnkrmall.co.kr/../goods/detail.do?gno=2511269 / »óÅÂ: Ç°Àı
+ÈÄº¸: ·Îº¸Æ®È¥ (Ka signature) (SIDE MS) RX-104FF Æä³Ú·ÎÆä (±âµ¿Àü»ç °Ç´ã ¼¶±¤ÀÇ ÇÏ»ç¿şÀÌ Ver.) [Re:Coordinate] -> https://www.bnkrmall.co.kr/../goods/detail.do?gno=47310925 / »óÅÂ: Ç°Àı
+ÈÄº¸: HG °Ç´ã TR-6 [¹ÙÀáII] ¸®Áö¿Â ³ëÈ¹ »ç¾ç (A.O.Z RE-BOOT Ver.) -> https://www.bnkrmall.co.kr/../goods/detail.do?gno=71108133 / »óÅÂ: Ç°Àı
+ÈÄº¸: PG Æ®·£½º¾Ï ¶óÀÌÀú Å¬¸®¾î ÄÃ·¯ º¸µğ -> https://www.bnkrmall.co.kr/../goods/detail.do?gno=65724034 / »óÅÂ: Ç°Àı
+ÈÄº¸: HG °Ç´ã ÇÃ·çÅä³× ºí·¢ -> https://www.bnkrmall.co.kr/../goods/detail.do?gno=50843773 / »óÅÂ: Ç°Àı
+ÈÄº¸: PG UNLEASHED °Ç´ã (Å¬¸®¾î ÄÃ·¯ ¹Ùµğ) -> https://www.bnkrmall.co.kr/../goods/detail.do?gno=11941686 / »óÅÂ: Ç°Àı
+ÈÄº¸: MG ÀÚÄí II Ver.2.0 °¡¸£¸¶ ÀÚºñ Àü¿ë±â -> https://www.bnkrmall.co.kr/../goods/detail.do?gno=83029407 / »óÅÂ: Ç°Àı
+ÈÄº¸: °Ç´ãµ¥Ä® DX08 -> https://www.bnkrmall.co.kr/../goods/detail.do?gno=19296120 / »óÅÂ: Ç°Àı
+ÈÄº¸: °Ç´ãµ¥Ä® DX06 -> https://www.bnkrmall.co.kr/../goods/detail.do?gno=71273211 / »óÅÂ: Ç°Àı
+ÈÄº¸: °Ç´ãµ¥Ä® DX05 -> https://www.bnkrmall.co.kr/../goods/detail.do?gno=97433723 / »óÅÂ: Ç°Àı
+ÈÄº¸: °Ç´ãµ¥Ä® DX04 -> https://www.bnkrmall.co.kr/../goods/detail.do?gno=42820275 / »óÅÂ: Ç°Àı
+[¸ñ·Ï] https://www.bnkrmall.co.kr/premium/p_category.do
+  ÈÄº¸ °³¼ö: 31
+   - SDCS/SDEX / »óÅÂ È®ÀÎ ÇÊ¿ä /  / https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&brandIdx=186&soldout=Y&endGoods=Y / 
+   - ±âµ¿Àü»ç °Ç´ã ¼ö¼ºÀÇ ¸¶³à / »óÅÂ È®ÀÎ ÇÊ¿ä /  / https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&seriesIdx=658&soldout=Y&endGoods=Y / 
+   - ±âµ¿Àü»ç °Ç´ã / »óÅÂ È®ÀÎ ÇÊ¿ä /  / https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&seriesIdx=280&soldout=Y&endGoods=Y / 
+   - ±âµ¿Àü»ç °Ç´ã ¿ª½ÀÀÇ »ş¾Æ / »óÅÂ È®ÀÎ ÇÊ¿ä /  / https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&seriesIdx=281&soldout=Y&endGoods=Y / 
+   - ±âµ¿Àü»ç °Ç´ã UC / »óÅÂ È®ÀÎ ÇÊ¿ä /  / https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&seriesIdx=282&soldout=Y&endGoods=Y / 
+   - ±âµ¿Àü»ç °Ç´ã SEED / »óÅÂ È®ÀÎ ÇÊ¿ä /  / https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&seriesIdx=284&soldout=Y&endGoods=Y / 
+   - ±âµ¿Àü»ç °Ç´ã OO / »óÅÂ È®ÀÎ ÇÊ¿ä /  / https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&seriesIdx=285&soldout=Y&endGoods=Y / 
+   - ±âµ¿Àü»ç °Ç´ã Ã¶Ç÷ÀÇ ¿ÀÆİ½º / »óÅÂ È®ÀÎ ÇÊ¿ä /  / https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&seriesIdx=286&soldout=Y&endGoods=Y / 
+   - »ï±¹Ã¢°ÉÀü/SD°Ç´ã ¿ùµå È÷¾î·ÎÁî / »óÅÂ È®ÀÎ ÇÊ¿ä /  / https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&seriesIdx=288,58&soldout=Y&endGoods=Y / 
+   - HG ÀÚÄí (GQ) / »óÅÂ È®ÀÎ ÇÊ¿ä /  / https://www.bnkrmall.co.kr/goods/detail.do?gno=43264580 / 
+ÈÄº¸: SDCS/SDEX -> https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&brandIdx=186&soldout=Y&endGoods=Y / »óÅÂ: »óÅÂ È®ÀÎ ÇÊ¿ä
+ÈÄº¸: ±âµ¿Àü»ç °Ç´ã ¼ö¼ºÀÇ ¸¶³à -> https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&seriesIdx=658&soldout=Y&endGoods=Y / »óÅÂ: »óÅÂ È®ÀÎ ÇÊ¿ä
+ÈÄº¸: ±âµ¿Àü»ç °Ç´ã -> https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&seriesIdx=280&soldout=Y&endGoods=Y / »óÅÂ: »óÅÂ È®ÀÎ ÇÊ¿ä
+ÈÄº¸: ±âµ¿Àü»ç °Ç´ã ¿ª½ÀÀÇ »ş¾Æ -> https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&seriesIdx=281&soldout=Y&endGoods=Y / »óÅÂ: »óÅÂ È®ÀÎ ÇÊ¿ä
+ÈÄº¸: ±âµ¿Àü»ç °Ç´ã UC -> https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&seriesIdx=282&soldout=Y&endGoods=Y / »óÅÂ: »óÅÂ È®ÀÎ ÇÊ¿ä
+ÈÄº¸: ±âµ¿Àü»ç °Ç´ã SEED -> https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&seriesIdx=284&soldout=Y&endGoods=Y / »óÅÂ: »óÅÂ È®ÀÎ ÇÊ¿ä
+ÈÄº¸: ±âµ¿Àü»ç °Ç´ã OO -> https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&seriesIdx=285&soldout=Y&endGoods=Y / »óÅÂ: »óÅÂ È®ÀÎ ÇÊ¿ä
+ÈÄº¸: ±âµ¿Àü»ç °Ç´ã Ã¶Ç÷ÀÇ ¿ÀÆİ½º -> https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&seriesIdx=286&soldout=Y&endGoods=Y / »óÅÂ: »óÅÂ È®ÀÎ ÇÊ¿ä
+ÈÄº¸: »ï±¹Ã¢°ÉÀü/SD°Ç´ã ¿ùµå È÷¾î·ÎÁî -> https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&seriesIdx=288,58&soldout=Y&endGoods=Y / »óÅÂ: »óÅÂ È®ÀÎ ÇÊ¿ä
+ÈÄº¸: HG ÀÚÄí (GQ) -> https://www.bnkrmall.co.kr/goods/detail.do?gno=43264580 / »óÅÂ: »óÅÂ È®ÀÎ ÇÊ¿ä
+ÈÄº¸: ENTRY GRADE À® °Ç´ã -> https://www.bnkrmall.co.kr/goods/detail.do?gno=21075377 / »óÅÂ: »óÅÂ È®ÀÎ ÇÊ¿ä
+ÈÄº¸: Figure-rise ½Ã¸®Áî -> https://www.bnkrmall.co.kr/goods/category.do?cate=1577&page=1&cateName=%EC%95%A0%EB%8B%88%ED%94%84%EB%9D%BC&brandIdx=202,203,407,386&soldout=Y&endGoods=Y / »óÅÂ: »óÅÂ È®ÀÎ ÇÊ¿ä
+ÈÄº¸: Figure-rise LABO -> https://www.bnkrmall.co.kr/goods/category.do?cate=1577&page=1&cateName=%EC%95%A0%EB%8B%88%ED%94%84%EB%9D%BC&brandIdx=204&soldout=Y&endGoods=Y / »óÅÂ: »óÅÂ È®ÀÎ ÇÊ¿ä
+ÈÄº¸: ±âµ¿Àü»ç °Ç´ã -> https://www.bnkrmall.co.kr/goods/category.do?cate=1607&page=1&cateName=%ED%94%BC%EA%B7%9C%EC%96%B4&seriesIdx=280&soldout=Y&endGoods=Y / »óÅÂ: »óÅÂ È®ÀÎ ÇÊ¿ä
+ÈÄº¸: ³ªÀÇ È÷¾î·Î ¾ÆÄ«µ¥¹Ì¾Æ -> https://www.bnkrmall.co.kr/goods/category.do?cate=1608&page=1&cateName=%ED%94%BC%EA%B7%9C%EC%96%B4&seriesIdx=338&soldout=Y&endGoods=Y / »óÅÂ: »óÅÂ È®ÀÎ ÇÊ¿ä
+ÈÄº¸: QMSV MINI Z °Ç´ã & °Ç´ã ¸¶Å© II -> https://www.bnkrmall.co.kr/goods/detail.do?gno=29334090 / »óÅÂ: »óÅÂ È®ÀÎ ÇÊ¿ä
+ÈÄº¸: ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï 30 MINUTES MISSIONS 30MM ARMORED CORE ¥µ FIRES OF RUBICON ARQUEBUS ADD VE-40A -> https://www.bnkrmall.co.kr/../../goods/detail.do?gno=72775337 / »óÅÂ: ÆÇ¸ÅÁß
+ÈÄº¸: ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï 30MM ARMORED CORE ¥µ FIRES OF RUBICON BALAM INDUSTRIES BD-011 MELANDER -> https://www.bnkrmall.co.kr/../../goods/detail.do?gno=67213289 / »óÅÂ: ÆÇ¸ÅÁß
+ÈÄº¸: ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï 30MM ARMORED CORE ¥µ FIRES OF RUBICON RaD CC-3000 WRECKER ¹ĞÅ© Åõ½º -> https://www.bnkrmall.co.kr/../../goods/detail.do?gno=43576694 / »óÅÂ: ÆÇ¸ÅÁß
+ÈÄº¸: ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ¸¶½Å¿µ¿õÀü ¿ÍÅ¸·ç HG ·ùÁø¸¶·ç -> https://www.bnkrmall.co.kr/../../goods/detail.do?gno=22621604 / »óÅÂ: ÆÇ¸ÅÁß
+ÈÄº¸: ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï SD °Ç´ã ¿ùµå »ï±¹Ã¢°ÉÀü SD»ï±¹Ã¢°ÉÀü ¼ø¿í ½ºÆ®¶óÀÌÅ© ´À¿Í¸£ -> https://www.bnkrmall.co.kr/../../goods/detail.do?gno=14398 / »óÅÂ: ÆÇ¸ÅÁß
+ÈÄº¸: ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ¸¶½ÅÃ¢Á¶Àü ¿ÍÅ¸·ç HG ·ù¿À¸¶·ç -> https://www.bnkrmall.co.kr/../../goods/detail.do?gno=5850638 / »óÅÂ: ÆÇ¸ÅÁß
+ÈÄº¸: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã RG °Ç´ã Ver.2.0 & Àü¿ë ¹«±â ¼¼Æ® -> https://www.bnkrmall.co.kr/../../goods/detail.do?gno=71597014 / »óÅÂ: Ç°Àı
+ÈÄº¸: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿¹«ÅõÀü G °Ç´ã RG »şÀÌ´× °Ç´ã -> https://www.bnkrmall.co.kr/../../goods/detail.do?gno=39580119 / »óÅÂ: Ç°Àı
+ÈÄº¸: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã Ã¶Ç÷ÀÇ ¿ÀÆİ½º ¿ì¸£µå ÇåÆ® HG °Ç´ã ÀÚ°£ -> https://www.bnkrmall.co.kr/../../goods/detail.do?gno=16109172 / »óÅÂ: Ç°Àı
+ÈÄº¸: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã GQuuuuuuX HG »ş¾Æ Àü¿ë ÀÚÄí (GQ) -> https://www.bnkrmall.co.kr/../../goods/detail.do?gno=97652416 / »óÅÂ: Ç°Àı
+ÈÄº¸: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã GQuuuuuuX HG ÀÚÄí (GQ) -> https://www.bnkrmall.co.kr/../../goods/detail.do?gno=43264580 / »óÅÂ: Ç°Àı
+ÈÄº¸: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã GQuuuuuuX HG °Ö±¸±× ½º°¡ÀÌ±â (GQ) -> https://www.bnkrmall.co.kr/../../goods/detail.do?gno=14277618 / »óÅÂ: Ç°Àı
+ÈÄº¸: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã SEED FREEDOM HG ¶óÀÌÂ¡ ÇÁ¸®´ı °Ç´ã -> https://www.bnkrmall.co.kr/../../goods/detail.do?gno=45160810 / »óÅÂ: Ç°Àı
+ÈÄº¸: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã ¼ö¼ºÀÇ ¸¶³à HG °Ç´ã Ä¶¸®¹ø -> https://www.bnkrmall.co.kr/../../goods/detail.do?gno=88414752 / »óÅÂ: Ç°Àı
+ÈÄº¸: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï HG ½ºÅ¸ÅÍ ¼¼Æ® 3 -> https://www.bnkrmall.co.kr/../../goods/detail.do?gno=79054013 / »óÅÂ: Ç°Àı
+ÈÄº¸: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï HG ½ºÅ¸ÅÍ ¼¼Æ® 1 -> https://www.bnkrmall.co.kr/../../goods/detail.do?gno=13055918 / »óÅÂ: Ç°Àı
+ÈÄº¸: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã SEED DESTINY MGEX ½ºÆ®¶óÀÌÅ© ÇÁ¸®´ı °Ç´ã -> https://www.bnkrmall.co.kr/../../goods/detail.do?gno=59274 / »óÅÂ: Ç°Àı
+ÈÄº¸: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã UC MG µ¨Å¸ ÇÃ·¯½º -> https://www.bnkrmall.co.kr/../../goods/detail.do?gno=58458 / »óÅÂ: Ç°Àı
+ÈÄº¸: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿¹«ÅõÀü G °Ç´ã MG ¹ö´× °Ç´ã -> https://www.bnkrmall.co.kr/../../goods/detail.do?gno=58171 / »óÅÂ: Ç°Àı
+ÈÄº¸: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ¢£ °Ç´ã MG ÅÏ¿¡ÀÌ °Ç´ã -> https://www.bnkrmall.co.kr/../../goods/detail.do?gno=57666 / »óÅÂ: Ç°Àı
+ÈÄº¸: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã OO PG ´õºí¿À¶óÀÌÀú -> https://www.bnkrmall.co.kr/../../goods/detail.do?gno=57394 / »óÅÂ: Ç°Àı
+ÈÄº¸: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç Z °Ç´ã MG ÇÏÀÌÀè -> https://www.bnkrmall.co.kr/../../goods/detail.do?gno=56554 / »óÅÂ: Ç°Àı
+ÈÄº¸: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿½Å¼¼±â °Ç´ã X HGAW °Ç´ã ´õºí ¿¢½º -> https://www.bnkrmall.co.kr/../../goods/detail.do?gno=56271 / »óÅÂ: Ç°Àı
+ÈÄº¸: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç ZZ °Ç´ã MG ´õºí Á¦Å¸ °Ç´ã Ver.Ka -> https://www.bnkrmall.co.kr/../../goods/detail.do?gno=55933 / »óÅÂ: Ç°Àı
+ÈÄº¸: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã UC MG ¸®Á© ´ëÀå±â -> https://www.bnkrmall.co.kr/../../goods/detail.do?gno=55931 / »óÅÂ: Ç°Àı
+ÈÄº¸: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã SEED DESTINY HGCE ½ºÆ®¶óÀÌÅ© ÇÁ¸®´ı °Ç´ã -> https://www.bnkrmall.co.kr/../../goods/detail.do?gno=55911 / »óÅÂ: Ç°Àı
+ÈÄº¸: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã ¿ª½ÀÀÇ »ş¾Æ RG »çÀÚºñ -> https://www.bnkrmall.co.kr/../../goods/detail.do?gno=55352 / »óÅÂ: Ç°Àı
+ÈÄº¸: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã ½ã´õº¼Æ® MG Ç® ¾Æ¸Ó °Ç´ã Ver.Ka (°Ç´ã ½ã´õº¼Æ®) -> https://www.bnkrmall.co.kr/../../goods/detail.do?gno=55351 / »óÅÂ: Ç°Àı
+ÈÄº¸: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã MG °Ç´ã Ver. 3.0 -> https://www.bnkrmall.co.kr/../../goods/detail.do?gno=18867 / »óÅÂ: Ç°Àı
+ÈÄº¸: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã MG ÀÚÄí II Ver. 2.0 »ş¾Æ Àü¿ë±â -> https://www.bnkrmall.co.kr/../../goods/detail.do?gno=15847 / »óÅÂ: Ç°Àı
+ÈÄº¸: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã SEED RG °Ç´ã ¾î½ºÆ®·¹ÀÌ °ñµå ÇÁ·¹ÀÓ ¾Æ¸¶Ã÷ ¹Ì³ª -> https://www.bnkrmall.co.kr/../../goods/detail.do?gno=15508 / »óÅÂ: Ç°Àı
+ÈÄº¸: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã HGUC µ¼ & ¸¯µ¼ -> https://www.bnkrmall.co.kr/../../goods/detail.do?gno=15321 / »óÅÂ: Ç°Àı
+ÈÄº¸: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã MG Áî°íÅ© »ş¾Æ Àü¿ë±â -> https://www.bnkrmall.co.kr/../../goods/detail.do?gno=14930 / »óÅÂ: Ç°Àı
+ÈÄº¸: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã 0080 ÁÖ¸Ó´Ï ¼ÓÀÇ ÀüÀï HGUC °Ç´ã NT-1 ¾Ë·º½º -> https://www.bnkrmall.co.kr/../../goods/detail.do?gno=14246 / »óÅÂ: Ç°Àı
+ÈÄº¸: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã ¿ª½ÀÀÇ »ş¾Æ MG ±â¶ó µµ°¡ -> https://www.bnkrmall.co.kr/../../goods/detail.do?gno=14245 / »óÅÂ: Ç°Àı
+ÈÄº¸: ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã µ¼ÇÁ¶ó±º ÀÔÃ¼ °í¹« ¸¶½ºÄÚÆ® Å° Ã¼ÀÎ -> https://www.bnkrmall.co.kr/../../goods/detail.do?gno=54564934 / »óÅÂ: ÆÇ¸ÅÁß
+ÈÄº¸: ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã Áö¿ÀÇÁ¶ó±º ÀÔÃ¼ °í¹« ¸¶½ºÄÚÆ® Å° Ã¼ÀÎ -> https://www.bnkrmall.co.kr/../../goods/detail.do?gno=18851261 / »óÅÂ: ÆÇ¸ÅÁß
+ÈÄº¸: ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï °Ç´ã ºôµå ÆÄÀÌÅÍÁî ºôµå ½ºÆ®ÇÁ¶ó±º ÀÔÃ¼ °í¹« ¸¶½ºÄÚÆ® Å° Ã¼ÀÎ -> https://www.bnkrmall.co.kr/../../goods/detail.do?gno=68034376 / »óÅÂ: ÆÇ¸ÅÁß
+ÈÄº¸: ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã SEED ¿¡ÀÏ ½ºÆ®ÇÁ¶ó±º ÀÔÃ¼ °í¹« ¸¶½ºÄÚÆ® Å° Ã¼ÀÎ -> https://www.bnkrmall.co.kr/../../goods/detail.do?gno=92914081 / »óÅÂ: ÆÇ¸ÅÁß
+[¸ñ·Ï] https://www.bnkrmall.co.kr/plan/p_content.do?idx=862
+  ÈÄº¸ °³¼ö: 55
+   - SDCS/SDEX / »óÅÂ È®ÀÎ ÇÊ¿ä /  / https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&brandIdx=186&soldout=Y&endGoods=Y / 
+   - ±âµ¿Àü»ç °Ç´ã ¼ö¼ºÀÇ ¸¶³à / »óÅÂ È®ÀÎ ÇÊ¿ä /  / https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&seriesIdx=658&soldout=Y&endGoods=Y / 
+   - ±âµ¿Àü»ç °Ç´ã / »óÅÂ È®ÀÎ ÇÊ¿ä /  / https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&seriesIdx=280&soldout=Y&endGoods=Y / 
+   - ±âµ¿Àü»ç °Ç´ã ¿ª½ÀÀÇ »ş¾Æ / »óÅÂ È®ÀÎ ÇÊ¿ä /  / https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&seriesIdx=281&soldout=Y&endGoods=Y / 
+   - ±âµ¿Àü»ç °Ç´ã UC / »óÅÂ È®ÀÎ ÇÊ¿ä /  / https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&seriesIdx=282&soldout=Y&endGoods=Y / 
+   - ±âµ¿Àü»ç °Ç´ã SEED / »óÅÂ È®ÀÎ ÇÊ¿ä /  / https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&seriesIdx=284&soldout=Y&endGoods=Y / 
+   - ±âµ¿Àü»ç °Ç´ã OO / »óÅÂ È®ÀÎ ÇÊ¿ä /  / https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&seriesIdx=285&soldout=Y&endGoods=Y / 
+   - ±âµ¿Àü»ç °Ç´ã Ã¶Ç÷ÀÇ ¿ÀÆİ½º / »óÅÂ È®ÀÎ ÇÊ¿ä /  / https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&seriesIdx=286&soldout=Y&endGoods=Y / 
+   - »ï±¹Ã¢°ÉÀü/SD°Ç´ã ¿ùµå È÷¾î·ÎÁî / »óÅÂ È®ÀÎ ÇÊ¿ä /  / https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&seriesIdx=288,58&soldout=Y&endGoods=Y / 
+   - HG ÀÚÄí (GQ) / »óÅÂ È®ÀÎ ÇÊ¿ä /  / https://www.bnkrmall.co.kr/goods/detail.do?gno=43264580 / 
+ÃÖÁ¾ ÀúÀå ´ë»ó ¼ö: 70
+ÀÌ¹ÌÁö ÀÖ´Â ´ë»ó ¼ö: 0
+ÀúÀå: SDCS/SDEX / »óÅÂ È®ÀÎ ÇÊ¿ä / 
+ÀúÀå: ±âµ¿Àü»ç °Ç´ã ¼ö¼ºÀÇ ¸¶³à / »óÅÂ È®ÀÎ ÇÊ¿ä / 
+ÀúÀå: ±âµ¿Àü»ç °Ç´ã / »óÅÂ È®ÀÎ ÇÊ¿ä / 
+ÀúÀå: ±âµ¿Àü»ç °Ç´ã ¿ª½ÀÀÇ »ş¾Æ / »óÅÂ È®ÀÎ ÇÊ¿ä / 
+ÀúÀå: ±âµ¿Àü»ç °Ç´ã UC / »óÅÂ È®ÀÎ ÇÊ¿ä / 
+ÀúÀå: ±âµ¿Àü»ç °Ç´ã SEED / »óÅÂ È®ÀÎ ÇÊ¿ä / 
+ÀúÀå: ±âµ¿Àü»ç °Ç´ã OO / »óÅÂ È®ÀÎ ÇÊ¿ä / 
+ÀúÀå: ±âµ¿Àü»ç °Ç´ã Ã¶Ç÷ÀÇ ¿ÀÆİ½º / »óÅÂ È®ÀÎ ÇÊ¿ä / 
+ÀúÀå: »ï±¹Ã¢°ÉÀü/SD°Ç´ã ¿ùµå È÷¾î·ÎÁî / »óÅÂ È®ÀÎ ÇÊ¿ä / 
+ÀúÀå: HG ÀÚÄí (GQ) / »óÅÂ È®ÀÎ ÇÊ¿ä / 
+ÀúÀå: ENTRY GRADE À® °Ç´ã / »óÅÂ È®ÀÎ ÇÊ¿ä / 
+ÀúÀå: Figure-rise ½Ã¸®Áî / »óÅÂ È®ÀÎ ÇÊ¿ä / 
+ÀúÀå: Figure-rise LABO / »óÅÂ È®ÀÎ ÇÊ¿ä / 
+ÀúÀå: ±âµ¿Àü»ç °Ç´ã / »óÅÂ È®ÀÎ ÇÊ¿ä / 
+ÀúÀå: ³ªÀÇ È÷¾î·Î ¾ÆÄ«µ¥¹Ì¾Æ / »óÅÂ È®ÀÎ ÇÊ¿ä / 
+ÀúÀå: QMSV MINI Z °Ç´ã & °Ç´ã ¸¶Å© II / »óÅÂ È®ÀÎ ÇÊ¿ä / 
+ÀúÀå: ¸ŞÅ»·Îº¸Æ®È¥ (SIDE MS) »çÀÚºñ / Ç°Àı / 288,000¿ø
+ÀúÀå: ¸ŞÅ»·Îº¸Æ®È¥ (SIDE MS) Åç±â½º / Ç°Àı / 204,000¿ø
+ÀúÀå: ¿øÁ¶ SD °Ç´ã¿ùµå ¹ö¼³ ³ªÀÌÆ® °Ç´ã / Ç°Àı / 72,000¿ø
+ÀúÀå: ·Îº¸Æ®È¥ (Ka signature) Å©½Ã °Ç´ã / Æä³Ú·ÎÆä Àü¿ë ÆÇ³Ú ¹Ì»çÀÏ ¿É¼Ç ÆÄÃ÷ ¼¼Æ® / Ç°Àı / 42,000¿ø
+ÀúÀå: ·Îº¸Æ®È¥ (Ka signature) (SIDE MS) RX-105 Å©½Ã °Ç´ã (±âµ¿Àü»ç °Ç´ã ¼¶±¤ÀÇ ÇÏ»ç¿şÀÌ Å°¸£ÄÉÀÇ ¸¶³à Ver.) / Ç°Àı / 384,000¿ø
+ÀúÀå: ·Îº¸Æ®È¥ (Ka signature) (SIDE MS) RX-104FF Æä³Ú·ÎÆä (±âµ¿Àü»ç °Ç´ã ¼¶±¤ÀÇ ÇÏ»ç¿şÀÌ Ver.) [Re:Coordinate] / Ç°Àı / 336,000¿ø
+ÀúÀå: HG °Ç´ã TR-6 [¹ÙÀáII] ¸®Áö¿Â ³ëÈ¹ »ç¾ç (A.O.Z RE-BOOT Ver.) / Ç°Àı / 57,600¿ø
+ÀúÀå: PG Æ®·£½º¾Ï ¶óÀÌÀú Å¬¸®¾î ÄÃ·¯ º¸µğ / Ç°Àı / 45,600¿ø
+ÀúÀå: HG °Ç´ã ÇÃ·çÅä³× ºí·¢ / Ç°Àı / 28,800¿ø
+ÀúÀå: PG UNLEASHED °Ç´ã (Å¬¸®¾î ÄÃ·¯ ¹Ùµğ) / Ç°Àı / 62,400¿ø
+ÀúÀå: MG ÀÚÄí II Ver.2.0 °¡¸£¸¶ ÀÚºñ Àü¿ë±â / Ç°Àı / 50,400¿ø
+ÀúÀå: °Ç´ãµ¥Ä® DX08 / Ç°Àı / 18,000¿ø
+ÀúÀå: °Ç´ãµ¥Ä® DX06 / Ç°Àı / 18,000¿ø
+ÀúÀå: °Ç´ãµ¥Ä® DX05 / Ç°Àı / 18,000¿ø
+ÀúÀå: °Ç´ãµ¥Ä® DX04 / Ç°Àı / 18,000¿ø
+ÀúÀå: ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï 30 MINUTES MISSIONS 30MM ARMORED CORE ¥µ FIRES OF RUBICON ARQUEBUS ADD VE-40A / ÆÇ¸ÅÁß / 45,600¿ø
+ÀúÀå: ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï 30MM ARMORED CORE ¥µ FIRES OF RUBICON BALAM INDUSTRIES BD-011 MELANDER / ÆÇ¸ÅÁß / 27,600¿ø
+ÀúÀå: ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï 30MM ARMORED CORE ¥µ FIRES OF RUBICON RaD CC-3000 WRECKER ¹ĞÅ© Åõ½º / ÆÇ¸ÅÁß / 42,000¿ø
+ÀúÀå: ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ¸¶½Å¿µ¿õÀü ¿ÍÅ¸·ç HG ·ùÁø¸¶·ç / ÆÇ¸ÅÁß / 31,200¿ø
+ÀúÀå: ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï SD °Ç´ã ¿ùµå »ï±¹Ã¢°ÉÀü SD»ï±¹Ã¢°ÉÀü ¼ø¿í ½ºÆ®¶óÀÌÅ© ´À¿Í¸£ / ÆÇ¸ÅÁß / 8,400¿ø
+ÀúÀå: ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ¸¶½ÅÃ¢Á¶Àü ¿ÍÅ¸·ç HG ·ù¿À¸¶·ç / ÆÇ¸ÅÁß / 39,600¿ø
+ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã RG °Ç´ã Ver.2.0 & Àü¿ë ¹«±â ¼¼Æ® / Ç°Àı / 66,000¿ø
+ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿¹«ÅõÀü G °Ç´ã RG »şÀÌ´× °Ç´ã / Ç°Àı / 42,000¿ø
+ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã Ã¶Ç÷ÀÇ ¿ÀÆİ½º ¿ì¸£µå ÇåÆ® HG °Ç´ã ÀÚ°£ / Ç°Àı / 33,600¿ø
+ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã GQuuuuuuX HG »ş¾Æ Àü¿ë ÀÚÄí (GQ) / Ç°Àı / 26,400¿ø
+ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã GQuuuuuuX HG ÀÚÄí (GQ) / Ç°Àı / 26,400¿ø
+ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã GQuuuuuuX HG °Ö±¸±× ½º°¡ÀÌ±â (GQ) / Ç°Àı / 26,400¿ø
+ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã SEED FREEDOM HG ¶óÀÌÂ¡ ÇÁ¸®´ı °Ç´ã / Ç°Àı / 28,800¿ø
+ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã ¼ö¼ºÀÇ ¸¶³à HG °Ç´ã Ä¶¸®¹ø / Ç°Àı / 24,000¿ø
+ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï HG ½ºÅ¸ÅÍ ¼¼Æ® 3 / Ç°Àı / 44,800¿ø
+ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï HG ½ºÅ¸ÅÍ ¼¼Æ® 1 / Ç°Àı / 44,800¿ø
+ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã SEED DESTINY MGEX ½ºÆ®¶óÀÌÅ© ÇÁ¸®´ı °Ç´ã / Ç°Àı / 186,000¿ø
+ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã UC MG µ¨Å¸ ÇÃ·¯½º / Ç°Àı / 58,800¿ø
+ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿¹«ÅõÀü G °Ç´ã MG ¹ö´× °Ç´ã / Ç°Àı / 34,800¿ø
+ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ¢£ °Ç´ã MG ÅÏ¿¡ÀÌ °Ç´ã / Ç°Àı / 52,800¿ø
+ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã OO PG ´õºí¿À¶óÀÌÀú / Ç°Àı / 312,000¿ø
+ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç Z °Ç´ã MG ÇÏÀÌÀè / Ç°Àı / 40,800¿ø
+ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿½Å¼¼±â °Ç´ã X HGAW °Ç´ã ´õºí ¿¢½º / Ç°Àı / 22,800¿ø
+ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç ZZ °Ç´ã MG ´õºí Á¦Å¸ °Ç´ã Ver.Ka / Ç°Àı / 78,000¿ø
+ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã UC MG ¸®Á© ´ëÀå±â / Ç°Àı / 64,800¿ø
+ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã SEED DESTINY HGCE ½ºÆ®¶óÀÌÅ© ÇÁ¸®´ı °Ç´ã / Ç°Àı / 26,400¿ø
+ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã ¿ª½ÀÀÇ »ş¾Æ RG »çÀÚºñ / Ç°Àı / 57,600¿ø
+ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã ½ã´õº¼Æ® MG Ç® ¾Æ¸Ó °Ç´ã Ver.Ka (°Ç´ã ½ã´õº¼Æ®) / Ç°Àı / 88,800¿ø
+ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã MG °Ç´ã Ver. 3.0 / Ç°Àı / 58,800¿ø
+ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã MG ÀÚÄí II Ver. 2.0 »ş¾Æ Àü¿ë±â / Ç°Àı / 46,800¿ø
+ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã SEED RG °Ç´ã ¾î½ºÆ®·¹ÀÌ °ñµå ÇÁ·¹ÀÓ ¾Æ¸¶Ã÷ ¹Ì³ª / Ç°Àı / 42,000¿ø
+ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã HGUC µ¼ & ¸¯µ¼ / Ç°Àı / 22,800¿ø
+ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã MG Áî°íÅ© »ş¾Æ Àü¿ë±â / Ç°Àı / 43,200¿ø
+ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã 0080 ÁÖ¸Ó´Ï ¼ÓÀÇ ÀüÀï HGUC °Ç´ã NT-1 ¾Ë·º½º / Ç°Àı / 21,600¿ø
+ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã ¿ª½ÀÀÇ »ş¾Æ MG ±â¶ó µµ°¡ / Ç°Àı / 62,400¿ø
+ÀúÀå: ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã µ¼ÇÁ¶ó±º ÀÔÃ¼ °í¹« ¸¶½ºÄÚÆ® Å° Ã¼ÀÎ / ÆÇ¸ÅÁß / 10,800¿ø
+ÀúÀå: ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã Áö¿ÀÇÁ¶ó±º ÀÔÃ¼ °í¹« ¸¶½ºÄÚÆ® Å° Ã¼ÀÎ / ÆÇ¸ÅÁß / 10,800¿ø
+ÀúÀå: ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï °Ç´ã ºôµå ÆÄÀÌÅÍÁî ºôµå ½ºÆ®ÇÁ¶ó±º ÀÔÃ¼ °í¹« ¸¶½ºÄÚÆ® Å° Ã¼ÀÎ / ÆÇ¸ÅÁß / 10,800¿ø
+ÀúÀå: ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã SEED ¿¡ÀÏ ½ºÆ®ÇÁ¶ó±º ÀÔÃ¼ °í¹« ¸¶½ºÄÚÆ® Å° Ã¼ÀÎ / ÆÇ¸ÅÁß / 10,800¿ø
+[¿Ï·á] ¹İ´ÙÀÌ³²ÄÚÄÚ¸®¾Æ¸ô ¿Ï·á / ÃÑ ÀúÀå 70°³
+[4/4] Absorption Stars 
+¿øº» ¹®¼­ ¼ö: 328
+Â÷´ÜµÊ(±×·ì´Ü°è): ºÎÈ°Àı ´Ş°¿ 4°³ °¡Á®°¡·Á´Ù ±¸¿ø¹ŞÀº »ç¶÷.jpg
+Â÷´ÜµÊ(±×·ì´Ü°è): ´ÙÀÌ³ª¹Í Ä³¸¯ÅÍÁî ±âµ¿Àü»ç °Ç´ã ¿¡¹İ°Ô¸®¿Â ´ÙÀÌ³ª¹Í Ä³¸¯ÅÍÁî µå·¡°ïº¼ ¿øÇÇ½º ±Í¸êÀÇ Ä®³¯ °¡¸é¶óÀÌ´õ ¿ïÆ®¶ó¸Ç
+Â÷´ÜµÊ(±×·ì´Ü°è): ºÎÈ°Àı ´Ş°¿ 4°³ °¡Á®°¡·Á´Ù ±¸¿ø¹ŞÀº »ç¶÷.jpg
+Â÷´ÜµÊ(±×·ì´Ü°è): µå·¡°ïº¼ ±âµ¿Àü»ç °Ç´ã ¿¡¹İ°Ô¸®¿Â ´ÙÀÌ³ª¹Í Ä³¸¯ÅÍÁî µå·¡°ïº¼ ¿øÇÇ½º ±Í¸êÀÇ Ä®³¯ °¡¸é¶óÀÌ´õ ¿ïÆ®¶ó¸Ç
+Â÷´ÜµÊ(±×·ì´Ü°è): ³ª·çÅä µå·¡°ïº¼ ¿øÇÇ½º ±Í¸êÀÇ Ä®³¯ ³ª·çÅä ³ªÀÇ È÷¾î·Î ¾ÆÄ«µ¥¹Ì¾Æ °Ç´ã
+Â÷´ÜµÊ(±×·ì´Ü°è): AI µµÀÔÀ¸·Î °³ÆÇ³­ ¾÷°è.jpg
+Â÷´ÜµÊ(±×·ì´Ü°è): ¿ïÆ®¶ó¸Ç ±âµ¿Àü»ç °Ç´ã ¿¡¹İ°Ô¸®¿Â ´ÙÀÌ³ª¹Í Ä³¸¯ÅÍÁî µå·¡°ïº¼ ¿øÇÇ½º ±Í¸êÀÇ Ä®³¯ °¡¸é¶óÀÌ´õ ¿ïÆ®¶ó¸Ç
+Â÷´ÜµÊ(±×·ì´Ü°è): ¼ÖÁ÷È÷ °íÆò°¡ ¹Ş¾Æ¾ßÇÏ´Â ¿©Áß»ıÀÛ°¡.jpg
+Â÷´ÜµÊ(±×·ì´Ü°è): ¿øÇÇ½º ±âµ¿Àü»ç °Ç´ã ¿¡¹İ°Ô¸®¿Â ´ÙÀÌ³ª¹Í Ä³¸¯ÅÍÁî µå·¡°ïº¼ ¿øÇÇ½º ±Í¸êÀÇ Ä®³¯ °¡¸é¶óÀÌ´õ ¿ïÆ®¶ó¸Ç
+Â÷´ÜµÊ(±×·ì´Ü°è): ³ªÀÇ È÷¾î·Î ¾ÆÄ«µ¥¹Ì¾Æ
+Â÷´ÜµÊ(±×·ì´Ü°è): °¡¸é¶óÀÌ´õ ±âµ¿Àü»ç °Ç´ã ¿¡¹İ°Ô¸®¿Â ´ÙÀÌ³ª¹Í Ä³¸¯ÅÍÁî µå·¡°ïº¼ ¿øÇÇ½º ±Í¸êÀÇ Ä®³¯ °¡¸é¶óÀÌ´õ ¿ïÆ®¶ó¸Ç
+Â÷´ÜµÊ(±×·ì´Ü°è): ±âµ¿Àü»ç °Ç´ã ±âµ¿Àü»ç °Ç´ã ¿¡¹İ°Ô¸®¿Â ´ÙÀÌ³ª¹Í Ä³¸¯ÅÍÁî µå·¡°ïº¼ ¿øÇÇ½º ±Í¸êÀÇ Ä®³¯ °¡¸é¶óÀÌ´õ ¿ïÆ®¶ó¸Ç
+Â÷´ÜµÊ(±×·ì´Ü°è): ¿øÇÇ½º µå·¡°ïº¼ ¿øÇÇ½º ±Í¸êÀÇ Ä®³¯ ³ª·çÅä ³ªÀÇ È÷¾î·Î ¾ÆÄ«µ¥¹Ì¾Æ °Ç´ã
+Â÷´ÜµÊ(±×·ì´Ü°è): ¼ÖÁ÷È÷ °íÆò°¡ ¹Ş¾Æ¾ßÇÏ´Â ¿©Áß»ıÀÛ°¡.jpg
+Â÷´ÜµÊ(±×·ì´Ü°è): AI µµÀÔÀ¸·Î °³ÆÇ³­ ¾÷°è.jpg
+Â÷´ÜµÊ(±×·ì´Ü°è): ±Í¸êÀÇ Ä®³¯ µå·¡°ïº¼ ¿øÇÇ½º ±Í¸êÀÇ Ä®³¯ ³ª·çÅä ³ªÀÇ È÷¾î·Î ¾ÆÄ«µ¥¹Ì¾Æ °Ç´ã
+Â÷´ÜµÊ(±×·ì´Ü°è): µå·¡°ïº¼ µå·¡°ïº¼ ¿øÇÇ½º ±Í¸êÀÇ Ä®³¯ ³ª·çÅä ³ªÀÇ È÷¾î·Î ¾ÆÄ«µ¥¹Ì¾Æ °Ç´ã
+Â÷´ÜµÊ(±×·ì´Ü°è): ±Í¸êÀÇ Ä®³¯ ±âµ¿Àü»ç °Ç´ã ¿¡¹İ°Ô¸®¿Â ´ÙÀÌ³ª¹Í Ä³¸¯ÅÍÁî µå·¡°ïº¼ ¿øÇÇ½º ±Í¸êÀÇ Ä®³¯ °¡¸é¶óÀÌ´õ ¿ïÆ®¶ó¸Ç
+Â÷´ÜµÊ(±×·ì´Ü°è): Figure-rise ½Ã¸®Áî
+Â÷´ÜµÊ(±×·ì´Ü°è): Figure-rise LABO
+Â÷´ÜµÊ(±×·ì´Ü°è): ³ªÀÇ È÷¾î·Î ¾ÆÄ«µ¥¹Ì¾Æ µå·¡°ïº¼ ¿øÇÇ½º ±Í¸êÀÇ Ä®³¯ ³ª·çÅä ³ªÀÇ È÷¾î·Î ¾ÆÄ«µ¥¹Ì¾Æ °Ç´ã
+Â÷´ÜµÊ(±×·ì´Ü°è): °Ç´ã µå·¡°ïº¼ ¿øÇÇ½º ±Í¸êÀÇ Ä®³¯ ³ª·çÅä ³ªÀÇ È÷¾î·Î ¾ÆÄ«µ¥¹Ì¾Æ °Ç´ã
+Â÷´ÜµÊ(±×·ì´Ü°è): ¿¡¹İ°Ô¸®¿Â ±âµ¿Àü»ç °Ç´ã ¿¡¹İ°Ô¸®¿Â ´ÙÀÌ³ª¹Í Ä³¸¯ÅÍÁî µå·¡°ïº¼ ¿øÇÇ½º ±Í¸êÀÇ Ä®³¯ °¡¸é¶óÀÌ´õ ¿ïÆ®¶ó¸Ç
+Â÷´ÜµÊ(±×·ì´Ü°è): AI µµÀÔÀ¸·Î °³ÆÇ³­ ¾÷°è.jpg
+Â÷´ÜµÊ(±×·ì´Ü°è): ¼ÖÁ÷È÷ °íÆò°¡ ¹Ş¾Æ¾ßÇÏ´Â ¿©Áß»ıÀÛ°¡.jpg
+Â÷´ÜµÊ(±×·ì´Ü°è): AI µµÀÔÀ¸·Î °³ÆÇ³­ ¾÷°è.jpg
+Â÷´ÜµÊ(±×·ì´Ü°è): ºÎÈ°Àı ´Ş°¿ 4°³ °¡Á®°¡·Á´Ù ±¸¿ø¹ŞÀº »ç¶÷.jpg
+º´ÇÕ ±×·ì ¼ö: 211
+±âÁ¸ º´ÇÕ ¹®¼­ ¼ö: 211
+º´ÇÕ ÀúÀå: HG °Ç´ã TR-6 [¹ÙÀáII] ¸®Áö¿Â ³ëÈ¹ »ç¾ç (A.O.Z RE-BOOT Ver.) / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/premium/p_category.do
+º´ÇÕ ÀúÀå: 2025³â 12¿ù10 ÀÔ°í [MG] À® °Ç´ã Á¦·Î EW / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10385947
+º´ÇÕ ÀúÀå: 2025³â 09¿ù10~02¿ùÁß ÀÔ°í [SD»ï±¹Ã¢°ÉÀü] 01. À¯ºñ À¯´ÏÄÜ °Ç´ã(À¯ºñµ¶°¢¼ö°­Åº / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10385194
+º´ÇÕ ÀúÀå: 2026³â 03¿ù01~08¿ùÃÊ ÀÔ°í [SD»ï±¹Ã¢°ÉÀü] 24. »ç¸¶ÀÇ µ¥½ºÆ¼´Ï °Ç´ã / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10385330
+º´ÇÕ ÀúÀå: ±× ¿Ü ¿£Æ®¸® ±×·¹ÀÌµå HG RG Figure-rise ½Ã¸®Áî Figure-rise LABO Æ÷ÄÏÇÁ¶ó 30 MINUTES MISSIONS ±× ¿Ü / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/goods/category.do?cate=1577&page=1&cateName=%EC%95%A0%EB%8B%88%ED%94%84%EB%9D%BC&brandIdx=71&etc=Y&soldout=Y&endGoods=Y
+º´ÇÕ ÀúÀå: MG Á¦°£ DÇü (¼±Çà ¹èÄ¡±â) / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/premium/p_category.do
+º´ÇÕ ÀúÀå: MG] À¯´ÏÄÜ °Ç´ã[¿µ»óÆÇ] / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/
+º´ÇÕ ÀúÀå: MG ³×¸ğ (À¯´ÏÄÜ ÄÃ·¯ Ver.) / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/premium/p_category.do
+º´ÇÕ ÀúÀå: 2025³â 08¿ù10 ÀÔ°í [MG] ÇÏÀÌ´º°Ç´ã Ver.ka(¹öÄ«) / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10368251
+º´ÇÕ ÀúÀå: ±âµ¿Àü»ç °Ç´ã ¼ö¼ºÀÇ ¸¶³à / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/premium/p_category.do
+º´ÇÕ ÀúÀå: 2026³â 01¿ù10~08¿ùÃÊ ÀÔ°í [MG]XXXG-01D2 µ¥½º»çÀÌÁîÇï EWÆÇ / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10232714
+º´ÇÕ ÀúÀå: °Ç´ã¼¥Ä«Æä °Ç´ã¼¥Ä«Æä / ÆÇ¸ÅÁß / http://cafe.naver.com/gundamshopcafe
+º´ÇÕ ÀúÀå: Figure-rise ½Ã¸®Áî ¿£Æ®¸® ±×·¹ÀÌµå HG RG Figure-rise ½Ã¸®Áî Figure-rise LABO Æ÷ÄÏÇÁ¶ó 30 MINUTES MISSIONS ±× ¿Ü / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/goods/category.do?cate=1577&page=1&cateName=%EC%95%A0%EB%8B%88%ED%94%84%EB%9D%BC&brandIdx=202,203,407,386&soldout=Y&endGoods=Y
+º´ÇÕ ÀúÀå: ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï 30MM ARMORED CORE ¥µ FIRES OF RUBICON BALAM INDUSTRIES BD-011 MELANDER / ÆÇ¸ÅÁß / https://www.bnkrmall.co.kr/../../goods/detail.do?gno=67213289
+º´ÇÕ ÀúÀå: SDCS/SDEX HG RG MG PG RE/100 ¸Ş°¡»çÀÌÁî ¸ğµ¨ SDCS/SDEX SD ¿É¼Ç ÆÄÃ÷ ±× ¿Ü / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&brandIdx=186&soldout=Y&endGoods=Y
+º´ÇÕ ÀúÀå: »ï±¹Ã¢°ÉÀü/SD°Ç´ã ¿ùµå È÷¾î·ÎÁî / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/premium/p_category.do
+º´ÇÕ ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã GQuuuuuuX HG °Ö±¸±× ½º°¡ÀÌ±â (GQ) / Ç°Àı / https://www.bnkrmall.co.kr/../../goods/detail.do?gno=14277618
+º´ÇÕ ÀúÀå: PG Æ®·£½º¾Ï ¶óÀÌÀú Å¬¸®¾î ÄÃ·¯ º¸µğ / Ç°Àı / https://www.bnkrmall.co.kr/../goods/detail.do?gno=65724034
+º´ÇÕ ÀúÀå: ¹İ´ÙÀÌ] HG SRW ÈÖÄÉ¹ÙÀÎ Mk-¥² Æ®·Òº£ ¼³Á¤ / ÀÔ°í ¿¹Á¤ / https://bbs.ruliweb.com/etcs/board/300016/read/2412876
+º´ÇÕ ÀúÀå: 2025³â 11¿ù20~02¿ùÁß ÀÔ°í [SD°Ç´ã¿ùµåÈ÷¾î·ÎÁî] 21.³ªÀÌÆ® ½ºÆ®¶óÀÌÅ© °Ç´ã / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10387285
+º´ÇÕ ÀúÀå: °ø±¸/µ¥Ä®/º£ÀÌ½º °ø±¸/µ¥Ä®/º£ÀÌ½º ÇÁ¶ó¸ğµ¨ Á¦ÀÛ °ø±¸ °Ç´ãµ¥Ä® °Ç´ã¸¶Ä¿ ±× ¿Ü / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/goods/category.do?cate=1609&page=1&cateName=%EA%B8%B0%ED%83%80&endGoods=Y
+º´ÇÕ ÀúÀå: 2025³â 07¿ùÃÊ~07¿ùÁß ÀÔ°í [PG]¾ğ¸®½Ãµå RX-78-2 ÆÛ½ºÆ®°Ç´ã / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10385954
+º´ÇÕ ÀúÀå: 2025³â 09¿ù10~08¿ùÃÊ ÀÔ°í [SD°Ç´ã¿ùµåÈ÷¾î·ÎÁî] 06.»ç½ºÄÉ µ¨Å¸ °Ç´ã / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10385967
+º´ÇÕ ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã UC MG µ¨Å¸ ÇÃ·¯½º / Ç°Àı / https://www.bnkrmall.co.kr/../../goods/detail.do?gno=58458
+º´ÇÕ ÀúÀå: 2025³â 08¿ù10~08¿ùÃÊ ÀÔ°í [RG]1/144 µ¥½ºÆ¼´Ï °Ç´ã / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10350959
+º´ÇÕ ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã 0080 ÁÖ¸Ó´Ï ¼ÓÀÇ ÀüÀï HGUC °Ç´ã NT-1 ¾Ë·º½º / Ç°Àı / https://www.bnkrmall.co.kr/../../goods/detail.do?gno=14246
+º´ÇÕ ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã OO PG ´õºí¿À¶óÀÌÀú / Ç°Àı / https://www.bnkrmall.co.kr/../../goods/detail.do?gno=57394
+º´ÇÕ ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã ¿ª½ÀÀÇ »ş¾Æ RG »çÀÚºñ / Ç°Àı / https://www.bnkrmall.co.kr/../../goods/detail.do?gno=55352
+º´ÇÕ ÀúÀå: HG HG RG MG PG RE/100 ¸Ş°¡»çÀÌÁî ¸ğµ¨ SDCS/SDEX SD ¿É¼Ç ÆÄÃ÷ ±× ¿Ü / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&brandIdx=180,509,403&soldout=Y&endGoods=Y
+º´ÇÕ ÀúÀå: 30MS ÆÄ¿ö¶ó¸® ÆÈ¸®Åæ (±×¶óº£ Æû) / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/premium/p_category.do
+º´ÇÕ ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿½Å¼¼±â °Ç´ã X HGAW °Ç´ã ´õºí ¿¢½º / Ç°Àı / https://www.bnkrmall.co.kr/../../goods/detail.do?gno=56271
+º´ÇÕ ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç ZZ °Ç´ã MG ´õºí Á¦Å¸ °Ç´ã Ver.Ka / Ç°Àı / https://www.bnkrmall.co.kr/../../goods/detail.do?gno=55933
+º´ÇÕ ÀúÀå: HG ÀÚÄí (GQ) / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/goods/detail.do?gno=43264580
+º´ÇÕ ÀúÀå: 2025³â 08¿ù10 ÀÔ°í [MG]1/100 ´õºí¿À¶óÀÌÀú / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10240248
+º´ÇÕ ÀúÀå: MG]À®°Ç´ã EWÆÇ - °­·ÂÃßÃµ / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/
+º´ÇÕ ÀúÀå: 30MM EXM-A9sg ½ºÇÇ³ªÆ¼¿À (Àå±º Å¸ÀÔ) / Ç°Àı / https://www.bnkrmall.co.kr/../goods/detail.do?gno=65035933
+º´ÇÕ ÀúÀå: °Ç´ãº£ÀÌ½º ¸ÅÀå¾È³» °Ç´ãº£ÀÌ½º ¸ÅÀå¾È³» / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/etc/gundam-base_store.do
+º´ÇÕ ÀúÀå: HG ¿£Æ®¸® ±×·¹ÀÌµå HG RG Figure-rise ½Ã¸®Áî Figure-rise LABO Æ÷ÄÏÇÁ¶ó 30 MINUTES MISSIONS ±× ¿Ü / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/goods/category.do?cate=1577&page=1&cateName=%EC%95%A0%EB%8B%88%ED%94%84%EB%9D%BC&brandIdx=180&soldout=Y&endGoods=Y
+º´ÇÕ ÀúÀå: ±âµ¿Àü»ç °Ç´ã ¿ª½ÀÀÇ »ş¾Æ / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/premium/p_category.do
+º´ÇÕ ÀúÀå: ±âµ¿Àü»ç °Ç´ã SEED / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&seriesIdx=284&soldout=Y&endGoods=Y
+º´ÇÕ ÀúÀå: ±âµ¿Àü»ç °Ç´ã OO / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/plan/p_content.do?idx=862
+º´ÇÕ ÀúÀå: 2026³â 01¿ù10~08¿ùÃÊ ÀÔ°í SD EX-STANDARD ´º°Ç´ã [016] / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10385802
+º´ÇÕ ÀúÀå: 2025³â 10¿ù10~07¿ùÃÊ ÀÔ°í [MG]1/100 ¿¡ÇÇ¿Â EW / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10241669
+º´ÇÕ ÀúÀå: ¹İ´ÙÀÌ °ø½Ä °¡»şÆù ¸Ó½Å Æ®¶óÀÌ ¹İ´ÙÀÌ °ø½Ä °¡»şÆù ¸Ó½Å Æ®¶óÀÌ QMSV MINI Z °Ç´ã & °Ç´ã ¸¶Å© II / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/goods/detail.do?gno=24227408
+º´ÇÕ ÀúÀå: SD EX-STANDARD ´º°Ç´ã [016] / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/
+º´ÇÕ ÀúÀå: ¸ŞÅ»·Îº¸Æ®È¥ (SIDE MS) »çÀÚºñ / Ç°Àı / https://www.bnkrmall.co.kr/../goods/detail.do?gno=81733587
+º´ÇÕ ÀúÀå: HG °Ç´ã ÇÃ·çÅä³× ºí·¢ / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/premium/p_category.do
+º´ÇÕ ÀúÀå: 2026³â 03¿ù20 ÀÔ°í [MG]1/100 µ¥½ºÆ¼´Ï°Ç´ã / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10011199
+º´ÇÕ ÀúÀå: 2026³â 02¿ù28~07¿ùÃÊ ÀÔ°í [HGUC]1/144 »çÀÚºñ / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10011317
+º´ÇÕ ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿¹«ÅõÀü G °Ç´ã RG »şÀÌ´× °Ç´ã / Ç°Àı / https://www.bnkrmall.co.kr/../../goods/detail.do?gno=39580119
+º´ÇÕ ÀúÀå: SD HG RG MG PG RE/100 ¸Ş°¡»çÀÌÁî ¸ğµ¨ SDCS/SDEX SD ¿É¼Ç ÆÄÃ÷ ±× ¿Ü / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&brandIdx=187,413&soldout=Y&endGoods=Y
+º´ÇÕ ÀúÀå: 2025³â 08¿ù10 ÀÔ°í [MG]°Ç´ãSEED ¿¡ÀÏ½ºÆ®¶óÀÌÅ© °Ç´ã Ve / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10354104
+º´ÇÕ ÀúÀå: 2025³â 12¿ù10~02¿ùÁß ÀÔ°í [SD°Ç´ã¿ùµåÈ÷¾î·ÎÁî] 11.³ëºÎ³ª°¡ °Ç´ã ¿¡ÇÇ¿Â ´ÙÅ© ¸¶½ºÅ©Ver. / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10386631
+º´ÇÕ ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã HGUC µ¼ & ¸¯µ¼ / Ç°Àı / https://www.bnkrmall.co.kr/../../goods/detail.do?gno=15321
+º´ÇÕ ÀúÀå: ·Îº¸Æ®È¥ (Ka signature) (SIDE MS) RX-104FF Æä³Ú·ÎÆä (±âµ¿Àü»ç °Ç´ã ¼¶±¤ÀÇ ÇÏ»ç¿şÀÌ Ver.) [Re:Coordinate] / Ç°Àı / https://www.bnkrmall.co.kr/../goods/detail.do?gno=47310925
+º´ÇÕ ÀúÀå: ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã µ¼ÇÁ¶ó±º ÀÔÃ¼ °í¹« ¸¶½ºÄÚÆ® Å° Ã¼ÀÎ / ÆÇ¸ÅÁß / https://www.bnkrmall.co.kr/../../goods/detail.do?gno=54564934
+º´ÇÕ ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã ¼ö¼ºÀÇ ¸¶³à HG °Ç´ã Ä¶¸®¹ø / Ç°Àı / https://www.bnkrmall.co.kr/../../goods/detail.do?gno=88414752
+º´ÇÕ ÀúÀå: QMSV MINI Z °Ç´ã & °Ç´ã ¸¶Å© II / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/premium/p_category.do
+º´ÇÕ ÀúÀå: MG]GF13-01NH2 ¸¶½ºÅÍ °Ç´ã / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/
+º´ÇÕ ÀúÀå: ¹İ´ÙÀÌ] HG 1/100 VF-25F ¸Ş»çÀÌ¾î ¾ËÅä±â Á¶¸³ ÀÌ¹ÌÁö / ÀÔ°í ¿¹Á¤ / https://bbs.ruliweb.com/etcs/board/300016/read/2412876
+º´ÇÕ ÀúÀå: MG ³×¸ğ (À¯´ÏÄÜ µ¥ÀúÆ® ÄÃ·¯ Ver.) / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/premium/p_category.do
+º´ÇÕ ÀúÀå: 2025³â 09¿ù20~08¿ùÃÊ ÀÔ°í [PG]1/60 °Ç´ã ´õºí¿À¶óÀÌÀú / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10237606
+º´ÇÕ ÀúÀå: 2026³â 03¿ù30 ÀÔ°í SD EX-STANDARD »çÀÚºñ [017] / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10385803
+º´ÇÕ ÀúÀå: ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã Áö¿ÀÇÁ¶ó±º ÀÔÃ¼ °í¹« ¸¶½ºÄÚÆ® Å° Ã¼ÀÎ / ÆÇ¸ÅÁß / https://www.bnkrmall.co.kr/../../goods/detail.do?gno=18851261
+º´ÇÕ ÀúÀå: MG] 1/100 ³»·¯Æ¼ºê °Ç´ã CÇüÅÂ Ver.Ka / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/
+º´ÇÕ ÀúÀå: ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï °Ç´ã ºôµå ÆÄÀÌÅÍÁî ºôµå ½ºÆ®ÇÁ¶ó±º ÀÔÃ¼ °í¹« ¸¶½ºÄÚÆ® Å° Ã¼ÀÎ / ÆÇ¸ÅÁß / https://www.bnkrmall.co.kr/../../goods/detail.do?gno=68034376
+º´ÇÕ ÀúÀå: °Ç´ãº£ÀÌ½º ÄÚ¸®¾Æ °ø½ÄÄ«Æä °Ç´ãº£ÀÌ½º ÄÚ¸®¾Æ °ø½ÄÄ«Æä / »óÅÂ È®ÀÎ ÇÊ¿ä / https://cafe.naver.com/gbasekorea
+º´ÇÕ ÀúÀå: 2026³â 01¿ù10~08¿ùÃÊ ÀÔ°í [HGFC]1/144 °«°Ç´ã-°­·ÂÃßÃµ / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10221068
+º´ÇÕ ÀúÀå: °Ç´ãµ¥Ä® DX05 / Ç°Àı / https://www.bnkrmall.co.kr/../goods/detail.do?gno=97433723
+º´ÇÕ ÀúÀå: ±× ¿Ü HG RG MG PG RE/100 ¸Ş°¡»çÀÌÁî ¸ğµ¨ SDCS/SDEX SD ¿É¼Ç ÆÄÃ÷ ±× ¿Ü / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&brandIdx=71&etc=Y&soldout=Y&endGoods=Y
+º´ÇÕ ÀúÀå: HG ¸®°Ö±¸ À¯´ÏÄÜVer. / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/premium/p_category.do
+º´ÇÕ ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã SEED RG °Ç´ã ¾î½ºÆ®·¹ÀÌ °ñµå ÇÁ·¹ÀÓ ¾Æ¸¶Ã÷ ¹Ì³ª / Ç°Àı / https://www.bnkrmall.co.kr/../../goods/detail.do?gno=15508
+º´ÇÕ ÀúÀå: 2026³â 01¿ù30 ÀÔ°í HGUC Hyaku Shiki ¹é½Ä [REVIVE] / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10377276
+º´ÇÕ ÀúÀå: 2026³â 01¿ù30 ÀÔ°í SD EX-STANDARD µ¥½ºÆ¼´Ï °Ç´ã / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10380429
+º´ÇÕ ÀúÀå: ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ¸¶½Å¿µ¿õÀü ¿ÍÅ¸·ç HG ·ùÁø¸¶·ç / ÆÇ¸ÅÁß / https://www.bnkrmall.co.kr/../../goods/detail.do?gno=22621604
+º´ÇÕ ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã MG °Ç´ã Ver. 3.0 / Ç°Àı / https://www.bnkrmall.co.kr/../../goods/detail.do?gno=18867
+º´ÇÕ ÀúÀå: 2026³â 02¿ù27~08¿ùÃÊ ÀÔ°í [MG] ¼ÒµåÀÓÆŞ½º °Ç´ã / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10164494
+º´ÇÕ ÀúÀå: MG Áü II ¼¼¹Ì ½ºÆ®¶óÀÌÄ¿ / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/premium/p_category.do
+º´ÇÕ ÀúÀå: °Ç´ã¸¶Ä¿ ÇÁ¶ó¸ğµ¨ Á¦ÀÛ °ø±¸ °Ç´ãµ¥Ä® °Ç´ã¸¶Ä¿ ±× ¿Ü / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/goods/category.do?cate=1609&page=1&cateName=%EA%B8%B0%ED%83%80&brandIdx=617
+º´ÇÕ ÀúÀå: 2025³â 08¿ù10 ÀÔ°í [RG]1/144 ÀÚÅ©2 (¾ç»êÇü) / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10242871
+º´ÇÕ ÀúÀå: ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï 30 MINUTES MISSIONS 30MM ARMORED CORE ¥µ FIRES OF RUBICON ARQUEBUS ADD VE-40A / ÆÇ¸ÅÁß / https://www.bnkrmall.co.kr/../../goods/detail.do?gno=72775337
+º´ÇÕ ÀúÀå: °Ç´ã À¯´Ï¹ö½º gMS-¥á ºÓÀº °Ç´ã / ÀÔ°í ¿¹Á¤ / https://m.ruliweb.com/news/board/1002/read/2414884
+º´ÇÕ ÀúÀå: 2025³â 08¿ù10~08¿ùÃÊ ÀÔ°í [MG]1/100 »÷·Õ°Ç´ã EWÆÇ / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10239486
+º´ÇÕ ÀúÀå: °Ç´ãÀÎÆ÷ °Ç´ãÀÎÆ÷ / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/etc/gundaminfo.do
+º´ÇÕ ÀúÀå: 2026³â 04¿ù10 ÀÔ°í [MG]1/100 ÇÁ¸®´ı °Ç´ã Ver.2.0 / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10376324
+º´ÇÕ ÀúÀå: 30MM EXM-A9bk ½ºÇÇ³ªÆ¼¿À (ºí·¢ ³ªÀÌÆ® »ç¾ç) / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/premium/p_category.do
+º´ÇÕ ÀúÀå: HG ÀÚÄí (GQ) HG ÀÚÄí (GQ) ENTRY GRADE À® °Ç´ã / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/goods/detail.do?gno=43264580
+º´ÇÕ ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ¢£ °Ç´ã MG ÅÏ¿¡ÀÌ °Ç´ã / Ç°Àı / https://www.bnkrmall.co.kr/../../goods/detail.do?gno=57666
+º´ÇÕ ÀúÀå: RG ¿£Æ®¸® ±×·¹ÀÌµå HG RG Figure-rise ½Ã¸®Áî Figure-rise LABO Æ÷ÄÏÇÁ¶ó 30 MINUTES MISSIONS ±× ¿Ü / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/goods/category.do?cate=1577&page=1&cateName=%EC%95%A0%EB%8B%88%ED%94%84%EB%9D%BC&brandIdx=181&soldout=Y&endGoods=Y
+º´ÇÕ ÀúÀå: MG HG RG MG PG RE/100 ¸Ş°¡»çÀÌÁî ¸ğµ¨ SDCS/SDEX SD ¿É¼Ç ÆÄÃ÷ ±× ¿Ü / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&brandIdx=182&soldout=Y&endGoods=Y
+º´ÇÕ ÀúÀå: 2026³â 01¿ù30 ÀÔ°í [HG]1/144 °Ç´ã ¿¢½Ã¾Æ[01] / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10011205
+º´ÇÕ ÀúÀå: °Ç´ãµ¥Ä® DX08 / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/premium/p_category.do
+º´ÇÕ ÀúÀå: 2025³â 06¿ù30~02¿ùÁß ÀÔ°í [EG] 1/144 RX-78-2 ÆÛ½ºÆ® °Ç´ã / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10385801
+º´ÇÕ ÀúÀå: Æ÷ÄÏÇÁ¶ó ¿£Æ®¸® ±×·¹ÀÌµå HG RG Figure-rise ½Ã¸®Áî Figure-rise LABO Æ÷ÄÏÇÁ¶ó 30 MINUTES MISSIONS ±× ¿Ü / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/goods/category.do?cate=1577&page=1&cateName=%EC%95%A0%EB%8B%88%ED%94%84%EB%9D%BC&brandIdx=411&soldout=Y&endGoods=Y
+º´ÇÕ ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã ¿ª½ÀÀÇ »ş¾Æ MG ±â¶ó µµ°¡ / Ç°Àı / https://www.bnkrmall.co.kr/../../goods/detail.do?gno=14245
+º´ÇÕ ÀúÀå: 2026³â 03¿ù10~05¿ùÃÊ ÀÔ°í [RG]1/144 ¿¡ÀÏ ½ºÆ®¶óÀÌÅ© °Ç´ã / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10239500
+º´ÇÕ ÀúÀå: 2025³â 08¿ù10~07¿ùÃÊ ÀÔ°í [MG]Æ÷½ºÀÓÆŞ½º °Ç´ã / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10011289
+º´ÇÕ ÀúÀå: 2026³â 07¿ù30~07¿ùÁß ÀÔ°í [HGUC]1/144 À¯´ÏÄÜ °Ç´ã 3È£±â Æä³Ø½º µğ½ºÆ® / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10383179
+º´ÇÕ ÀúÀå: 2025³â 12¿ù10~08¿ùÃÊ ÀÔ°í [SD»ï±¹Ã¢°ÉÀü] 20. Á¦°¥·® ÇÁ¸®´ı °Ç´ã / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10385266
+º´ÇÕ ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã SEED DESTINY HGCE ½ºÆ®¶óÀÌÅ© ÇÁ¸®´ı °Ç´ã / Ç°Àı / https://www.bnkrmall.co.kr/../../goods/detail.do?gno=55911
+º´ÇÕ ÀúÀå: 2025³â 09¿ù10 ÀÔ°í [HG]1/144 ¹ß¹ÙÅä½º ·çÇÁ½º / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10377670
+º´ÇÕ ÀúÀå: 2025³â 05¿ù¸»~05¿ùÃÊ ÀÔ°í [HG][R-04]ºí¸´Ã÷ °Ç´ã / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10257813
+º´ÇÕ ÀúÀå: ENTRY GRADE À® °Ç´ã HG ÀÚÄí (GQ) ENTRY GRADE À® °Ç´ã / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/goods/detail.do?gno=21075377
+º´ÇÕ ÀúÀå: ±âµ¿Àü»ç °Ç´ã / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/premium/p_category.do
+º´ÇÕ ÀúÀå: 2025³â 09¿ù10 ÀÔ°í ¿ëÁ¸ À¯ºñ À¯´ÏÄÜ °Ç´ã / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10387088
+º´ÇÕ ÀúÀå: ¿£Æ®¸® ±×·¹ÀÌµå ¿£Æ®¸® ±×·¹ÀÌµå HG RG Figure-rise ½Ã¸®Áî Figure-rise LABO Æ÷ÄÏÇÁ¶ó 30 MINUTES MISSIONS ±× ¿Ü / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/goods/category.do?cate=1577&page=1&cateName=%EC%95%A0%EB%8B%88%ED%94%84%EB%9D%BC&brandIdx=188&soldout=Y&endGoods=Y
+º´ÇÕ ÀúÀå: ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ¸¶½ÅÃ¢Á¶Àü ¿ÍÅ¸·ç HG ·ù¿À¸¶·ç / ÆÇ¸ÅÁß / https://www.bnkrmall.co.kr/../../goods/detail.do?gno=5850638
+º´ÇÕ ÀúÀå: 2026³â 02¿ù28 ÀÔ°í [MG]1/100 ¹é½Ä Ver 2.0 / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10372957
+º´ÇÕ ÀúÀå: MG ÀÚÄí II Ver.2.0 °¡¸£¸¶ ÀÚºñ Àü¿ë±â / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/premium/p_category.do
+º´ÇÕ ÀúÀå: 2025³â 04¿ù¸»~05¿ùÃÊ ÀÔ°í [HG][R-10]1/144 ·¹ÀÌ´õ °Ç´ã / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10260572
+º´ÇÕ ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã MG Áî°íÅ© »ş¾Æ Àü¿ë±â / Ç°Àı / https://www.bnkrmall.co.kr/../../goods/detail.do?gno=14930
+º´ÇÕ ÀúÀå: ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï SD °Ç´ã ¿ùµå »ï±¹Ã¢°ÉÀü SD»ï±¹Ã¢°ÉÀü ¼ø¿í ½ºÆ®¶óÀÌÅ© ´À¿Í¸£ / ÆÇ¸ÅÁß / https://www.bnkrmall.co.kr/../../goods/detail.do?gno=14398
+º´ÇÕ ÀúÀå: RE/100 HG RG MG PG RE/100 ¸Ş°¡»çÀÌÁî ¸ğµ¨ SDCS/SDEX SD ¿É¼Ç ÆÄÃ÷ ±× ¿Ü / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&brandIdx=184&soldout=Y&endGoods=Y
+º´ÇÕ ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã MG ÀÚÄí II Ver. 2.0 »ş¾Æ Àü¿ë±â / Ç°Àı / https://www.bnkrmall.co.kr/../../goods/detail.do?gno=15847
+º´ÇÕ ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã SEED DESTINY MGEX ½ºÆ®¶óÀÌÅ© ÇÁ¸®´ı °Ç´ã / Ç°Àı / https://www.bnkrmall.co.kr/../../goods/detail.do?gno=59274
+º´ÇÕ ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç Z °Ç´ã MG ÇÏÀÌÀè / Ç°Àı / https://www.bnkrmall.co.kr/../../goods/detail.do?gno=56554
+º´ÇÕ ÀúÀå: 2025³â 10¿ù20 ÀÔ°í [MG]1/100 OZ-00MS Åç±â½º / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10291913
+º´ÇÕ ÀúÀå: 2026³â 01¿ù30~08¿ùÃÊ ÀÔ°í [RG] 1/144 WING GUNDAM À® °Ç´ã[035] / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10385941
+º´ÇÕ ÀúÀå: ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï HG ½ºÅ¸ÅÍ ¼¼Æ® 3 / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/../../goods/detail.do?gno=79054013
+º´ÇÕ ÀúÀå: PG UNLEASHED °Ç´ã (Å¬¸®¾î ÄÃ·¯ ¹Ùµğ) / Ç°Àı / https://www.bnkrmall.co.kr/../goods/detail.do?gno=11941686
+º´ÇÕ ÀúÀå: ENTRY GRADE À® °Ç´ã / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/premium/p_category.do
+º´ÇÕ ÀúÀå: °Ç´ãµ¥Ä® DX04 / Ç°Àı / https://www.bnkrmall.co.kr/../goods/detail.do?gno=42820275
+º´ÇÕ ÀúÀå: 2026³â 04¿ù10~08¿ùÃÊ ÀÔ°í [MG]RX-78-2 Gundam (Ver.3.0) / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10355557
+º´ÇÕ ÀúÀå: ±âµ¿Àü»ç °Ç´ã GQuuuuuuX / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/plan/p_content.do?idx=862
+º´ÇÕ ÀúÀå: ¸ÅÀå¾È³» ¸ÅÀå¾È³» ¹İ´ÙÀÌ³²ÄÚÄÚ¸®¾Æ ½ºÅä¾î °Ç´ãº£ÀÌ½º Æİ½ºÄù¾î GASHAPON BANDAI OFFICIAL SHOP / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/etc/gundam-base_store.do
+º´ÇÕ ÀúÀå: 2025³â 07¿ù20~07¿ùÁß ÀÔ°í [MG] ½ºÆ®¶óÀÌÅ© ´À¿Í¸£ °Ç´ã / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10011143
+º´ÇÕ ÀúÀå: °Ç´ãµ¥Ä® ÇÁ¶ó¸ğµ¨ Á¦ÀÛ °ø±¸ °Ç´ãµ¥Ä® °Ç´ã¸¶Ä¿ ±× ¿Ü / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/goods/category.do?cate=1609&page=1&cateName=%EA%B8%B0%ED%83%80&brandIdx=191
+º´ÇÕ ÀúÀå: 2026³â 01¿ù28 ÀÔ°í [HGUC]1/144 ½Ã³­ÁÖ / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10224944
+º´ÇÕ ÀúÀå: ±âµ¿Àü»ç °Ç´ã Ã¶Ç÷ÀÇ ¿ÀÆİ½º / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/premium/p_category.do
+º´ÇÕ ÀúÀå: SDCS/SDEX / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/premium/p_category.do
+º´ÇÕ ÀúÀå: 2025³â 12¿ù10~08¿ùÃÊ ÀÔ°í [HGUC]1/144 Å©»şÆ®¸®¾Æ / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10201936
+º´ÇÕ ÀúÀå: 30 MINUTES MISSIONS ¿£Æ®¸® ±×·¹ÀÌµå HG RG Figure-rise ½Ã¸®Áî Figure-rise LABO Æ÷ÄÏÇÁ¶ó 30 MINUTES MISSIONS ±× ¿Ü / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/goods/category.do?cate=1577&page=1&cateName=%EC%95%A0%EB%8B%88%ED%94%84%EB%9D%BC&brandIdx=205&soldout=Y&endGoods=Y
+º´ÇÕ ÀúÀå: MG ½ºÅ¸Å© Á¦°£ / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/premium/p_category.do
+º´ÇÕ ÀúÀå: 2026³â 01¿ù¸»~01¿ùÃÊ ÀÔ°í [MG] 1/100 Á¦Å¸ °Ç´ãVer.Ka / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10387750
+º´ÇÕ ÀúÀå: 2025³â 07¿ù20 ÀÔ°í [MG]½ºÆ®¶óÀÌÅ© ÇÁ¸®´ı(ÀÏ¹İÆÇ) / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10011087
+º´ÇÕ ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã GQuuuuuuX HG »ş¾Æ Àü¿ë ÀÚÄí (GQ) / Ç°Àı / https://www.bnkrmall.co.kr/../../goods/detail.do?gno=97652416
+º´ÇÕ ÀúÀå: 2026³â 01¿ù30 ÀÔ°í [SD»ï±¹Ã¢°ÉÀü] 21. Àå·á »çÀÚºñ / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10385267
+º´ÇÕ ÀúÀå: 2025³â 06¿ù10 ÀÔ°í [HGBF]1/144 Ä«¹ÌÅ° ¹ö´×°Ç´ã / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10374903
+º´ÇÕ ÀúÀå: 2026³â 07¿ù¸»~08¿ùÃÊ ÀÔ°í [HG]°Ç´ã¿¢½Ã¾Æ ¸®Æä¾î¥±[44] / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10178533
+º´ÇÕ ÀúÀå: 2026³â 01¿ù10 ÀÔ°í SD EX-STANDARD ·¹µåÇÁ·¹ÀÓ / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10377259
+º´ÇÕ ÀúÀå: 2026³â 02¿ù28~07¿ùÃÊ ÀÔ°í [HGUC] 1/144 ´º°Ç´ã / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10011286
+º´ÇÕ ÀúÀå: 2026³â 04¿ù10 ÀÔ°í [RG] 1/144 °«°Ç´ã [37] / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10387424
+º´ÇÕ ÀúÀå: 2026³â 07¿ù30~08¿ùÃÊ ÀÔ°í [HG]1/144 ¼¼¶óºñ GNHW/B / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10201498
+º´ÇÕ ÀúÀå: °Ç´ãµ¥Ä® DX06 / Ç°Àı / https://www.bnkrmall.co.kr/../goods/detail.do?gno=71273211
+º´ÇÕ ÀúÀå: MG] ¼ÒµåÀÓÆŞ½º °Ç´ã / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/
+º´ÇÕ ÀúÀå: QMSV MINI Z °Ç´ã & °Ç´ã ¸¶Å© II ¹İ´ÙÀÌ °ø½Ä °¡»şÆù ¸Ó½Å Æ®¶óÀÌ QMSV MINI Z °Ç´ã & °Ç´ã ¸¶Å© II / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/goods/detail.do?gno=29334090
+º´ÇÕ ÀúÀå: 2026³â 01¿ù10 ÀÔ°í [HGUC] 1/144 F91 °Ç´ã / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10361863
+º´ÇÕ ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã UC MG ¸®Á© ´ëÀå±â / Ç°Àı / https://www.bnkrmall.co.kr/../../goods/detail.do?gno=55931
+º´ÇÕ ÀúÀå: Figure-rise LABO ¿£Æ®¸® ±×·¹ÀÌµå HG RG Figure-rise ½Ã¸®Áî Figure-rise LABO Æ÷ÄÏÇÁ¶ó 30 MINUTES MISSIONS ±× ¿Ü / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/goods/category.do?cate=1577&page=1&cateName=%EC%95%A0%EB%8B%88%ED%94%84%EB%9D%BC&brandIdx=204&soldout=Y&endGoods=Y
+º´ÇÕ ÀúÀå: ¸ŞÅ»·Îº¸Æ®È¥ (SIDE MS) Åç±â½º / Ç°Àı / https://www.bnkrmall.co.kr/../goods/detail.do?gno=53299012
+º´ÇÕ ÀúÀå: 2025³â 04¿ù¸»~05¿ùÃÊ ÀÔ°í [HG][R-09]1/144 Æ÷ºñ´ø °Ç´ã / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10260571
+º´ÇÕ ÀúÀå: 2025³â 10¿ù¸»~10¿ùÃÊ ÀÔ°í [HG] 1/144 ¶óÀÌÂ¡ ÇÁ¸®´ı °Ç´ã [243] / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10388105
+º´ÇÕ ÀúÀå: ±× ¿Ü ÇÁ¶ó¸ğµ¨ Á¦ÀÛ °ø±¸ °Ç´ãµ¥Ä® °Ç´ã¸¶Ä¿ ±× ¿Ü / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/goods/category.do?cate=1609&page=1&cateName=%EA%B8%B0%ED%83%80&brandIdx=71&etc=Y
+º´ÇÕ ÀúÀå: 2026³â 03¿ù28 ÀÔ°í [MG] Ã¶Ç÷ÀÇ ¿ÀÆİ½º ¹ß¹ÙÅä½º / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10385270
+º´ÇÕ ÀúÀå: 2026³â 06¿ù¸»~07¿ùÃÊ ÀÔ°í [MG]RX-78-4 °Ç´ã4È£±â / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10010070
+º´ÇÕ ÀúÀå: ÇÁ¶ó¸ğµ¨ Á¦ÀÛ °ø±¸ ÇÁ¶ó¸ğµ¨ Á¦ÀÛ °ø±¸ °Ç´ãµ¥Ä® °Ç´ã¸¶Ä¿ ±× ¿Ü / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/goods/category.do?cate=1609&page=1&cateName=%EA%B8%B0%ED%83%80&brandIdx=262
+º´ÇÕ ÀúÀå: °Ç´ãº£ÀÌ½º ÄÚ¸®¾Æ °ø½ÄÄ«Æä / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/premium/p_category.do
+º´ÇÕ ÀúÀå: 2026³â 01¿ù29 ÀÔ°í [174][HGAC]À®°Ç´ã Á¦·Î / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10365591
+º´ÇÕ ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã ½ã´õº¼Æ® MG Ç® ¾Æ¸Ó °Ç´ã Ver.Ka (°Ç´ã ½ã´õº¼Æ®) / Ç°Àı / https://www.bnkrmall.co.kr/../../goods/detail.do?gno=55351
+º´ÇÕ ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã GQuuuuuuX HG ÀÚÄí (GQ) / Ç°Àı / https://www.bnkrmall.co.kr/../../goods/detail.do?gno=43264580
+º´ÇÕ ÀúÀå: ¿øÁ¶ SD °Ç´ã¿ùµå ¹ö¼³ ³ªÀÌÆ® °Ç´ã / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/premium/p_category.do
+º´ÇÕ ÀúÀå: 2025³â 07¿ù¸»~08¿ùÃÊ ÀÔ°í [MG]½ºÆ®¶óÀÌÅ©·çÁî ¿À¿ÀÅä¸®ÆÑ RM / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10357096
+º´ÇÕ ÀúÀå: 2026³â 01¿ù10 ÀÔ°í [HGUC]1/144 ÇÏÀÌ´º °Ç´ã / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10178529
+º´ÇÕ ÀúÀå: 2025³â 10¿ù10 ÀÔ°í [RG]1/144 RX-0 À¯´ÏÄÜ °Ç´ã / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10381098
+º´ÇÕ ÀúÀå: 2026³â 01¿ù30 ÀÔ°í [MG]1/100 °Ç´ã Çìºñ¾ÏÁî EW / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10260581
+º´ÇÕ ÀúÀå: SD EX-STANDARD À® °Ç´ã Á¦·Î[018] / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/
+º´ÇÕ ÀúÀå: 2026³â 01¿ù10~08¿ùÃÊ ÀÔ°í [HGUC]1/144 ¹ê½Ã ³ë¸¥[µğ½ºÆ®·ÎÀÌ¸ğµå] / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10366271
+º´ÇÕ ÀúÀå: ¸Ş°¡»çÀÌÁî ¸ğµ¨ HG RG MG PG RE/100 ¸Ş°¡»çÀÌÁî ¸ğµ¨ SDCS/SDEX SD ¿É¼Ç ÆÄÃ÷ ±× ¿Ü / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&brandIdx=185&soldout=Y&endGoods=Y
+º´ÇÕ ÀúÀå: 2025³â 08¿ù10~02¿ùÁß ÀÔ°í [SD°Ç´ã¿ùµåÈ÷¾î·ÎÁî]03.¼­ÀüÆ® º£¸£µ¥ ¹ö½ºÅÍ °Ç´ã / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10385946
+º´ÇÕ ÀúÀå: 2026³â 03¿ù01~07¿ùÃÊ ÀÔ°í [MG]GF13-01NH2 ¸¶½ºÅÍ °Ç´ã / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10010094
+º´ÇÕ ÀúÀå: ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã SEED ¿¡ÀÏ ½ºÆ®ÇÁ¶ó±º ÀÔÃ¼ °í¹« ¸¶½ºÄÚÆ® Å° Ã¼ÀÎ / ÆÇ¸ÅÁß / https://www.bnkrmall.co.kr/../../goods/detail.do?gno=92914081
+º´ÇÕ ÀúÀå: 2025³â 07¿ù20 ÀÔ°í [MG] JUSTICE GUNDAM Àú½ºÆ¼½º / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10380666
+º´ÇÕ ÀúÀå: RG HG RG MG PG RE/100 ¸Ş°¡»çÀÌÁî ¸ğµ¨ SDCS/SDEX SD ¿É¼Ç ÆÄÃ÷ ±× ¿Ü / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&brandIdx=181&soldout=Y&endGoods=Y
+º´ÇÕ ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã RG °Ç´ã Ver.2.0 & Àü¿ë ¹«±â ¼¼Æ® / Ç°Àı / https://www.bnkrmall.co.kr/../../goods/detail.do?gno=71597014
+º´ÇÕ ÀúÀå: ·Îº¸Æ®È¥ (Ka signature) (SIDE MS) RX-105 Å©½Ã °Ç´ã (±âµ¿Àü»ç °Ç´ã ¼¶±¤ÀÇ ÇÏ»ç¿şÀÌ Å°¸£ÄÉÀÇ ¸¶³à Ver.) / Ç°Àı / https://www.bnkrmall.co.kr/../goods/detail.do?gno=2511269
+º´ÇÕ ÀúÀå: 2025³â 05¿ù30~07¿ùÃÊ ÀÔ°í [HG ¸Ş°¡»çÀÌÁî]1/48 RX-78-2 °Ç´ã / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10213906
+º´ÇÕ ÀúÀå: PG HG RG MG PG RE/100 ¸Ş°¡»çÀÌÁî ¸ğµ¨ SDCS/SDEX SD ¿É¼Ç ÆÄÃ÷ ±× ¿Ü / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&brandIdx=183&soldout=Y&endGoods=Y
+º´ÇÕ ÀúÀå: 2025³â 12¿ù20 ÀÔ°í [EG] 1/144 ´º°Ç´ã / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10387425
+º´ÇÕ ÀúÀå: 2025³â 09¿ù10 ÀÔ°í [RG]1/144 ´õºí¿À ÄöÅÍ[021] / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10376325
+º´ÇÕ ÀúÀå: 2026³â 01¿ùÃÊ~02¿ùÁß ÀÔ°í [HGUC]1/144 ÆÛ½ºÆ® °Ç´ã REVIVE / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10372952
+º´ÇÕ ÀúÀå: ±âµ¿Àü»ç °Ç´ã UC / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&seriesIdx=282&soldout=Y&endGoods=Y
+º´ÇÕ ÀúÀå: ·Îº¸Æ®È¥ (Ka signature) Å©½Ã °Ç´ã / Æä³Ú·ÎÆä Àü¿ë ÆÇ³Ú ¹Ì»çÀÏ ¿É¼Ç ÆÄÃ÷ ¼¼Æ® / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/premium/p_category.do
+º´ÇÕ ÀúÀå: 2025³â 08¿ù10~07¿ùÃÊ ÀÔ°í [RG]1/144 ÇÁ¸®´ı °Ç´ã / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10252664
+º´ÇÕ ÀúÀå: 2025³â 12¿ùÃÊ~01¿ùÁß ÀÔ°í [MG] °Ç´ã AGE-2 ³ë¸Ö / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10273398
+º´ÇÕ ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã Ã¶Ç÷ÀÇ ¿ÀÆİ½º ¿ì¸£µå ÇåÆ® HG °Ç´ã ÀÚ°£ / Ç°Àı / https://www.bnkrmall.co.kr/../../goods/detail.do?gno=16109172
+º´ÇÕ ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï HG ½ºÅ¸ÅÍ ¼¼Æ® 1 / Ç°Àı / https://www.bnkrmall.co.kr/../../goods/detail.do?gno=13055918
+º´ÇÕ ÀúÀå: 2025³â 06¿ù10 ÀÔ°í [HGUC]1/144 À¯´ÏÄÜ °Ç´ã O2 ¹ê½Ã / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10260577
+º´ÇÕ ÀúÀå: 2026³â 03¿ù30 ÀÔ°í [HG]1/144 ¹ß¹ÙÅä½º °Ç´ã / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10375268
+º´ÇÕ ÀúÀå: 2026³â 01¿ù30~02¿ùÁß ÀÔ°í SD EX-STANDARD ½ºÆ®¶óÀÌÅ© ÇÁ¸®´ı / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10377258
+º´ÇÕ ÀúÀå: 2026³â 01¿ù30~08¿ùÃÊ ÀÔ°í [MG]Ãµ»ç°Ç´ã À®°Ç´ãÁ¦·ÎÄ¿½ºÅÒ / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10010133
+º´ÇÕ ÀúÀå: ¿É¼Ç ÆÄÃ÷ HG RG MG PG RE/100 ¸Ş°¡»çÀÌÁî ¸ğµ¨ SDCS/SDEX SD ¿É¼Ç ÆÄÃ÷ ±× ¿Ü / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&brandIdx=175,193&soldout=Y&endGoods=Y
+º´ÇÕ ÀúÀå: 2025³â 07¿ù30 ÀÔ°í [MG]GAT-X103 ¹ö½ºÅÍ°Ç´ã / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10277029
+º´ÇÕ ÀúÀå: 2026³â 02¿ù28~05¿ùÃÊ ÀÔ°í [RG]1/144 Á¦Å¸ °Ç´ã / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10278936
+º´ÇÕ ÀúÀå: ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï 30MM ARMORED CORE ¥µ FIRES OF RUBICON RaD CC-3000 WRECKER ¹ĞÅ© Åõ½º / ÆÇ¸ÅÁß / https://www.bnkrmall.co.kr/../../goods/detail.do?gno=43576694
+º´ÇÕ ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï HG ½ºÅ¸ÅÍ ¼¼Æ® 3 / Ç°Àı / https://www.bnkrmall.co.kr/../../goods/detail.do?gno=79054013
+º´ÇÕ ÀúÀå: 1/100 ÀÌÅ¬¸³½º °Ç´ã / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/
+º´ÇÕ ÀúÀå: 2026³â 05¿ù30 ÀÔ°í [MG]±¸ÇÁÄ¿½ºÅÒ / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10010062
+º´ÇÕ ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿¹«ÅõÀü G °Ç´ã MG ¹ö´× °Ç´ã / Ç°Àı / https://www.bnkrmall.co.kr/../../goods/detail.do?gno=58171
+º´ÇÕ ÀúÀå: 2025³â 12¿ù10 ÀÔ°í [RG]1/144 À®°Ç´ã Á¦·Î EW / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10370414
+º´ÇÕ ÀúÀå: 2026³â 03¿ù30~02¿ùÁß ÀÔ°í [SD°Ç´ã¿ùµåÈ÷¾î·ÎÁî] 05.¿¡µå¿öµå ¼¼ÄÁµåV / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10385966
+º´ÇÕ ÀúÀå: 2027³â 01¿ù10 ÀÔ°í [HGCE] ÇÁ¸®´ı °Ç´ã REVIVE / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10373398
+º´ÇÕ ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã SEED FREEDOM HG ¶óÀÌÂ¡ ÇÁ¸®´ı °Ç´ã / Ç°Àı / https://www.bnkrmall.co.kr/../../goods/detail.do?gno=45160810
+º´ÇÕ ÀúÀå: 2026³â 06¿ù30 ÀÔ°í [MG]MS-06J ¾ç»êÇü ÀÚÅ© ver.2.0 / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10011146
+º´ÇÕ ÀúÀå: BANDAI SPIRITS: Hobby BB Senshi / »óÅÂ È®ÀÎ ÇÊ¿ä / 
+º´ÇÕ ÀúÀå: BANDAI SPIRITS: Hobby BB Senshi BB332 / »óÅÂ È®ÀÎ ÇÊ¿ä / 
+º´ÇÕ ÀúÀå: MGSD Wing Gundam Zero EW / »óÅÂ È®ÀÎ ÇÊ¿ä / 
+º´ÇÕ ÀúÀå: HG][R-04]ºí¸´Ã÷ °Ç´ã / ÆÇ¸ÅÁß / https://www.bnkrmall.co.kr/../goods/detail.do?gno=50843773
+º´ÇÕ ÀúÀå: MG Full Armor Gundam Ver.Ka (Gundam Thunderbolt Ver.) / »óÅÂ È®ÀÎ ÇÊ¿ä / 
+º´ÇÕ ÀúÀå: MG]MS-06J ¾ç»êÇü ÀÚÅ© ver.2.0 / ÆÇ¸ÅÁß / https://www.bnkrmall.co.kr/../goods/detail.do?gno=83029407
+º´ÇÕ ÀúÀå: MGSD Destiny Gundam / »óÅÂ È®ÀÎ ÇÊ¿ä / 
+º´ÇÕ ÀúÀå: MG 1/100 Gundam Barbatos Lupus / »óÅÂ È®ÀÎ ÇÊ¿ä / 
+[¿Ï·á] º´ÇÕ ¿Ï·á / ÃÑ ÀúÀå 211°³
+[2026-03-25 20:41:13.62] KR entire operation successfully completed 
+ 
+====================================== 
+[2026-03-25 21:42:48.63] Start KR prerequisite work 
+[1/4] GundamBase Stars 
+  File "C:\Users\b6118\gundam_app\sync_kr_gundambase.py", line 770
+    ddef save_items_json(items, output_path=OUTPUT_JSON_PATH):
+         ^^^^^^^^^^^^^^^
+SyntaxError: invalid syntax
+[2026-03-25 21:42:48.71] An error occurred - work stoppage 
+ 
+====================================== 
+[2026-03-25 21:43:56.96] Start KR prerequisite work 
+[1/4] GundamBase Stars 
+[¸ñ·Ï] https://www.gundamshop.co.kr/
+  ÈÄº¸ °³¼ö: 0
+[¸ñ·Ï] https://www.gundamshop.co.kr/theme/Reserve.html?cate=0001&ordr=wol_panme&sort=DESC
+  ÈÄº¸ °³¼ö: 0
+[ÀúÀå] JSON ÀúÀå ¿Ï·á: data\gundamshop_items.json / 0°³
+[¿Ï·á] °Ç´ã¼¥ ¿Ï·á / ÃÑ ÃßÃâ 0°³ / Firestore ÀúÀå 0°³
+[2/4] GundamShop Stars 
+[¸ñ·Ï] https://www.gundamshop.co.kr/
+  ÈÄº¸ °³¼ö: 0
+[¸ñ·Ï] https://www.gundamshop.co.kr/theme/Reserve.html?cate=0001&ordr=wol_panme&sort=DESC
+  ÈÄº¸ °³¼ö: 0
+ÃÖÁ¾ ÀúÀå ´ë»ó ¼ö: 0
+[¿Ï·á] °Ç´ã¼¥ ¿Ï·á / ÃÑ ÀúÀå 0°³
+[3/4] BNKRMALL Stars 
+ÈÄº¸: SDCS/SDEX -> https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&brandIdx=186&soldout=Y&endGoods=Y / »óÅÂ: »óÅÂ È®ÀÎ ÇÊ¿ä
+ÈÄº¸: ±âµ¿Àü»ç °Ç´ã ¼ö¼ºÀÇ ¸¶³à -> https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&seriesIdx=658&soldout=Y&endGoods=Y / »óÅÂ: »óÅÂ È®ÀÎ ÇÊ¿ä
+ÈÄº¸: ±âµ¿Àü»ç °Ç´ã -> https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&seriesIdx=280&soldout=Y&endGoods=Y / »óÅÂ: »óÅÂ È®ÀÎ ÇÊ¿ä
+ÈÄº¸: ±âµ¿Àü»ç °Ç´ã ¿ª½ÀÀÇ »ş¾Æ -> https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&seriesIdx=281&soldout=Y&endGoods=Y / »óÅÂ: »óÅÂ È®ÀÎ ÇÊ¿ä
+ÈÄº¸: ±âµ¿Àü»ç °Ç´ã UC -> https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&seriesIdx=282&soldout=Y&endGoods=Y / »óÅÂ: »óÅÂ È®ÀÎ ÇÊ¿ä
+ÈÄº¸: ±âµ¿Àü»ç °Ç´ã SEED -> https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&seriesIdx=284&soldout=Y&endGoods=Y / »óÅÂ: »óÅÂ È®ÀÎ ÇÊ¿ä
+ÈÄº¸: ±âµ¿Àü»ç °Ç´ã OO -> https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&seriesIdx=285&soldout=Y&endGoods=Y / »óÅÂ: »óÅÂ È®ÀÎ ÇÊ¿ä
+ÈÄº¸: ±âµ¿Àü»ç °Ç´ã Ã¶Ç÷ÀÇ ¿ÀÆİ½º -> https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&seriesIdx=286&soldout=Y&endGoods=Y / »óÅÂ: »óÅÂ È®ÀÎ ÇÊ¿ä
+ÈÄº¸: »ï±¹Ã¢°ÉÀü/SD°Ç´ã ¿ùµå È÷¾î·ÎÁî -> https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&seriesIdx=288,58&soldout=Y&endGoods=Y / »óÅÂ: »óÅÂ È®ÀÎ ÇÊ¿ä
+ÈÄº¸: HG ÀÚÄí (GQ) -> https://www.bnkrmall.co.kr/goods/detail.do?gno=43264580 / »óÅÂ: »óÅÂ È®ÀÎ ÇÊ¿ä
+ÈÄº¸: ENTRY GRADE À® °Ç´ã -> https://www.bnkrmall.co.kr/goods/detail.do?gno=21075377 / »óÅÂ: »óÅÂ È®ÀÎ ÇÊ¿ä
+ÈÄº¸: Figure-rise ½Ã¸®Áî -> https://www.bnkrmall.co.kr/goods/category.do?cate=1577&page=1&cateName=%EC%95%A0%EB%8B%88%ED%94%84%EB%9D%BC&brandIdx=202,203,407,386&soldout=Y&endGoods=Y / »óÅÂ: »óÅÂ È®ÀÎ ÇÊ¿ä
+ÈÄº¸: Figure-rise LABO -> https://www.bnkrmall.co.kr/goods/category.do?cate=1577&page=1&cateName=%EC%95%A0%EB%8B%88%ED%94%84%EB%9D%BC&brandIdx=204&soldout=Y&endGoods=Y / »óÅÂ: »óÅÂ È®ÀÎ ÇÊ¿ä
+ÈÄº¸: ±âµ¿Àü»ç °Ç´ã -> https://www.bnkrmall.co.kr/goods/category.do?cate=1607&page=1&cateName=%ED%94%BC%EA%B7%9C%EC%96%B4&seriesIdx=280&soldout=Y&endGoods=Y / »óÅÂ: »óÅÂ È®ÀÎ ÇÊ¿ä
+ÈÄº¸: ³ªÀÇ È÷¾î·Î ¾ÆÄ«µ¥¹Ì¾Æ -> https://www.bnkrmall.co.kr/goods/category.do?cate=1608&page=1&cateName=%ED%94%BC%EA%B7%9C%EC%96%B4&seriesIdx=338&soldout=Y&endGoods=Y / »óÅÂ: »óÅÂ È®ÀÎ ÇÊ¿ä
+ÈÄº¸: QMSV MINI Z °Ç´ã & °Ç´ã ¸¶Å© II -> https://www.bnkrmall.co.kr/goods/detail.do?gno=29334090 / »óÅÂ: »óÅÂ È®ÀÎ ÇÊ¿ä
+ÈÄº¸: ¸ŞÅ»·Îº¸Æ®È¥ (SIDE MS) »çÀÚºñ -> https://www.bnkrmall.co.kr/../goods/detail.do?gno=81733587 / »óÅÂ: Ç°Àı
+ÈÄº¸: ¸ŞÅ»·Îº¸Æ®È¥ (SIDE MS) Åç±â½º -> https://www.bnkrmall.co.kr/../goods/detail.do?gno=53299012 / »óÅÂ: Ç°Àı
+ÈÄº¸: ¿øÁ¶ SD °Ç´ã¿ùµå ¹ö¼³ ³ªÀÌÆ® °Ç´ã -> https://www.bnkrmall.co.kr/../goods/detail.do?gno=67695874 / »óÅÂ: Ç°Àı
+ÈÄº¸: ·Îº¸Æ®È¥ (Ka signature) Å©½Ã °Ç´ã / Æä³Ú·ÎÆä Àü¿ë ÆÇ³Ú ¹Ì»çÀÏ ¿É¼Ç ÆÄÃ÷ ¼¼Æ® -> https://www.bnkrmall.co.kr/../goods/detail.do?gno=81617634 / »óÅÂ: Ç°Àı
+ÈÄº¸: ·Îº¸Æ®È¥ (Ka signature) (SIDE MS) RX-105 Å©½Ã °Ç´ã (±âµ¿Àü»ç °Ç´ã ¼¶±¤ÀÇ ÇÏ»ç¿şÀÌ Å°¸£ÄÉÀÇ ¸¶³à Ver.) -> https://www.bnkrmall.co.kr/../goods/detail.do?gno=2511269 / »óÅÂ: Ç°Àı
+ÈÄº¸: ·Îº¸Æ®È¥ (Ka signature) (SIDE MS) RX-104FF Æä³Ú·ÎÆä (±âµ¿Àü»ç °Ç´ã ¼¶±¤ÀÇ ÇÏ»ç¿şÀÌ Ver.) [Re:Coordinate] -> https://www.bnkrmall.co.kr/../goods/detail.do?gno=47310925 / »óÅÂ: Ç°Àı
+ÈÄº¸: HG °Ç´ã TR-6 [¹ÙÀáII] ¸®Áö¿Â ³ëÈ¹ »ç¾ç (A.O.Z RE-BOOT Ver.) -> https://www.bnkrmall.co.kr/../goods/detail.do?gno=71108133 / »óÅÂ: Ç°Àı
+ÈÄº¸: PG Æ®·£½º¾Ï ¶óÀÌÀú Å¬¸®¾î ÄÃ·¯ º¸µğ -> https://www.bnkrmall.co.kr/../goods/detail.do?gno=65724034 / »óÅÂ: Ç°Àı
+ÈÄº¸: HG °Ç´ã ÇÃ·çÅä³× ºí·¢ -> https://www.bnkrmall.co.kr/../goods/detail.do?gno=50843773 / »óÅÂ: Ç°Àı
+ÈÄº¸: PG UNLEASHED °Ç´ã (Å¬¸®¾î ÄÃ·¯ ¹Ùµğ) -> https://www.bnkrmall.co.kr/../goods/detail.do?gno=11941686 / »óÅÂ: Ç°Àı
+ÈÄº¸: MG ÀÚÄí II Ver.2.0 °¡¸£¸¶ ÀÚºñ Àü¿ë±â -> https://www.bnkrmall.co.kr/../goods/detail.do?gno=83029407 / »óÅÂ: Ç°Àı
+ÈÄº¸: °Ç´ãµ¥Ä® DX08 -> https://www.bnkrmall.co.kr/../goods/detail.do?gno=19296120 / »óÅÂ: Ç°Àı
+ÈÄº¸: °Ç´ãµ¥Ä® DX06 -> https://www.bnkrmall.co.kr/../goods/detail.do?gno=71273211 / »óÅÂ: Ç°Àı
+ÈÄº¸: °Ç´ãµ¥Ä® DX05 -> https://www.bnkrmall.co.kr/../goods/detail.do?gno=97433723 / »óÅÂ: Ç°Àı
+ÈÄº¸: °Ç´ãµ¥Ä® DX04 -> https://www.bnkrmall.co.kr/../goods/detail.do?gno=42820275 / »óÅÂ: Ç°Àı
+[¸ñ·Ï] https://www.bnkrmall.co.kr/premium/p_category.do
+  ÈÄº¸ °³¼ö: 31
+   - SDCS/SDEX / »óÅÂ È®ÀÎ ÇÊ¿ä /  / https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&brandIdx=186&soldout=Y&endGoods=Y / 
+   - ±âµ¿Àü»ç °Ç´ã ¼ö¼ºÀÇ ¸¶³à / »óÅÂ È®ÀÎ ÇÊ¿ä /  / https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&seriesIdx=658&soldout=Y&endGoods=Y / 
+   - ±âµ¿Àü»ç °Ç´ã / »óÅÂ È®ÀÎ ÇÊ¿ä /  / https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&seriesIdx=280&soldout=Y&endGoods=Y / 
+   - ±âµ¿Àü»ç °Ç´ã ¿ª½ÀÀÇ »ş¾Æ / »óÅÂ È®ÀÎ ÇÊ¿ä /  / https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&seriesIdx=281&soldout=Y&endGoods=Y / 
+   - ±âµ¿Àü»ç °Ç´ã UC / »óÅÂ È®ÀÎ ÇÊ¿ä /  / https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&seriesIdx=282&soldout=Y&endGoods=Y / 
+   - ±âµ¿Àü»ç °Ç´ã SEED / »óÅÂ È®ÀÎ ÇÊ¿ä /  / https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&seriesIdx=284&soldout=Y&endGoods=Y / 
+   - ±âµ¿Àü»ç °Ç´ã OO / »óÅÂ È®ÀÎ ÇÊ¿ä /  / https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&seriesIdx=285&soldout=Y&endGoods=Y / 
+   - ±âµ¿Àü»ç °Ç´ã Ã¶Ç÷ÀÇ ¿ÀÆİ½º / »óÅÂ È®ÀÎ ÇÊ¿ä /  / https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&seriesIdx=286&soldout=Y&endGoods=Y / 
+   - »ï±¹Ã¢°ÉÀü/SD°Ç´ã ¿ùµå È÷¾î·ÎÁî / »óÅÂ È®ÀÎ ÇÊ¿ä /  / https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&seriesIdx=288,58&soldout=Y&endGoods=Y / 
+   - HG ÀÚÄí (GQ) / »óÅÂ È®ÀÎ ÇÊ¿ä /  / https://www.bnkrmall.co.kr/goods/detail.do?gno=43264580 / 
+ÈÄº¸: SDCS/SDEX -> https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&brandIdx=186&soldout=Y&endGoods=Y / »óÅÂ: »óÅÂ È®ÀÎ ÇÊ¿ä
+ÈÄº¸: ±âµ¿Àü»ç °Ç´ã ¼ö¼ºÀÇ ¸¶³à -> https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&seriesIdx=658&soldout=Y&endGoods=Y / »óÅÂ: »óÅÂ È®ÀÎ ÇÊ¿ä
+ÈÄº¸: ±âµ¿Àü»ç °Ç´ã -> https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&seriesIdx=280&soldout=Y&endGoods=Y / »óÅÂ: »óÅÂ È®ÀÎ ÇÊ¿ä
+ÈÄº¸: ±âµ¿Àü»ç °Ç´ã ¿ª½ÀÀÇ »ş¾Æ -> https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&seriesIdx=281&soldout=Y&endGoods=Y / »óÅÂ: »óÅÂ È®ÀÎ ÇÊ¿ä
+ÈÄº¸: ±âµ¿Àü»ç °Ç´ã UC -> https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&seriesIdx=282&soldout=Y&endGoods=Y / »óÅÂ: »óÅÂ È®ÀÎ ÇÊ¿ä
+ÈÄº¸: ±âµ¿Àü»ç °Ç´ã SEED -> https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&seriesIdx=284&soldout=Y&endGoods=Y / »óÅÂ: »óÅÂ È®ÀÎ ÇÊ¿ä
+ÈÄº¸: ±âµ¿Àü»ç °Ç´ã OO -> https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&seriesIdx=285&soldout=Y&endGoods=Y / »óÅÂ: »óÅÂ È®ÀÎ ÇÊ¿ä
+ÈÄº¸: ±âµ¿Àü»ç °Ç´ã Ã¶Ç÷ÀÇ ¿ÀÆİ½º -> https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&seriesIdx=286&soldout=Y&endGoods=Y / »óÅÂ: »óÅÂ È®ÀÎ ÇÊ¿ä
+ÈÄº¸: »ï±¹Ã¢°ÉÀü/SD°Ç´ã ¿ùµå È÷¾î·ÎÁî -> https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&seriesIdx=288,58&soldout=Y&endGoods=Y / »óÅÂ: »óÅÂ È®ÀÎ ÇÊ¿ä
+ÈÄº¸: HG ÀÚÄí (GQ) -> https://www.bnkrmall.co.kr/goods/detail.do?gno=43264580 / »óÅÂ: »óÅÂ È®ÀÎ ÇÊ¿ä
+ÈÄº¸: ENTRY GRADE À® °Ç´ã -> https://www.bnkrmall.co.kr/goods/detail.do?gno=21075377 / »óÅÂ: »óÅÂ È®ÀÎ ÇÊ¿ä
+ÈÄº¸: Figure-rise ½Ã¸®Áî -> https://www.bnkrmall.co.kr/goods/category.do?cate=1577&page=1&cateName=%EC%95%A0%EB%8B%88%ED%94%84%EB%9D%BC&brandIdx=202,203,407,386&soldout=Y&endGoods=Y / »óÅÂ: »óÅÂ È®ÀÎ ÇÊ¿ä
+ÈÄº¸: Figure-rise LABO -> https://www.bnkrmall.co.kr/goods/category.do?cate=1577&page=1&cateName=%EC%95%A0%EB%8B%88%ED%94%84%EB%9D%BC&brandIdx=204&soldout=Y&endGoods=Y / »óÅÂ: »óÅÂ È®ÀÎ ÇÊ¿ä
+ÈÄº¸: ±âµ¿Àü»ç °Ç´ã -> https://www.bnkrmall.co.kr/goods/category.do?cate=1607&page=1&cateName=%ED%94%BC%EA%B7%9C%EC%96%B4&seriesIdx=280&soldout=Y&endGoods=Y / »óÅÂ: »óÅÂ È®ÀÎ ÇÊ¿ä
+ÈÄº¸: ³ªÀÇ È÷¾î·Î ¾ÆÄ«µ¥¹Ì¾Æ -> https://www.bnkrmall.co.kr/goods/category.do?cate=1608&page=1&cateName=%ED%94%BC%EA%B7%9C%EC%96%B4&seriesIdx=338&soldout=Y&endGoods=Y / »óÅÂ: »óÅÂ È®ÀÎ ÇÊ¿ä
+ÈÄº¸: QMSV MINI Z °Ç´ã & °Ç´ã ¸¶Å© II -> https://www.bnkrmall.co.kr/goods/detail.do?gno=29334090 / »óÅÂ: »óÅÂ È®ÀÎ ÇÊ¿ä
+ÈÄº¸: ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï 30 MINUTES MISSIONS 30MM ARMORED CORE ¥µ FIRES OF RUBICON ARQUEBUS ADD VE-40A -> https://www.bnkrmall.co.kr/../../goods/detail.do?gno=72775337 / »óÅÂ: ÆÇ¸ÅÁß
+ÈÄº¸: ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï 30MM ARMORED CORE ¥µ FIRES OF RUBICON BALAM INDUSTRIES BD-011 MELANDER -> https://www.bnkrmall.co.kr/../../goods/detail.do?gno=67213289 / »óÅÂ: ÆÇ¸ÅÁß
+ÈÄº¸: ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï 30MM ARMORED CORE ¥µ FIRES OF RUBICON RaD CC-3000 WRECKER ¹ĞÅ© Åõ½º -> https://www.bnkrmall.co.kr/../../goods/detail.do?gno=43576694 / »óÅÂ: ÆÇ¸ÅÁß
+ÈÄº¸: ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ¸¶½Å¿µ¿õÀü ¿ÍÅ¸·ç HG ·ùÁø¸¶·ç -> https://www.bnkrmall.co.kr/../../goods/detail.do?gno=22621604 / »óÅÂ: ÆÇ¸ÅÁß
+ÈÄº¸: ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï SD °Ç´ã ¿ùµå »ï±¹Ã¢°ÉÀü SD»ï±¹Ã¢°ÉÀü ¼ø¿í ½ºÆ®¶óÀÌÅ© ´À¿Í¸£ -> https://www.bnkrmall.co.kr/../../goods/detail.do?gno=14398 / »óÅÂ: ÆÇ¸ÅÁß
+ÈÄº¸: ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ¸¶½ÅÃ¢Á¶Àü ¿ÍÅ¸·ç HG ·ù¿À¸¶·ç -> https://www.bnkrmall.co.kr/../../goods/detail.do?gno=5850638 / »óÅÂ: ÆÇ¸ÅÁß
+ÈÄº¸: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã RG °Ç´ã Ver.2.0 & Àü¿ë ¹«±â ¼¼Æ® -> https://www.bnkrmall.co.kr/../../goods/detail.do?gno=71597014 / »óÅÂ: Ç°Àı
+ÈÄº¸: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿¹«ÅõÀü G °Ç´ã RG »şÀÌ´× °Ç´ã -> https://www.bnkrmall.co.kr/../../goods/detail.do?gno=39580119 / »óÅÂ: Ç°Àı
+ÈÄº¸: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã Ã¶Ç÷ÀÇ ¿ÀÆİ½º ¿ì¸£µå ÇåÆ® HG °Ç´ã ÀÚ°£ -> https://www.bnkrmall.co.kr/../../goods/detail.do?gno=16109172 / »óÅÂ: Ç°Àı
+ÈÄº¸: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã GQuuuuuuX HG »ş¾Æ Àü¿ë ÀÚÄí (GQ) -> https://www.bnkrmall.co.kr/../../goods/detail.do?gno=97652416 / »óÅÂ: Ç°Àı
+ÈÄº¸: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã GQuuuuuuX HG ÀÚÄí (GQ) -> https://www.bnkrmall.co.kr/../../goods/detail.do?gno=43264580 / »óÅÂ: Ç°Àı
+ÈÄº¸: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã GQuuuuuuX HG °Ö±¸±× ½º°¡ÀÌ±â (GQ) -> https://www.bnkrmall.co.kr/../../goods/detail.do?gno=14277618 / »óÅÂ: Ç°Àı
+ÈÄº¸: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã SEED FREEDOM HG ¶óÀÌÂ¡ ÇÁ¸®´ı °Ç´ã -> https://www.bnkrmall.co.kr/../../goods/detail.do?gno=45160810 / »óÅÂ: Ç°Àı
+ÈÄº¸: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã ¼ö¼ºÀÇ ¸¶³à HG °Ç´ã Ä¶¸®¹ø -> https://www.bnkrmall.co.kr/../../goods/detail.do?gno=88414752 / »óÅÂ: Ç°Àı
+ÈÄº¸: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï HG ½ºÅ¸ÅÍ ¼¼Æ® 3 -> https://www.bnkrmall.co.kr/../../goods/detail.do?gno=79054013 / »óÅÂ: Ç°Àı
+ÈÄº¸: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï HG ½ºÅ¸ÅÍ ¼¼Æ® 1 -> https://www.bnkrmall.co.kr/../../goods/detail.do?gno=13055918 / »óÅÂ: Ç°Àı
+ÈÄº¸: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã SEED DESTINY MGEX ½ºÆ®¶óÀÌÅ© ÇÁ¸®´ı °Ç´ã -> https://www.bnkrmall.co.kr/../../goods/detail.do?gno=59274 / »óÅÂ: Ç°Àı
+ÈÄº¸: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã UC MG µ¨Å¸ ÇÃ·¯½º -> https://www.bnkrmall.co.kr/../../goods/detail.do?gno=58458 / »óÅÂ: Ç°Àı
+ÈÄº¸: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿¹«ÅõÀü G °Ç´ã MG ¹ö´× °Ç´ã -> https://www.bnkrmall.co.kr/../../goods/detail.do?gno=58171 / »óÅÂ: Ç°Àı
+ÈÄº¸: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ¢£ °Ç´ã MG ÅÏ¿¡ÀÌ °Ç´ã -> https://www.bnkrmall.co.kr/../../goods/detail.do?gno=57666 / »óÅÂ: Ç°Àı
+ÈÄº¸: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã OO PG ´õºí¿À¶óÀÌÀú -> https://www.bnkrmall.co.kr/../../goods/detail.do?gno=57394 / »óÅÂ: Ç°Àı
+ÈÄº¸: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç Z °Ç´ã MG ÇÏÀÌÀè -> https://www.bnkrmall.co.kr/../../goods/detail.do?gno=56554 / »óÅÂ: Ç°Àı
+ÈÄº¸: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿½Å¼¼±â °Ç´ã X HGAW °Ç´ã ´õºí ¿¢½º -> https://www.bnkrmall.co.kr/../../goods/detail.do?gno=56271 / »óÅÂ: Ç°Àı
+ÈÄº¸: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç ZZ °Ç´ã MG ´õºí Á¦Å¸ °Ç´ã Ver.Ka -> https://www.bnkrmall.co.kr/../../goods/detail.do?gno=55933 / »óÅÂ: Ç°Àı
+ÈÄº¸: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã UC MG ¸®Á© ´ëÀå±â -> https://www.bnkrmall.co.kr/../../goods/detail.do?gno=55931 / »óÅÂ: Ç°Àı
+ÈÄº¸: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã SEED DESTINY HGCE ½ºÆ®¶óÀÌÅ© ÇÁ¸®´ı °Ç´ã -> https://www.bnkrmall.co.kr/../../goods/detail.do?gno=55911 / »óÅÂ: Ç°Àı
+ÈÄº¸: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã ¿ª½ÀÀÇ »ş¾Æ RG »çÀÚºñ -> https://www.bnkrmall.co.kr/../../goods/detail.do?gno=55352 / »óÅÂ: Ç°Àı
+ÈÄº¸: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã ½ã´õº¼Æ® MG Ç® ¾Æ¸Ó °Ç´ã Ver.Ka (°Ç´ã ½ã´õº¼Æ®) -> https://www.bnkrmall.co.kr/../../goods/detail.do?gno=55351 / »óÅÂ: Ç°Àı
+ÈÄº¸: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã MG °Ç´ã Ver. 3.0 -> https://www.bnkrmall.co.kr/../../goods/detail.do?gno=18867 / »óÅÂ: Ç°Àı
+ÈÄº¸: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã MG ÀÚÄí II Ver. 2.0 »ş¾Æ Àü¿ë±â -> https://www.bnkrmall.co.kr/../../goods/detail.do?gno=15847 / »óÅÂ: Ç°Àı
+ÈÄº¸: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã SEED RG °Ç´ã ¾î½ºÆ®·¹ÀÌ °ñµå ÇÁ·¹ÀÓ ¾Æ¸¶Ã÷ ¹Ì³ª -> https://www.bnkrmall.co.kr/../../goods/detail.do?gno=15508 / »óÅÂ: Ç°Àı
+ÈÄº¸: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã HGUC µ¼ & ¸¯µ¼ -> https://www.bnkrmall.co.kr/../../goods/detail.do?gno=15321 / »óÅÂ: Ç°Àı
+ÈÄº¸: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã MG Áî°íÅ© »ş¾Æ Àü¿ë±â -> https://www.bnkrmall.co.kr/../../goods/detail.do?gno=14930 / »óÅÂ: Ç°Àı
+ÈÄº¸: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã 0080 ÁÖ¸Ó´Ï ¼ÓÀÇ ÀüÀï HGUC °Ç´ã NT-1 ¾Ë·º½º -> https://www.bnkrmall.co.kr/../../goods/detail.do?gno=14246 / »óÅÂ: Ç°Àı
+ÈÄº¸: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã ¿ª½ÀÀÇ »ş¾Æ MG ±â¶ó µµ°¡ -> https://www.bnkrmall.co.kr/../../goods/detail.do?gno=14245 / »óÅÂ: Ç°Àı
+ÈÄº¸: ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã µ¼ÇÁ¶ó±º ÀÔÃ¼ °í¹« ¸¶½ºÄÚÆ® Å° Ã¼ÀÎ -> https://www.bnkrmall.co.kr/../../goods/detail.do?gno=54564934 / »óÅÂ: ÆÇ¸ÅÁß
+ÈÄº¸: ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã Áö¿ÀÇÁ¶ó±º ÀÔÃ¼ °í¹« ¸¶½ºÄÚÆ® Å° Ã¼ÀÎ -> https://www.bnkrmall.co.kr/../../goods/detail.do?gno=18851261 / »óÅÂ: ÆÇ¸ÅÁß
+ÈÄº¸: ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï °Ç´ã ºôµå ÆÄÀÌÅÍÁî ºôµå ½ºÆ®ÇÁ¶ó±º ÀÔÃ¼ °í¹« ¸¶½ºÄÚÆ® Å° Ã¼ÀÎ -> https://www.bnkrmall.co.kr/../../goods/detail.do?gno=68034376 / »óÅÂ: ÆÇ¸ÅÁß
+ÈÄº¸: ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã SEED ¿¡ÀÏ ½ºÆ®ÇÁ¶ó±º ÀÔÃ¼ °í¹« ¸¶½ºÄÚÆ® Å° Ã¼ÀÎ -> https://www.bnkrmall.co.kr/../../goods/detail.do?gno=92914081 / »óÅÂ: ÆÇ¸ÅÁß
+[¸ñ·Ï] https://www.bnkrmall.co.kr/plan/p_content.do?idx=862
+  ÈÄº¸ °³¼ö: 55
+   - SDCS/SDEX / »óÅÂ È®ÀÎ ÇÊ¿ä /  / https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&brandIdx=186&soldout=Y&endGoods=Y / 
+   - ±âµ¿Àü»ç °Ç´ã ¼ö¼ºÀÇ ¸¶³à / »óÅÂ È®ÀÎ ÇÊ¿ä /  / https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&seriesIdx=658&soldout=Y&endGoods=Y / 
+   - ±âµ¿Àü»ç °Ç´ã / »óÅÂ È®ÀÎ ÇÊ¿ä /  / https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&seriesIdx=280&soldout=Y&endGoods=Y / 
+   - ±âµ¿Àü»ç °Ç´ã ¿ª½ÀÀÇ »ş¾Æ / »óÅÂ È®ÀÎ ÇÊ¿ä /  / https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&seriesIdx=281&soldout=Y&endGoods=Y / 
+   - ±âµ¿Àü»ç °Ç´ã UC / »óÅÂ È®ÀÎ ÇÊ¿ä /  / https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&seriesIdx=282&soldout=Y&endGoods=Y / 
+   - ±âµ¿Àü»ç °Ç´ã SEED / »óÅÂ È®ÀÎ ÇÊ¿ä /  / https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&seriesIdx=284&soldout=Y&endGoods=Y / 
+   - ±âµ¿Àü»ç °Ç´ã OO / »óÅÂ È®ÀÎ ÇÊ¿ä /  / https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&seriesIdx=285&soldout=Y&endGoods=Y / 
+   - ±âµ¿Àü»ç °Ç´ã Ã¶Ç÷ÀÇ ¿ÀÆİ½º / »óÅÂ È®ÀÎ ÇÊ¿ä /  / https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&seriesIdx=286&soldout=Y&endGoods=Y / 
+   - »ï±¹Ã¢°ÉÀü/SD°Ç´ã ¿ùµå È÷¾î·ÎÁî / »óÅÂ È®ÀÎ ÇÊ¿ä /  / https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&seriesIdx=288,58&soldout=Y&endGoods=Y / 
+   - HG ÀÚÄí (GQ) / »óÅÂ È®ÀÎ ÇÊ¿ä /  / https://www.bnkrmall.co.kr/goods/detail.do?gno=43264580 / 
+ÃÖÁ¾ ÀúÀå ´ë»ó ¼ö: 70
+ÀÌ¹ÌÁö ÀÖ´Â ´ë»ó ¼ö: 0
+ÀúÀå: SDCS/SDEX / »óÅÂ È®ÀÎ ÇÊ¿ä / 
+ÀúÀå: ±âµ¿Àü»ç °Ç´ã ¼ö¼ºÀÇ ¸¶³à / »óÅÂ È®ÀÎ ÇÊ¿ä / 
+ÀúÀå: ±âµ¿Àü»ç °Ç´ã / »óÅÂ È®ÀÎ ÇÊ¿ä / 
+ÀúÀå: ±âµ¿Àü»ç °Ç´ã ¿ª½ÀÀÇ »ş¾Æ / »óÅÂ È®ÀÎ ÇÊ¿ä / 
+ÀúÀå: ±âµ¿Àü»ç °Ç´ã UC / »óÅÂ È®ÀÎ ÇÊ¿ä / 
+ÀúÀå: ±âµ¿Àü»ç °Ç´ã SEED / »óÅÂ È®ÀÎ ÇÊ¿ä / 
+ÀúÀå: ±âµ¿Àü»ç °Ç´ã OO / »óÅÂ È®ÀÎ ÇÊ¿ä / 
+ÀúÀå: ±âµ¿Àü»ç °Ç´ã Ã¶Ç÷ÀÇ ¿ÀÆİ½º / »óÅÂ È®ÀÎ ÇÊ¿ä / 
+ÀúÀå: »ï±¹Ã¢°ÉÀü/SD°Ç´ã ¿ùµå È÷¾î·ÎÁî / »óÅÂ È®ÀÎ ÇÊ¿ä / 
+ÀúÀå: HG ÀÚÄí (GQ) / »óÅÂ È®ÀÎ ÇÊ¿ä / 
+ÀúÀå: ENTRY GRADE À® °Ç´ã / »óÅÂ È®ÀÎ ÇÊ¿ä / 
+ÀúÀå: Figure-rise ½Ã¸®Áî / »óÅÂ È®ÀÎ ÇÊ¿ä / 
+ÀúÀå: Figure-rise LABO / »óÅÂ È®ÀÎ ÇÊ¿ä / 
+ÀúÀå: ±âµ¿Àü»ç °Ç´ã / »óÅÂ È®ÀÎ ÇÊ¿ä / 
+ÀúÀå: ³ªÀÇ È÷¾î·Î ¾ÆÄ«µ¥¹Ì¾Æ / »óÅÂ È®ÀÎ ÇÊ¿ä / 
+ÀúÀå: QMSV MINI Z °Ç´ã & °Ç´ã ¸¶Å© II / »óÅÂ È®ÀÎ ÇÊ¿ä / 
+ÀúÀå: ¸ŞÅ»·Îº¸Æ®È¥ (SIDE MS) »çÀÚºñ / Ç°Àı / 288,000¿ø
+ÀúÀå: ¸ŞÅ»·Îº¸Æ®È¥ (SIDE MS) Åç±â½º / Ç°Àı / 204,000¿ø
+ÀúÀå: ¿øÁ¶ SD °Ç´ã¿ùµå ¹ö¼³ ³ªÀÌÆ® °Ç´ã / Ç°Àı / 72,000¿ø
+ÀúÀå: ·Îº¸Æ®È¥ (Ka signature) Å©½Ã °Ç´ã / Æä³Ú·ÎÆä Àü¿ë ÆÇ³Ú ¹Ì»çÀÏ ¿É¼Ç ÆÄÃ÷ ¼¼Æ® / Ç°Àı / 42,000¿ø
+ÀúÀå: ·Îº¸Æ®È¥ (Ka signature) (SIDE MS) RX-105 Å©½Ã °Ç´ã (±âµ¿Àü»ç °Ç´ã ¼¶±¤ÀÇ ÇÏ»ç¿şÀÌ Å°¸£ÄÉÀÇ ¸¶³à Ver.) / Ç°Àı / 384,000¿ø
+ÀúÀå: ·Îº¸Æ®È¥ (Ka signature) (SIDE MS) RX-104FF Æä³Ú·ÎÆä (±âµ¿Àü»ç °Ç´ã ¼¶±¤ÀÇ ÇÏ»ç¿şÀÌ Ver.) [Re:Coordinate] / Ç°Àı / 336,000¿ø
+ÀúÀå: HG °Ç´ã TR-6 [¹ÙÀáII] ¸®Áö¿Â ³ëÈ¹ »ç¾ç (A.O.Z RE-BOOT Ver.) / Ç°Àı / 57,600¿ø
+ÀúÀå: PG Æ®·£½º¾Ï ¶óÀÌÀú Å¬¸®¾î ÄÃ·¯ º¸µğ / Ç°Àı / 45,600¿ø
+ÀúÀå: HG °Ç´ã ÇÃ·çÅä³× ºí·¢ / Ç°Àı / 28,800¿ø
+ÀúÀå: PG UNLEASHED °Ç´ã (Å¬¸®¾î ÄÃ·¯ ¹Ùµğ) / Ç°Àı / 62,400¿ø
+ÀúÀå: MG ÀÚÄí II Ver.2.0 °¡¸£¸¶ ÀÚºñ Àü¿ë±â / Ç°Àı / 50,400¿ø
+ÀúÀå: °Ç´ãµ¥Ä® DX08 / Ç°Àı / 18,000¿ø
+ÀúÀå: °Ç´ãµ¥Ä® DX06 / Ç°Àı / 18,000¿ø
+ÀúÀå: °Ç´ãµ¥Ä® DX05 / Ç°Àı / 18,000¿ø
+ÀúÀå: °Ç´ãµ¥Ä® DX04 / Ç°Àı / 18,000¿ø
+ÀúÀå: ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï 30 MINUTES MISSIONS 30MM ARMORED CORE ¥µ FIRES OF RUBICON ARQUEBUS ADD VE-40A / ÆÇ¸ÅÁß / 45,600¿ø
+ÀúÀå: ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï 30MM ARMORED CORE ¥µ FIRES OF RUBICON BALAM INDUSTRIES BD-011 MELANDER / ÆÇ¸ÅÁß / 27,600¿ø
+ÀúÀå: ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï 30MM ARMORED CORE ¥µ FIRES OF RUBICON RaD CC-3000 WRECKER ¹ĞÅ© Åõ½º / ÆÇ¸ÅÁß / 42,000¿ø
+ÀúÀå: ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ¸¶½Å¿µ¿õÀü ¿ÍÅ¸·ç HG ·ùÁø¸¶·ç / ÆÇ¸ÅÁß / 31,200¿ø
+ÀúÀå: ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï SD °Ç´ã ¿ùµå »ï±¹Ã¢°ÉÀü SD»ï±¹Ã¢°ÉÀü ¼ø¿í ½ºÆ®¶óÀÌÅ© ´À¿Í¸£ / ÆÇ¸ÅÁß / 8,400¿ø
+ÀúÀå: ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ¸¶½ÅÃ¢Á¶Àü ¿ÍÅ¸·ç HG ·ù¿À¸¶·ç / ÆÇ¸ÅÁß / 39,600¿ø
+ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã RG °Ç´ã Ver.2.0 & Àü¿ë ¹«±â ¼¼Æ® / Ç°Àı / 66,000¿ø
+ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿¹«ÅõÀü G °Ç´ã RG »şÀÌ´× °Ç´ã / Ç°Àı / 42,000¿ø
+ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã Ã¶Ç÷ÀÇ ¿ÀÆİ½º ¿ì¸£µå ÇåÆ® HG °Ç´ã ÀÚ°£ / Ç°Àı / 33,600¿ø
+ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã GQuuuuuuX HG »ş¾Æ Àü¿ë ÀÚÄí (GQ) / Ç°Àı / 26,400¿ø
+ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã GQuuuuuuX HG ÀÚÄí (GQ) / Ç°Àı / 26,400¿ø
+ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã GQuuuuuuX HG °Ö±¸±× ½º°¡ÀÌ±â (GQ) / Ç°Àı / 26,400¿ø
+ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã SEED FREEDOM HG ¶óÀÌÂ¡ ÇÁ¸®´ı °Ç´ã / Ç°Àı / 28,800¿ø
+ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã ¼ö¼ºÀÇ ¸¶³à HG °Ç´ã Ä¶¸®¹ø / Ç°Àı / 24,000¿ø
+ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï HG ½ºÅ¸ÅÍ ¼¼Æ® 3 / Ç°Àı / 44,800¿ø
+ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï HG ½ºÅ¸ÅÍ ¼¼Æ® 1 / Ç°Àı / 44,800¿ø
+ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã SEED DESTINY MGEX ½ºÆ®¶óÀÌÅ© ÇÁ¸®´ı °Ç´ã / Ç°Àı / 186,000¿ø
+ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã UC MG µ¨Å¸ ÇÃ·¯½º / Ç°Àı / 58,800¿ø
+ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿¹«ÅõÀü G °Ç´ã MG ¹ö´× °Ç´ã / Ç°Àı / 34,800¿ø
+ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ¢£ °Ç´ã MG ÅÏ¿¡ÀÌ °Ç´ã / Ç°Àı / 52,800¿ø
+ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã OO PG ´õºí¿À¶óÀÌÀú / Ç°Àı / 312,000¿ø
+ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç Z °Ç´ã MG ÇÏÀÌÀè / Ç°Àı / 40,800¿ø
+ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿½Å¼¼±â °Ç´ã X HGAW °Ç´ã ´õºí ¿¢½º / Ç°Àı / 22,800¿ø
+ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç ZZ °Ç´ã MG ´õºí Á¦Å¸ °Ç´ã Ver.Ka / Ç°Àı / 78,000¿ø
+ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã UC MG ¸®Á© ´ëÀå±â / Ç°Àı / 64,800¿ø
+ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã SEED DESTINY HGCE ½ºÆ®¶óÀÌÅ© ÇÁ¸®´ı °Ç´ã / Ç°Àı / 26,400¿ø
+ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã ¿ª½ÀÀÇ »ş¾Æ RG »çÀÚºñ / Ç°Àı / 57,600¿ø
+ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã ½ã´õº¼Æ® MG Ç® ¾Æ¸Ó °Ç´ã Ver.Ka (°Ç´ã ½ã´õº¼Æ®) / Ç°Àı / 88,800¿ø
+ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã MG °Ç´ã Ver. 3.0 / Ç°Àı / 58,800¿ø
+ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã MG ÀÚÄí II Ver. 2.0 »ş¾Æ Àü¿ë±â / Ç°Àı / 46,800¿ø
+ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã SEED RG °Ç´ã ¾î½ºÆ®·¹ÀÌ °ñµå ÇÁ·¹ÀÓ ¾Æ¸¶Ã÷ ¹Ì³ª / Ç°Àı / 42,000¿ø
+ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã HGUC µ¼ & ¸¯µ¼ / Ç°Àı / 22,800¿ø
+ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã MG Áî°íÅ© »ş¾Æ Àü¿ë±â / Ç°Àı / 43,200¿ø
+ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã 0080 ÁÖ¸Ó´Ï ¼ÓÀÇ ÀüÀï HGUC °Ç´ã NT-1 ¾Ë·º½º / Ç°Àı / 21,600¿ø
+ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã ¿ª½ÀÀÇ »ş¾Æ MG ±â¶ó µµ°¡ / Ç°Àı / 62,400¿ø
+ÀúÀå: ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã µ¼ÇÁ¶ó±º ÀÔÃ¼ °í¹« ¸¶½ºÄÚÆ® Å° Ã¼ÀÎ / ÆÇ¸ÅÁß / 10,800¿ø
+ÀúÀå: ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã Áö¿ÀÇÁ¶ó±º ÀÔÃ¼ °í¹« ¸¶½ºÄÚÆ® Å° Ã¼ÀÎ / ÆÇ¸ÅÁß / 10,800¿ø
+ÀúÀå: ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï °Ç´ã ºôµå ÆÄÀÌÅÍÁî ºôµå ½ºÆ®ÇÁ¶ó±º ÀÔÃ¼ °í¹« ¸¶½ºÄÚÆ® Å° Ã¼ÀÎ / ÆÇ¸ÅÁß / 10,800¿ø
+ÀúÀå: ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã SEED ¿¡ÀÏ ½ºÆ®ÇÁ¶ó±º ÀÔÃ¼ °í¹« ¸¶½ºÄÚÆ® Å° Ã¼ÀÎ / ÆÇ¸ÅÁß / 10,800¿ø
+[¿Ï·á] ¹İ´ÙÀÌ³²ÄÚÄÚ¸®¾Æ¸ô ¿Ï·á / ÃÑ ÀúÀå 70°³
+[4/4] Absorption Stars 
+¿øº» ¹®¼­ ¼ö: 328
+Â÷´ÜµÊ(±×·ì´Ü°è): ºÎÈ°Àı ´Ş°¿ 4°³ °¡Á®°¡·Á´Ù ±¸¿ø¹ŞÀº »ç¶÷.jpg
+Â÷´ÜµÊ(±×·ì´Ü°è): ´ÙÀÌ³ª¹Í Ä³¸¯ÅÍÁî ±âµ¿Àü»ç °Ç´ã ¿¡¹İ°Ô¸®¿Â ´ÙÀÌ³ª¹Í Ä³¸¯ÅÍÁî µå·¡°ïº¼ ¿øÇÇ½º ±Í¸êÀÇ Ä®³¯ °¡¸é¶óÀÌ´õ ¿ïÆ®¶ó¸Ç
+Â÷´ÜµÊ(±×·ì´Ü°è): ºÎÈ°Àı ´Ş°¿ 4°³ °¡Á®°¡·Á´Ù ±¸¿ø¹ŞÀº »ç¶÷.jpg
+Â÷´ÜµÊ(±×·ì´Ü°è): µå·¡°ïº¼ ±âµ¿Àü»ç °Ç´ã ¿¡¹İ°Ô¸®¿Â ´ÙÀÌ³ª¹Í Ä³¸¯ÅÍÁî µå·¡°ïº¼ ¿øÇÇ½º ±Í¸êÀÇ Ä®³¯ °¡¸é¶óÀÌ´õ ¿ïÆ®¶ó¸Ç
+Â÷´ÜµÊ(±×·ì´Ü°è): ³ª·çÅä µå·¡°ïº¼ ¿øÇÇ½º ±Í¸êÀÇ Ä®³¯ ³ª·çÅä ³ªÀÇ È÷¾î·Î ¾ÆÄ«µ¥¹Ì¾Æ °Ç´ã
+Â÷´ÜµÊ(±×·ì´Ü°è): AI µµÀÔÀ¸·Î °³ÆÇ³­ ¾÷°è.jpg
+Â÷´ÜµÊ(±×·ì´Ü°è): ¿ïÆ®¶ó¸Ç ±âµ¿Àü»ç °Ç´ã ¿¡¹İ°Ô¸®¿Â ´ÙÀÌ³ª¹Í Ä³¸¯ÅÍÁî µå·¡°ïº¼ ¿øÇÇ½º ±Í¸êÀÇ Ä®³¯ °¡¸é¶óÀÌ´õ ¿ïÆ®¶ó¸Ç
+Â÷´ÜµÊ(±×·ì´Ü°è): ¼ÖÁ÷È÷ °íÆò°¡ ¹Ş¾Æ¾ßÇÏ´Â ¿©Áß»ıÀÛ°¡.jpg
+Â÷´ÜµÊ(±×·ì´Ü°è): ¿øÇÇ½º ±âµ¿Àü»ç °Ç´ã ¿¡¹İ°Ô¸®¿Â ´ÙÀÌ³ª¹Í Ä³¸¯ÅÍÁî µå·¡°ïº¼ ¿øÇÇ½º ±Í¸êÀÇ Ä®³¯ °¡¸é¶óÀÌ´õ ¿ïÆ®¶ó¸Ç
+Â÷´ÜµÊ(±×·ì´Ü°è): ³ªÀÇ È÷¾î·Î ¾ÆÄ«µ¥¹Ì¾Æ
+Â÷´ÜµÊ(±×·ì´Ü°è): °¡¸é¶óÀÌ´õ ±âµ¿Àü»ç °Ç´ã ¿¡¹İ°Ô¸®¿Â ´ÙÀÌ³ª¹Í Ä³¸¯ÅÍÁî µå·¡°ïº¼ ¿øÇÇ½º ±Í¸êÀÇ Ä®³¯ °¡¸é¶óÀÌ´õ ¿ïÆ®¶ó¸Ç
+Â÷´ÜµÊ(±×·ì´Ü°è): ±âµ¿Àü»ç °Ç´ã ±âµ¿Àü»ç °Ç´ã ¿¡¹İ°Ô¸®¿Â ´ÙÀÌ³ª¹Í Ä³¸¯ÅÍÁî µå·¡°ïº¼ ¿øÇÇ½º ±Í¸êÀÇ Ä®³¯ °¡¸é¶óÀÌ´õ ¿ïÆ®¶ó¸Ç
+Â÷´ÜµÊ(±×·ì´Ü°è): ¿øÇÇ½º µå·¡°ïº¼ ¿øÇÇ½º ±Í¸êÀÇ Ä®³¯ ³ª·çÅä ³ªÀÇ È÷¾î·Î ¾ÆÄ«µ¥¹Ì¾Æ °Ç´ã
+Â÷´ÜµÊ(±×·ì´Ü°è): ¼ÖÁ÷È÷ °íÆò°¡ ¹Ş¾Æ¾ßÇÏ´Â ¿©Áß»ıÀÛ°¡.jpg
+Â÷´ÜµÊ(±×·ì´Ü°è): AI µµÀÔÀ¸·Î °³ÆÇ³­ ¾÷°è.jpg
+Â÷´ÜµÊ(±×·ì´Ü°è): ±Í¸êÀÇ Ä®³¯ µå·¡°ïº¼ ¿øÇÇ½º ±Í¸êÀÇ Ä®³¯ ³ª·çÅä ³ªÀÇ È÷¾î·Î ¾ÆÄ«µ¥¹Ì¾Æ °Ç´ã
+Â÷´ÜµÊ(±×·ì´Ü°è): µå·¡°ïº¼ µå·¡°ïº¼ ¿øÇÇ½º ±Í¸êÀÇ Ä®³¯ ³ª·çÅä ³ªÀÇ È÷¾î·Î ¾ÆÄ«µ¥¹Ì¾Æ °Ç´ã
+Â÷´ÜµÊ(±×·ì´Ü°è): ±Í¸êÀÇ Ä®³¯ ±âµ¿Àü»ç °Ç´ã ¿¡¹İ°Ô¸®¿Â ´ÙÀÌ³ª¹Í Ä³¸¯ÅÍÁî µå·¡°ïº¼ ¿øÇÇ½º ±Í¸êÀÇ Ä®³¯ °¡¸é¶óÀÌ´õ ¿ïÆ®¶ó¸Ç
+Â÷´ÜµÊ(±×·ì´Ü°è): Figure-rise ½Ã¸®Áî
+Â÷´ÜµÊ(±×·ì´Ü°è): Figure-rise LABO
+Â÷´ÜµÊ(±×·ì´Ü°è): ³ªÀÇ È÷¾î·Î ¾ÆÄ«µ¥¹Ì¾Æ µå·¡°ïº¼ ¿øÇÇ½º ±Í¸êÀÇ Ä®³¯ ³ª·çÅä ³ªÀÇ È÷¾î·Î ¾ÆÄ«µ¥¹Ì¾Æ °Ç´ã
+Â÷´ÜµÊ(±×·ì´Ü°è): °Ç´ã µå·¡°ïº¼ ¿øÇÇ½º ±Í¸êÀÇ Ä®³¯ ³ª·çÅä ³ªÀÇ È÷¾î·Î ¾ÆÄ«µ¥¹Ì¾Æ °Ç´ã
+Â÷´ÜµÊ(±×·ì´Ü°è): ¿¡¹İ°Ô¸®¿Â ±âµ¿Àü»ç °Ç´ã ¿¡¹İ°Ô¸®¿Â ´ÙÀÌ³ª¹Í Ä³¸¯ÅÍÁî µå·¡°ïº¼ ¿øÇÇ½º ±Í¸êÀÇ Ä®³¯ °¡¸é¶óÀÌ´õ ¿ïÆ®¶ó¸Ç
+Â÷´ÜµÊ(±×·ì´Ü°è): AI µµÀÔÀ¸·Î °³ÆÇ³­ ¾÷°è.jpg
+Â÷´ÜµÊ(±×·ì´Ü°è): ¼ÖÁ÷È÷ °íÆò°¡ ¹Ş¾Æ¾ßÇÏ´Â ¿©Áß»ıÀÛ°¡.jpg
+Â÷´ÜµÊ(±×·ì´Ü°è): AI µµÀÔÀ¸·Î °³ÆÇ³­ ¾÷°è.jpg
+Â÷´ÜµÊ(±×·ì´Ü°è): ºÎÈ°Àı ´Ş°¿ 4°³ °¡Á®°¡·Á´Ù ±¸¿ø¹ŞÀº »ç¶÷.jpg
+º´ÇÕ ±×·ì ¼ö: 211
+±âÁ¸ º´ÇÕ ¹®¼­ ¼ö: 211
+º´ÇÕ ÀúÀå: HG °Ç´ã TR-6 [¹ÙÀáII] ¸®Áö¿Â ³ëÈ¹ »ç¾ç (A.O.Z RE-BOOT Ver.) / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/premium/p_category.do
+º´ÇÕ ÀúÀå: 2025³â 12¿ù10 ÀÔ°í [MG] À® °Ç´ã Á¦·Î EW / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10385947
+º´ÇÕ ÀúÀå: 2025³â 09¿ù10~02¿ùÁß ÀÔ°í [SD»ï±¹Ã¢°ÉÀü] 01. À¯ºñ À¯´ÏÄÜ °Ç´ã(À¯ºñµ¶°¢¼ö°­Åº / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10385194
+º´ÇÕ ÀúÀå: 2026³â 03¿ù01~08¿ùÃÊ ÀÔ°í [SD»ï±¹Ã¢°ÉÀü] 24. »ç¸¶ÀÇ µ¥½ºÆ¼´Ï °Ç´ã / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10385330
+º´ÇÕ ÀúÀå: ±× ¿Ü ¿£Æ®¸® ±×·¹ÀÌµå HG RG Figure-rise ½Ã¸®Áî Figure-rise LABO Æ÷ÄÏÇÁ¶ó 30 MINUTES MISSIONS ±× ¿Ü / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/goods/category.do?cate=1577&page=1&cateName=%EC%95%A0%EB%8B%88%ED%94%84%EB%9D%BC&brandIdx=71&etc=Y&soldout=Y&endGoods=Y
+º´ÇÕ ÀúÀå: MG Á¦°£ DÇü (¼±Çà ¹èÄ¡±â) / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/premium/p_category.do
+º´ÇÕ ÀúÀå: MG] À¯´ÏÄÜ °Ç´ã[¿µ»óÆÇ] / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/
+º´ÇÕ ÀúÀå: MG ³×¸ğ (À¯´ÏÄÜ ÄÃ·¯ Ver.) / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/premium/p_category.do
+º´ÇÕ ÀúÀå: 2025³â 08¿ù10 ÀÔ°í [MG] ÇÏÀÌ´º°Ç´ã Ver.ka(¹öÄ«) / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10368251
+º´ÇÕ ÀúÀå: ±âµ¿Àü»ç °Ç´ã ¼ö¼ºÀÇ ¸¶³à / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/premium/p_category.do
+º´ÇÕ ÀúÀå: 2026³â 01¿ù10~08¿ùÃÊ ÀÔ°í [MG]XXXG-01D2 µ¥½º»çÀÌÁîÇï EWÆÇ / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10232714
+º´ÇÕ ÀúÀå: °Ç´ã¼¥Ä«Æä °Ç´ã¼¥Ä«Æä / ÆÇ¸ÅÁß / http://cafe.naver.com/gundamshopcafe
+º´ÇÕ ÀúÀå: Figure-rise ½Ã¸®Áî ¿£Æ®¸® ±×·¹ÀÌµå HG RG Figure-rise ½Ã¸®Áî Figure-rise LABO Æ÷ÄÏÇÁ¶ó 30 MINUTES MISSIONS ±× ¿Ü / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/goods/category.do?cate=1577&page=1&cateName=%EC%95%A0%EB%8B%88%ED%94%84%EB%9D%BC&brandIdx=202,203,407,386&soldout=Y&endGoods=Y
+º´ÇÕ ÀúÀå: ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï 30MM ARMORED CORE ¥µ FIRES OF RUBICON BALAM INDUSTRIES BD-011 MELANDER / ÆÇ¸ÅÁß / https://www.bnkrmall.co.kr/../../goods/detail.do?gno=67213289
+º´ÇÕ ÀúÀå: SDCS/SDEX HG RG MG PG RE/100 ¸Ş°¡»çÀÌÁî ¸ğµ¨ SDCS/SDEX SD ¿É¼Ç ÆÄÃ÷ ±× ¿Ü / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&brandIdx=186&soldout=Y&endGoods=Y
+º´ÇÕ ÀúÀå: »ï±¹Ã¢°ÉÀü/SD°Ç´ã ¿ùµå È÷¾î·ÎÁî / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/premium/p_category.do
+º´ÇÕ ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã GQuuuuuuX HG °Ö±¸±× ½º°¡ÀÌ±â (GQ) / Ç°Àı / https://www.bnkrmall.co.kr/../../goods/detail.do?gno=14277618
+º´ÇÕ ÀúÀå: PG Æ®·£½º¾Ï ¶óÀÌÀú Å¬¸®¾î ÄÃ·¯ º¸µğ / Ç°Àı / https://www.bnkrmall.co.kr/../goods/detail.do?gno=65724034
+º´ÇÕ ÀúÀå: ¹İ´ÙÀÌ] HG SRW ÈÖÄÉ¹ÙÀÎ Mk-¥² Æ®·Òº£ ¼³Á¤ / ÀÔ°í ¿¹Á¤ / https://bbs.ruliweb.com/etcs/board/300016/read/2412876
+º´ÇÕ ÀúÀå: 2025³â 11¿ù20~02¿ùÁß ÀÔ°í [SD°Ç´ã¿ùµåÈ÷¾î·ÎÁî] 21.³ªÀÌÆ® ½ºÆ®¶óÀÌÅ© °Ç´ã / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10387285
+º´ÇÕ ÀúÀå: °ø±¸/µ¥Ä®/º£ÀÌ½º °ø±¸/µ¥Ä®/º£ÀÌ½º ÇÁ¶ó¸ğµ¨ Á¦ÀÛ °ø±¸ °Ç´ãµ¥Ä® °Ç´ã¸¶Ä¿ ±× ¿Ü / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/goods/category.do?cate=1609&page=1&cateName=%EA%B8%B0%ED%83%80&endGoods=Y
+º´ÇÕ ÀúÀå: 2025³â 07¿ùÃÊ~07¿ùÁß ÀÔ°í [PG]¾ğ¸®½Ãµå RX-78-2 ÆÛ½ºÆ®°Ç´ã / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10385954
+º´ÇÕ ÀúÀå: 2025³â 09¿ù10~08¿ùÃÊ ÀÔ°í [SD°Ç´ã¿ùµåÈ÷¾î·ÎÁî] 06.»ç½ºÄÉ µ¨Å¸ °Ç´ã / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10385967
+º´ÇÕ ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã UC MG µ¨Å¸ ÇÃ·¯½º / Ç°Àı / https://www.bnkrmall.co.kr/../../goods/detail.do?gno=58458
+º´ÇÕ ÀúÀå: 2025³â 08¿ù10~08¿ùÃÊ ÀÔ°í [RG]1/144 µ¥½ºÆ¼´Ï °Ç´ã / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10350959
+º´ÇÕ ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã 0080 ÁÖ¸Ó´Ï ¼ÓÀÇ ÀüÀï HGUC °Ç´ã NT-1 ¾Ë·º½º / Ç°Àı / https://www.bnkrmall.co.kr/../../goods/detail.do?gno=14246
+º´ÇÕ ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã OO PG ´õºí¿À¶óÀÌÀú / Ç°Àı / https://www.bnkrmall.co.kr/../../goods/detail.do?gno=57394
+º´ÇÕ ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã ¿ª½ÀÀÇ »ş¾Æ RG »çÀÚºñ / Ç°Àı / https://www.bnkrmall.co.kr/../../goods/detail.do?gno=55352
+º´ÇÕ ÀúÀå: HG HG RG MG PG RE/100 ¸Ş°¡»çÀÌÁî ¸ğµ¨ SDCS/SDEX SD ¿É¼Ç ÆÄÃ÷ ±× ¿Ü / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&brandIdx=180,509,403&soldout=Y&endGoods=Y
+º´ÇÕ ÀúÀå: 30MS ÆÄ¿ö¶ó¸® ÆÈ¸®Åæ (±×¶óº£ Æû) / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/premium/p_category.do
+º´ÇÕ ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿½Å¼¼±â °Ç´ã X HGAW °Ç´ã ´õºí ¿¢½º / Ç°Àı / https://www.bnkrmall.co.kr/../../goods/detail.do?gno=56271
+º´ÇÕ ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç ZZ °Ç´ã MG ´õºí Á¦Å¸ °Ç´ã Ver.Ka / Ç°Àı / https://www.bnkrmall.co.kr/../../goods/detail.do?gno=55933
+º´ÇÕ ÀúÀå: HG ÀÚÄí (GQ) / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/goods/detail.do?gno=43264580
+º´ÇÕ ÀúÀå: 2025³â 08¿ù10 ÀÔ°í [MG]1/100 ´õºí¿À¶óÀÌÀú / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10240248
+º´ÇÕ ÀúÀå: MG]À®°Ç´ã EWÆÇ - °­·ÂÃßÃµ / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/
+º´ÇÕ ÀúÀå: 30MM EXM-A9sg ½ºÇÇ³ªÆ¼¿À (Àå±º Å¸ÀÔ) / Ç°Àı / https://www.bnkrmall.co.kr/../goods/detail.do?gno=65035933
+º´ÇÕ ÀúÀå: °Ç´ãº£ÀÌ½º ¸ÅÀå¾È³» °Ç´ãº£ÀÌ½º ¸ÅÀå¾È³» / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/etc/gundam-base_store.do
+º´ÇÕ ÀúÀå: HG ¿£Æ®¸® ±×·¹ÀÌµå HG RG Figure-rise ½Ã¸®Áî Figure-rise LABO Æ÷ÄÏÇÁ¶ó 30 MINUTES MISSIONS ±× ¿Ü / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/goods/category.do?cate=1577&page=1&cateName=%EC%95%A0%EB%8B%88%ED%94%84%EB%9D%BC&brandIdx=180&soldout=Y&endGoods=Y
+º´ÇÕ ÀúÀå: ±âµ¿Àü»ç °Ç´ã ¿ª½ÀÀÇ »ş¾Æ / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/premium/p_category.do
+º´ÇÕ ÀúÀå: ±âµ¿Àü»ç °Ç´ã SEED / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&seriesIdx=284&soldout=Y&endGoods=Y
+º´ÇÕ ÀúÀå: ±âµ¿Àü»ç °Ç´ã OO / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/plan/p_content.do?idx=862
+º´ÇÕ ÀúÀå: 2026³â 01¿ù10~08¿ùÃÊ ÀÔ°í SD EX-STANDARD ´º°Ç´ã [016] / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10385802
+º´ÇÕ ÀúÀå: 2025³â 10¿ù10~07¿ùÃÊ ÀÔ°í [MG]1/100 ¿¡ÇÇ¿Â EW / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10241669
+º´ÇÕ ÀúÀå: ¹İ´ÙÀÌ °ø½Ä °¡»şÆù ¸Ó½Å Æ®¶óÀÌ ¹İ´ÙÀÌ °ø½Ä °¡»şÆù ¸Ó½Å Æ®¶óÀÌ QMSV MINI Z °Ç´ã & °Ç´ã ¸¶Å© II / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/goods/detail.do?gno=24227408
+º´ÇÕ ÀúÀå: SD EX-STANDARD ´º°Ç´ã [016] / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/
+º´ÇÕ ÀúÀå: ¸ŞÅ»·Îº¸Æ®È¥ (SIDE MS) »çÀÚºñ / Ç°Àı / https://www.bnkrmall.co.kr/../goods/detail.do?gno=81733587
+º´ÇÕ ÀúÀå: HG °Ç´ã ÇÃ·çÅä³× ºí·¢ / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/premium/p_category.do
+º´ÇÕ ÀúÀå: 2026³â 03¿ù20 ÀÔ°í [MG]1/100 µ¥½ºÆ¼´Ï°Ç´ã / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10011199
+º´ÇÕ ÀúÀå: 2026³â 02¿ù28~07¿ùÃÊ ÀÔ°í [HGUC]1/144 »çÀÚºñ / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10011317
+º´ÇÕ ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿¹«ÅõÀü G °Ç´ã RG »şÀÌ´× °Ç´ã / Ç°Àı / https://www.bnkrmall.co.kr/../../goods/detail.do?gno=39580119
+º´ÇÕ ÀúÀå: SD HG RG MG PG RE/100 ¸Ş°¡»çÀÌÁî ¸ğµ¨ SDCS/SDEX SD ¿É¼Ç ÆÄÃ÷ ±× ¿Ü / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&brandIdx=187,413&soldout=Y&endGoods=Y
+º´ÇÕ ÀúÀå: 2025³â 08¿ù10 ÀÔ°í [MG]°Ç´ãSEED ¿¡ÀÏ½ºÆ®¶óÀÌÅ© °Ç´ã Ve / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10354104
+º´ÇÕ ÀúÀå: 2025³â 12¿ù10~02¿ùÁß ÀÔ°í [SD°Ç´ã¿ùµåÈ÷¾î·ÎÁî] 11.³ëºÎ³ª°¡ °Ç´ã ¿¡ÇÇ¿Â ´ÙÅ© ¸¶½ºÅ©Ver. / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10386631
+º´ÇÕ ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã HGUC µ¼ & ¸¯µ¼ / Ç°Àı / https://www.bnkrmall.co.kr/../../goods/detail.do?gno=15321
+º´ÇÕ ÀúÀå: ·Îº¸Æ®È¥ (Ka signature) (SIDE MS) RX-104FF Æä³Ú·ÎÆä (±âµ¿Àü»ç °Ç´ã ¼¶±¤ÀÇ ÇÏ»ç¿şÀÌ Ver.) [Re:Coordinate] / Ç°Àı / https://www.bnkrmall.co.kr/../goods/detail.do?gno=47310925
+º´ÇÕ ÀúÀå: ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã µ¼ÇÁ¶ó±º ÀÔÃ¼ °í¹« ¸¶½ºÄÚÆ® Å° Ã¼ÀÎ / ÆÇ¸ÅÁß / https://www.bnkrmall.co.kr/../../goods/detail.do?gno=54564934
+º´ÇÕ ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã ¼ö¼ºÀÇ ¸¶³à HG °Ç´ã Ä¶¸®¹ø / Ç°Àı / https://www.bnkrmall.co.kr/../../goods/detail.do?gno=88414752
+º´ÇÕ ÀúÀå: QMSV MINI Z °Ç´ã & °Ç´ã ¸¶Å© II / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/premium/p_category.do
+º´ÇÕ ÀúÀå: MG]GF13-01NH2 ¸¶½ºÅÍ °Ç´ã / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/
+º´ÇÕ ÀúÀå: ¹İ´ÙÀÌ] HG 1/100 VF-25F ¸Ş»çÀÌ¾î ¾ËÅä±â Á¶¸³ ÀÌ¹ÌÁö / ÀÔ°í ¿¹Á¤ / https://bbs.ruliweb.com/etcs/board/300016/read/2412876
+º´ÇÕ ÀúÀå: MG ³×¸ğ (À¯´ÏÄÜ µ¥ÀúÆ® ÄÃ·¯ Ver.) / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/premium/p_category.do
+º´ÇÕ ÀúÀå: 2025³â 09¿ù20~08¿ùÃÊ ÀÔ°í [PG]1/60 °Ç´ã ´õºí¿À¶óÀÌÀú / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10237606
+º´ÇÕ ÀúÀå: 2026³â 03¿ù30 ÀÔ°í SD EX-STANDARD »çÀÚºñ [017] / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10385803
+º´ÇÕ ÀúÀå: ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã Áö¿ÀÇÁ¶ó±º ÀÔÃ¼ °í¹« ¸¶½ºÄÚÆ® Å° Ã¼ÀÎ / ÆÇ¸ÅÁß / https://www.bnkrmall.co.kr/../../goods/detail.do?gno=18851261
+º´ÇÕ ÀúÀå: MG] 1/100 ³»·¯Æ¼ºê °Ç´ã CÇüÅÂ Ver.Ka / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/
+º´ÇÕ ÀúÀå: ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï °Ç´ã ºôµå ÆÄÀÌÅÍÁî ºôµå ½ºÆ®ÇÁ¶ó±º ÀÔÃ¼ °í¹« ¸¶½ºÄÚÆ® Å° Ã¼ÀÎ / ÆÇ¸ÅÁß / https://www.bnkrmall.co.kr/../../goods/detail.do?gno=68034376
+º´ÇÕ ÀúÀå: °Ç´ãº£ÀÌ½º ÄÚ¸®¾Æ °ø½ÄÄ«Æä °Ç´ãº£ÀÌ½º ÄÚ¸®¾Æ °ø½ÄÄ«Æä / »óÅÂ È®ÀÎ ÇÊ¿ä / https://cafe.naver.com/gbasekorea
+º´ÇÕ ÀúÀå: 2026³â 01¿ù10~08¿ùÃÊ ÀÔ°í [HGFC]1/144 °«°Ç´ã-°­·ÂÃßÃµ / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10221068
+º´ÇÕ ÀúÀå: °Ç´ãµ¥Ä® DX05 / Ç°Àı / https://www.bnkrmall.co.kr/../goods/detail.do?gno=97433723
+º´ÇÕ ÀúÀå: ±× ¿Ü HG RG MG PG RE/100 ¸Ş°¡»çÀÌÁî ¸ğµ¨ SDCS/SDEX SD ¿É¼Ç ÆÄÃ÷ ±× ¿Ü / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&brandIdx=71&etc=Y&soldout=Y&endGoods=Y
+º´ÇÕ ÀúÀå: HG ¸®°Ö±¸ À¯´ÏÄÜVer. / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/premium/p_category.do
+º´ÇÕ ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã SEED RG °Ç´ã ¾î½ºÆ®·¹ÀÌ °ñµå ÇÁ·¹ÀÓ ¾Æ¸¶Ã÷ ¹Ì³ª / Ç°Àı / https://www.bnkrmall.co.kr/../../goods/detail.do?gno=15508
+º´ÇÕ ÀúÀå: 2026³â 01¿ù30 ÀÔ°í HGUC Hyaku Shiki ¹é½Ä [REVIVE] / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10377276
+º´ÇÕ ÀúÀå: 2026³â 01¿ù30 ÀÔ°í SD EX-STANDARD µ¥½ºÆ¼´Ï °Ç´ã / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10380429
+º´ÇÕ ÀúÀå: ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ¸¶½Å¿µ¿õÀü ¿ÍÅ¸·ç HG ·ùÁø¸¶·ç / ÆÇ¸ÅÁß / https://www.bnkrmall.co.kr/../../goods/detail.do?gno=22621604
+º´ÇÕ ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã MG °Ç´ã Ver. 3.0 / Ç°Àı / https://www.bnkrmall.co.kr/../../goods/detail.do?gno=18867
+º´ÇÕ ÀúÀå: 2026³â 02¿ù27~08¿ùÃÊ ÀÔ°í [MG] ¼ÒµåÀÓÆŞ½º °Ç´ã / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10164494
+º´ÇÕ ÀúÀå: MG Áü II ¼¼¹Ì ½ºÆ®¶óÀÌÄ¿ / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/premium/p_category.do
+º´ÇÕ ÀúÀå: °Ç´ã¸¶Ä¿ ÇÁ¶ó¸ğµ¨ Á¦ÀÛ °ø±¸ °Ç´ãµ¥Ä® °Ç´ã¸¶Ä¿ ±× ¿Ü / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/goods/category.do?cate=1609&page=1&cateName=%EA%B8%B0%ED%83%80&brandIdx=617
+º´ÇÕ ÀúÀå: 2025³â 08¿ù10 ÀÔ°í [RG]1/144 ÀÚÅ©2 (¾ç»êÇü) / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10242871
+º´ÇÕ ÀúÀå: ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï 30 MINUTES MISSIONS 30MM ARMORED CORE ¥µ FIRES OF RUBICON ARQUEBUS ADD VE-40A / ÆÇ¸ÅÁß / https://www.bnkrmall.co.kr/../../goods/detail.do?gno=72775337
+º´ÇÕ ÀúÀå: °Ç´ã À¯´Ï¹ö½º gMS-¥á ºÓÀº °Ç´ã / ÀÔ°í ¿¹Á¤ / https://m.ruliweb.com/news/board/1002/read/2414884
+º´ÇÕ ÀúÀå: 2025³â 08¿ù10~08¿ùÃÊ ÀÔ°í [MG]1/100 »÷·Õ°Ç´ã EWÆÇ / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10239486
+º´ÇÕ ÀúÀå: °Ç´ãÀÎÆ÷ °Ç´ãÀÎÆ÷ / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/etc/gundaminfo.do
+º´ÇÕ ÀúÀå: 2026³â 04¿ù10 ÀÔ°í [MG]1/100 ÇÁ¸®´ı °Ç´ã Ver.2.0 / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10376324
+º´ÇÕ ÀúÀå: 30MM EXM-A9bk ½ºÇÇ³ªÆ¼¿À (ºí·¢ ³ªÀÌÆ® »ç¾ç) / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/premium/p_category.do
+º´ÇÕ ÀúÀå: HG ÀÚÄí (GQ) HG ÀÚÄí (GQ) ENTRY GRADE À® °Ç´ã / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/goods/detail.do?gno=43264580
+º´ÇÕ ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ¢£ °Ç´ã MG ÅÏ¿¡ÀÌ °Ç´ã / Ç°Àı / https://www.bnkrmall.co.kr/../../goods/detail.do?gno=57666
+º´ÇÕ ÀúÀå: RG ¿£Æ®¸® ±×·¹ÀÌµå HG RG Figure-rise ½Ã¸®Áî Figure-rise LABO Æ÷ÄÏÇÁ¶ó 30 MINUTES MISSIONS ±× ¿Ü / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/goods/category.do?cate=1577&page=1&cateName=%EC%95%A0%EB%8B%88%ED%94%84%EB%9D%BC&brandIdx=181&soldout=Y&endGoods=Y
+º´ÇÕ ÀúÀå: MG HG RG MG PG RE/100 ¸Ş°¡»çÀÌÁî ¸ğµ¨ SDCS/SDEX SD ¿É¼Ç ÆÄÃ÷ ±× ¿Ü / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&brandIdx=182&soldout=Y&endGoods=Y
+º´ÇÕ ÀúÀå: 2026³â 01¿ù30 ÀÔ°í [HG]1/144 °Ç´ã ¿¢½Ã¾Æ[01] / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10011205
+º´ÇÕ ÀúÀå: °Ç´ãµ¥Ä® DX08 / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/premium/p_category.do
+º´ÇÕ ÀúÀå: 2025³â 06¿ù30~02¿ùÁß ÀÔ°í [EG] 1/144 RX-78-2 ÆÛ½ºÆ® °Ç´ã / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10385801
+º´ÇÕ ÀúÀå: Æ÷ÄÏÇÁ¶ó ¿£Æ®¸® ±×·¹ÀÌµå HG RG Figure-rise ½Ã¸®Áî Figure-rise LABO Æ÷ÄÏÇÁ¶ó 30 MINUTES MISSIONS ±× ¿Ü / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/goods/category.do?cate=1577&page=1&cateName=%EC%95%A0%EB%8B%88%ED%94%84%EB%9D%BC&brandIdx=411&soldout=Y&endGoods=Y
+º´ÇÕ ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã ¿ª½ÀÀÇ »ş¾Æ MG ±â¶ó µµ°¡ / Ç°Àı / https://www.bnkrmall.co.kr/../../goods/detail.do?gno=14245
+º´ÇÕ ÀúÀå: 2026³â 03¿ù10~05¿ùÃÊ ÀÔ°í [RG]1/144 ¿¡ÀÏ ½ºÆ®¶óÀÌÅ© °Ç´ã / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10239500
+º´ÇÕ ÀúÀå: 2025³â 08¿ù10~07¿ùÃÊ ÀÔ°í [MG]Æ÷½ºÀÓÆŞ½º °Ç´ã / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10011289
+º´ÇÕ ÀúÀå: 2026³â 07¿ù30~07¿ùÁß ÀÔ°í [HGUC]1/144 À¯´ÏÄÜ °Ç´ã 3È£±â Æä³Ø½º µğ½ºÆ® / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10383179
+º´ÇÕ ÀúÀå: 2025³â 12¿ù10~08¿ùÃÊ ÀÔ°í [SD»ï±¹Ã¢°ÉÀü] 20. Á¦°¥·® ÇÁ¸®´ı °Ç´ã / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10385266
+º´ÇÕ ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã SEED DESTINY HGCE ½ºÆ®¶óÀÌÅ© ÇÁ¸®´ı °Ç´ã / Ç°Àı / https://www.bnkrmall.co.kr/../../goods/detail.do?gno=55911
+º´ÇÕ ÀúÀå: 2025³â 09¿ù10 ÀÔ°í [HG]1/144 ¹ß¹ÙÅä½º ·çÇÁ½º / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10377670
+º´ÇÕ ÀúÀå: 2025³â 05¿ù¸»~05¿ùÃÊ ÀÔ°í [HG][R-04]ºí¸´Ã÷ °Ç´ã / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10257813
+º´ÇÕ ÀúÀå: ENTRY GRADE À® °Ç´ã HG ÀÚÄí (GQ) ENTRY GRADE À® °Ç´ã / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/goods/detail.do?gno=21075377
+º´ÇÕ ÀúÀå: ±âµ¿Àü»ç °Ç´ã / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/premium/p_category.do
+º´ÇÕ ÀúÀå: 2025³â 09¿ù10 ÀÔ°í ¿ëÁ¸ À¯ºñ À¯´ÏÄÜ °Ç´ã / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10387088
+º´ÇÕ ÀúÀå: ¿£Æ®¸® ±×·¹ÀÌµå ¿£Æ®¸® ±×·¹ÀÌµå HG RG Figure-rise ½Ã¸®Áî Figure-rise LABO Æ÷ÄÏÇÁ¶ó 30 MINUTES MISSIONS ±× ¿Ü / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/goods/category.do?cate=1577&page=1&cateName=%EC%95%A0%EB%8B%88%ED%94%84%EB%9D%BC&brandIdx=188&soldout=Y&endGoods=Y
+º´ÇÕ ÀúÀå: ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ¸¶½ÅÃ¢Á¶Àü ¿ÍÅ¸·ç HG ·ù¿À¸¶·ç / ÆÇ¸ÅÁß / https://www.bnkrmall.co.kr/../../goods/detail.do?gno=5850638
+º´ÇÕ ÀúÀå: 2026³â 02¿ù28 ÀÔ°í [MG]1/100 ¹é½Ä Ver 2.0 / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10372957
+º´ÇÕ ÀúÀå: MG ÀÚÄí II Ver.2.0 °¡¸£¸¶ ÀÚºñ Àü¿ë±â / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/premium/p_category.do
+º´ÇÕ ÀúÀå: 2025³â 04¿ù¸»~05¿ùÃÊ ÀÔ°í [HG][R-10]1/144 ·¹ÀÌ´õ °Ç´ã / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10260572
+º´ÇÕ ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã MG Áî°íÅ© »ş¾Æ Àü¿ë±â / Ç°Àı / https://www.bnkrmall.co.kr/../../goods/detail.do?gno=14930
+º´ÇÕ ÀúÀå: ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï SD °Ç´ã ¿ùµå »ï±¹Ã¢°ÉÀü SD»ï±¹Ã¢°ÉÀü ¼ø¿í ½ºÆ®¶óÀÌÅ© ´À¿Í¸£ / ÆÇ¸ÅÁß / https://www.bnkrmall.co.kr/../../goods/detail.do?gno=14398
+º´ÇÕ ÀúÀå: RE/100 HG RG MG PG RE/100 ¸Ş°¡»çÀÌÁî ¸ğµ¨ SDCS/SDEX SD ¿É¼Ç ÆÄÃ÷ ±× ¿Ü / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&brandIdx=184&soldout=Y&endGoods=Y
+º´ÇÕ ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã MG ÀÚÄí II Ver. 2.0 »ş¾Æ Àü¿ë±â / Ç°Àı / https://www.bnkrmall.co.kr/../../goods/detail.do?gno=15847
+º´ÇÕ ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã SEED DESTINY MGEX ½ºÆ®¶óÀÌÅ© ÇÁ¸®´ı °Ç´ã / Ç°Àı / https://www.bnkrmall.co.kr/../../goods/detail.do?gno=59274
+º´ÇÕ ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç Z °Ç´ã MG ÇÏÀÌÀè / Ç°Àı / https://www.bnkrmall.co.kr/../../goods/detail.do?gno=56554
+º´ÇÕ ÀúÀå: 2025³â 10¿ù20 ÀÔ°í [MG]1/100 OZ-00MS Åç±â½º / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10291913
+º´ÇÕ ÀúÀå: 2026³â 01¿ù30~08¿ùÃÊ ÀÔ°í [RG] 1/144 WING GUNDAM À® °Ç´ã[035] / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10385941
+º´ÇÕ ÀúÀå: ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï HG ½ºÅ¸ÅÍ ¼¼Æ® 3 / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/../../goods/detail.do?gno=79054013
+º´ÇÕ ÀúÀå: PG UNLEASHED °Ç´ã (Å¬¸®¾î ÄÃ·¯ ¹Ùµğ) / Ç°Àı / https://www.bnkrmall.co.kr/../goods/detail.do?gno=11941686
+º´ÇÕ ÀúÀå: ENTRY GRADE À® °Ç´ã / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/premium/p_category.do
+º´ÇÕ ÀúÀå: °Ç´ãµ¥Ä® DX04 / Ç°Àı / https://www.bnkrmall.co.kr/../goods/detail.do?gno=42820275
+º´ÇÕ ÀúÀå: 2026³â 04¿ù10~08¿ùÃÊ ÀÔ°í [MG]RX-78-2 Gundam (Ver.3.0) / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10355557
+º´ÇÕ ÀúÀå: ±âµ¿Àü»ç °Ç´ã GQuuuuuuX / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/plan/p_content.do?idx=862
+º´ÇÕ ÀúÀå: ¸ÅÀå¾È³» ¸ÅÀå¾È³» ¹İ´ÙÀÌ³²ÄÚÄÚ¸®¾Æ ½ºÅä¾î °Ç´ãº£ÀÌ½º Æİ½ºÄù¾î GASHAPON BANDAI OFFICIAL SHOP / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/etc/gundam-base_store.do
+º´ÇÕ ÀúÀå: 2025³â 07¿ù20~07¿ùÁß ÀÔ°í [MG] ½ºÆ®¶óÀÌÅ© ´À¿Í¸£ °Ç´ã / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10011143
+º´ÇÕ ÀúÀå: °Ç´ãµ¥Ä® ÇÁ¶ó¸ğµ¨ Á¦ÀÛ °ø±¸ °Ç´ãµ¥Ä® °Ç´ã¸¶Ä¿ ±× ¿Ü / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/goods/category.do?cate=1609&page=1&cateName=%EA%B8%B0%ED%83%80&brandIdx=191
+º´ÇÕ ÀúÀå: 2026³â 01¿ù28 ÀÔ°í [HGUC]1/144 ½Ã³­ÁÖ / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10224944
+º´ÇÕ ÀúÀå: ±âµ¿Àü»ç °Ç´ã Ã¶Ç÷ÀÇ ¿ÀÆİ½º / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/premium/p_category.do
+º´ÇÕ ÀúÀå: SDCS/SDEX / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/premium/p_category.do
+º´ÇÕ ÀúÀå: 2025³â 12¿ù10~08¿ùÃÊ ÀÔ°í [HGUC]1/144 Å©»şÆ®¸®¾Æ / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10201936
+º´ÇÕ ÀúÀå: 30 MINUTES MISSIONS ¿£Æ®¸® ±×·¹ÀÌµå HG RG Figure-rise ½Ã¸®Áî Figure-rise LABO Æ÷ÄÏÇÁ¶ó 30 MINUTES MISSIONS ±× ¿Ü / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/goods/category.do?cate=1577&page=1&cateName=%EC%95%A0%EB%8B%88%ED%94%84%EB%9D%BC&brandIdx=205&soldout=Y&endGoods=Y
+º´ÇÕ ÀúÀå: MG ½ºÅ¸Å© Á¦°£ / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/premium/p_category.do
+º´ÇÕ ÀúÀå: 2026³â 01¿ù¸»~01¿ùÃÊ ÀÔ°í [MG] 1/100 Á¦Å¸ °Ç´ãVer.Ka / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10387750
+º´ÇÕ ÀúÀå: 2025³â 07¿ù20 ÀÔ°í [MG]½ºÆ®¶óÀÌÅ© ÇÁ¸®´ı(ÀÏ¹İÆÇ) / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10011087
+º´ÇÕ ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã GQuuuuuuX HG »ş¾Æ Àü¿ë ÀÚÄí (GQ) / Ç°Àı / https://www.bnkrmall.co.kr/../../goods/detail.do?gno=97652416
+º´ÇÕ ÀúÀå: 2026³â 01¿ù30 ÀÔ°í [SD»ï±¹Ã¢°ÉÀü] 21. Àå·á »çÀÚºñ / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10385267
+º´ÇÕ ÀúÀå: 2025³â 06¿ù10 ÀÔ°í [HGBF]1/144 Ä«¹ÌÅ° ¹ö´×°Ç´ã / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10374903
+º´ÇÕ ÀúÀå: 2026³â 07¿ù¸»~08¿ùÃÊ ÀÔ°í [HG]°Ç´ã¿¢½Ã¾Æ ¸®Æä¾î¥±[44] / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10178533
+º´ÇÕ ÀúÀå: 2026³â 01¿ù10 ÀÔ°í SD EX-STANDARD ·¹µåÇÁ·¹ÀÓ / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10377259
+º´ÇÕ ÀúÀå: 2026³â 02¿ù28~07¿ùÃÊ ÀÔ°í [HGUC] 1/144 ´º°Ç´ã / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10011286
+º´ÇÕ ÀúÀå: 2026³â 04¿ù10 ÀÔ°í [RG] 1/144 °«°Ç´ã [37] / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10387424
+º´ÇÕ ÀúÀå: 2026³â 07¿ù30~08¿ùÃÊ ÀÔ°í [HG]1/144 ¼¼¶óºñ GNHW/B / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10201498
+º´ÇÕ ÀúÀå: °Ç´ãµ¥Ä® DX06 / Ç°Àı / https://www.bnkrmall.co.kr/../goods/detail.do?gno=71273211
+º´ÇÕ ÀúÀå: MG] ¼ÒµåÀÓÆŞ½º °Ç´ã / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/
+º´ÇÕ ÀúÀå: QMSV MINI Z °Ç´ã & °Ç´ã ¸¶Å© II ¹İ´ÙÀÌ °ø½Ä °¡»şÆù ¸Ó½Å Æ®¶óÀÌ QMSV MINI Z °Ç´ã & °Ç´ã ¸¶Å© II / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/goods/detail.do?gno=29334090
+º´ÇÕ ÀúÀå: 2026³â 01¿ù10 ÀÔ°í [HGUC] 1/144 F91 °Ç´ã / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10361863
+º´ÇÕ ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã UC MG ¸®Á© ´ëÀå±â / Ç°Àı / https://www.bnkrmall.co.kr/../../goods/detail.do?gno=55931
+º´ÇÕ ÀúÀå: Figure-rise LABO ¿£Æ®¸® ±×·¹ÀÌµå HG RG Figure-rise ½Ã¸®Áî Figure-rise LABO Æ÷ÄÏÇÁ¶ó 30 MINUTES MISSIONS ±× ¿Ü / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/goods/category.do?cate=1577&page=1&cateName=%EC%95%A0%EB%8B%88%ED%94%84%EB%9D%BC&brandIdx=204&soldout=Y&endGoods=Y
+º´ÇÕ ÀúÀå: ¸ŞÅ»·Îº¸Æ®È¥ (SIDE MS) Åç±â½º / Ç°Àı / https://www.bnkrmall.co.kr/../goods/detail.do?gno=53299012
+º´ÇÕ ÀúÀå: 2025³â 04¿ù¸»~05¿ùÃÊ ÀÔ°í [HG][R-09]1/144 Æ÷ºñ´ø °Ç´ã / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10260571
+º´ÇÕ ÀúÀå: 2025³â 10¿ù¸»~10¿ùÃÊ ÀÔ°í [HG] 1/144 ¶óÀÌÂ¡ ÇÁ¸®´ı °Ç´ã [243] / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10388105
+º´ÇÕ ÀúÀå: ±× ¿Ü ÇÁ¶ó¸ğµ¨ Á¦ÀÛ °ø±¸ °Ç´ãµ¥Ä® °Ç´ã¸¶Ä¿ ±× ¿Ü / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/goods/category.do?cate=1609&page=1&cateName=%EA%B8%B0%ED%83%80&brandIdx=71&etc=Y
+º´ÇÕ ÀúÀå: 2026³â 03¿ù28 ÀÔ°í [MG] Ã¶Ç÷ÀÇ ¿ÀÆİ½º ¹ß¹ÙÅä½º / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10385270
+º´ÇÕ ÀúÀå: 2026³â 06¿ù¸»~07¿ùÃÊ ÀÔ°í [MG]RX-78-4 °Ç´ã4È£±â / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10010070
+º´ÇÕ ÀúÀå: ÇÁ¶ó¸ğµ¨ Á¦ÀÛ °ø±¸ ÇÁ¶ó¸ğµ¨ Á¦ÀÛ °ø±¸ °Ç´ãµ¥Ä® °Ç´ã¸¶Ä¿ ±× ¿Ü / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/goods/category.do?cate=1609&page=1&cateName=%EA%B8%B0%ED%83%80&brandIdx=262
+º´ÇÕ ÀúÀå: °Ç´ãº£ÀÌ½º ÄÚ¸®¾Æ °ø½ÄÄ«Æä / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/premium/p_category.do
+º´ÇÕ ÀúÀå: 2026³â 01¿ù29 ÀÔ°í [174][HGAC]À®°Ç´ã Á¦·Î / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10365591
+º´ÇÕ ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã ½ã´õº¼Æ® MG Ç® ¾Æ¸Ó °Ç´ã Ver.Ka (°Ç´ã ½ã´õº¼Æ®) / Ç°Àı / https://www.bnkrmall.co.kr/../../goods/detail.do?gno=55351
+º´ÇÕ ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã GQuuuuuuX HG ÀÚÄí (GQ) / Ç°Àı / https://www.bnkrmall.co.kr/../../goods/detail.do?gno=43264580
+º´ÇÕ ÀúÀå: ¿øÁ¶ SD °Ç´ã¿ùµå ¹ö¼³ ³ªÀÌÆ® °Ç´ã / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/premium/p_category.do
+º´ÇÕ ÀúÀå: 2025³â 07¿ù¸»~08¿ùÃÊ ÀÔ°í [MG]½ºÆ®¶óÀÌÅ©·çÁî ¿À¿ÀÅä¸®ÆÑ RM / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10357096
+º´ÇÕ ÀúÀå: 2026³â 01¿ù10 ÀÔ°í [HGUC]1/144 ÇÏÀÌ´º °Ç´ã / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10178529
+º´ÇÕ ÀúÀå: 2025³â 10¿ù10 ÀÔ°í [RG]1/144 RX-0 À¯´ÏÄÜ °Ç´ã / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10381098
+º´ÇÕ ÀúÀå: 2026³â 01¿ù30 ÀÔ°í [MG]1/100 °Ç´ã Çìºñ¾ÏÁî EW / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10260581
+º´ÇÕ ÀúÀå: SD EX-STANDARD À® °Ç´ã Á¦·Î[018] / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/
+º´ÇÕ ÀúÀå: 2026³â 01¿ù10~08¿ùÃÊ ÀÔ°í [HGUC]1/144 ¹ê½Ã ³ë¸¥[µğ½ºÆ®·ÎÀÌ¸ğµå] / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10366271
+º´ÇÕ ÀúÀå: ¸Ş°¡»çÀÌÁî ¸ğµ¨ HG RG MG PG RE/100 ¸Ş°¡»çÀÌÁî ¸ğµ¨ SDCS/SDEX SD ¿É¼Ç ÆÄÃ÷ ±× ¿Ü / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&brandIdx=185&soldout=Y&endGoods=Y
+º´ÇÕ ÀúÀå: 2025³â 08¿ù10~02¿ùÁß ÀÔ°í [SD°Ç´ã¿ùµåÈ÷¾î·ÎÁî]03.¼­ÀüÆ® º£¸£µ¥ ¹ö½ºÅÍ °Ç´ã / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10385946
+º´ÇÕ ÀúÀå: 2026³â 03¿ù01~07¿ùÃÊ ÀÔ°í [MG]GF13-01NH2 ¸¶½ºÅÍ °Ç´ã / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10010094
+º´ÇÕ ÀúÀå: ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã SEED ¿¡ÀÏ ½ºÆ®ÇÁ¶ó±º ÀÔÃ¼ °í¹« ¸¶½ºÄÚÆ® Å° Ã¼ÀÎ / ÆÇ¸ÅÁß / https://www.bnkrmall.co.kr/../../goods/detail.do?gno=92914081
+º´ÇÕ ÀúÀå: 2025³â 07¿ù20 ÀÔ°í [MG] JUSTICE GUNDAM Àú½ºÆ¼½º / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10380666
+º´ÇÕ ÀúÀå: RG HG RG MG PG RE/100 ¸Ş°¡»çÀÌÁî ¸ğµ¨ SDCS/SDEX SD ¿É¼Ç ÆÄÃ÷ ±× ¿Ü / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&brandIdx=181&soldout=Y&endGoods=Y
+º´ÇÕ ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã RG °Ç´ã Ver.2.0 & Àü¿ë ¹«±â ¼¼Æ® / Ç°Àı / https://www.bnkrmall.co.kr/../../goods/detail.do?gno=71597014
+º´ÇÕ ÀúÀå: ·Îº¸Æ®È¥ (Ka signature) (SIDE MS) RX-105 Å©½Ã °Ç´ã (±âµ¿Àü»ç °Ç´ã ¼¶±¤ÀÇ ÇÏ»ç¿şÀÌ Å°¸£ÄÉÀÇ ¸¶³à Ver.) / Ç°Àı / https://www.bnkrmall.co.kr/../goods/detail.do?gno=2511269
+º´ÇÕ ÀúÀå: 2025³â 05¿ù30~07¿ùÃÊ ÀÔ°í [HG ¸Ş°¡»çÀÌÁî]1/48 RX-78-2 °Ç´ã / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10213906
+º´ÇÕ ÀúÀå: PG HG RG MG PG RE/100 ¸Ş°¡»çÀÌÁî ¸ğµ¨ SDCS/SDEX SD ¿É¼Ç ÆÄÃ÷ ±× ¿Ü / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&brandIdx=183&soldout=Y&endGoods=Y
+º´ÇÕ ÀúÀå: 2025³â 12¿ù20 ÀÔ°í [EG] 1/144 ´º°Ç´ã / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10387425
+º´ÇÕ ÀúÀå: 2025³â 09¿ù10 ÀÔ°í [RG]1/144 ´õºí¿À ÄöÅÍ[021] / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10376325
+º´ÇÕ ÀúÀå: 2026³â 01¿ùÃÊ~02¿ùÁß ÀÔ°í [HGUC]1/144 ÆÛ½ºÆ® °Ç´ã REVIVE / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10372952
+º´ÇÕ ÀúÀå: ±âµ¿Àü»ç °Ç´ã UC / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&seriesIdx=282&soldout=Y&endGoods=Y
+º´ÇÕ ÀúÀå: ·Îº¸Æ®È¥ (Ka signature) Å©½Ã °Ç´ã / Æä³Ú·ÎÆä Àü¿ë ÆÇ³Ú ¹Ì»çÀÏ ¿É¼Ç ÆÄÃ÷ ¼¼Æ® / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/premium/p_category.do
+º´ÇÕ ÀúÀå: 2025³â 08¿ù10~07¿ùÃÊ ÀÔ°í [RG]1/144 ÇÁ¸®´ı °Ç´ã / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10252664
+º´ÇÕ ÀúÀå: 2025³â 12¿ùÃÊ~01¿ùÁß ÀÔ°í [MG] °Ç´ã AGE-2 ³ë¸Ö / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10273398
+º´ÇÕ ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã Ã¶Ç÷ÀÇ ¿ÀÆİ½º ¿ì¸£µå ÇåÆ® HG °Ç´ã ÀÚ°£ / Ç°Àı / https://www.bnkrmall.co.kr/../../goods/detail.do?gno=16109172
+º´ÇÕ ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï HG ½ºÅ¸ÅÍ ¼¼Æ® 1 / Ç°Àı / https://www.bnkrmall.co.kr/../../goods/detail.do?gno=13055918
+º´ÇÕ ÀúÀå: 2025³â 06¿ù10 ÀÔ°í [HGUC]1/144 À¯´ÏÄÜ °Ç´ã O2 ¹ê½Ã / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10260577
+º´ÇÕ ÀúÀå: 2026³â 03¿ù30 ÀÔ°í [HG]1/144 ¹ß¹ÙÅä½º °Ç´ã / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10375268
+º´ÇÕ ÀúÀå: 2026³â 01¿ù30~02¿ùÁß ÀÔ°í SD EX-STANDARD ½ºÆ®¶óÀÌÅ© ÇÁ¸®´ı / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10377258
+º´ÇÕ ÀúÀå: 2026³â 01¿ù30~08¿ùÃÊ ÀÔ°í [MG]Ãµ»ç°Ç´ã À®°Ç´ãÁ¦·ÎÄ¿½ºÅÒ / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10010133
+º´ÇÕ ÀúÀå: ¿É¼Ç ÆÄÃ÷ HG RG MG PG RE/100 ¸Ş°¡»çÀÌÁî ¸ğµ¨ SDCS/SDEX SD ¿É¼Ç ÆÄÃ÷ ±× ¿Ü / »óÅÂ È®ÀÎ ÇÊ¿ä / https://www.bnkrmall.co.kr/goods/category.do?cate=1576&page=1&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&brandIdx=175,193&soldout=Y&endGoods=Y
+º´ÇÕ ÀúÀå: 2025³â 07¿ù30 ÀÔ°í [MG]GAT-X103 ¹ö½ºÅÍ°Ç´ã / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10277029
+º´ÇÕ ÀúÀå: 2026³â 02¿ù28~05¿ùÃÊ ÀÔ°í [RG]1/144 Á¦Å¸ °Ç´ã / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10278936
+º´ÇÕ ÀúÀå: ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï 30MM ARMORED CORE ¥µ FIRES OF RUBICON RaD CC-3000 WRECKER ¹ĞÅ© Åõ½º / ÆÇ¸ÅÁß / https://www.bnkrmall.co.kr/../../goods/detail.do?gno=43576694
+º´ÇÕ ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï HG ½ºÅ¸ÅÍ ¼¼Æ® 3 / Ç°Àı / https://www.bnkrmall.co.kr/../../goods/detail.do?gno=79054013
+º´ÇÕ ÀúÀå: 1/100 ÀÌÅ¬¸³½º °Ç´ã / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/
+º´ÇÕ ÀúÀå: 2026³â 05¿ù30 ÀÔ°í [MG]±¸ÇÁÄ¿½ºÅÒ / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10010062
+º´ÇÕ ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿¹«ÅõÀü G °Ç´ã MG ¹ö´× °Ç´ã / Ç°Àı / https://www.bnkrmall.co.kr/../../goods/detail.do?gno=58171
+º´ÇÕ ÀúÀå: 2025³â 12¿ù10 ÀÔ°í [RG]1/144 À®°Ç´ã Á¦·Î EW / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10370414
+º´ÇÕ ÀúÀå: 2026³â 03¿ù30~02¿ùÁß ÀÔ°í [SD°Ç´ã¿ùµåÈ÷¾î·ÎÁî] 05.¿¡µå¿öµå ¼¼ÄÁµåV / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10385966
+º´ÇÕ ÀúÀå: 2027³â 01¿ù10 ÀÔ°í [HGCE] ÇÁ¸®´ı °Ç´ã REVIVE / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10373398
+º´ÇÕ ÀúÀå: SOLD OUT ÁÁ¾Æ¿ä Àå¹Ù±¸´Ï ±âµ¿Àü»ç °Ç´ã SEED FREEDOM HG ¶óÀÌÂ¡ ÇÁ¸®´ı °Ç´ã / Ç°Àı / https://www.bnkrmall.co.kr/../../goods/detail.do?gno=45160810
+º´ÇÕ ÀúÀå: 2026³â 06¿ù30 ÀÔ°í [MG]MS-06J ¾ç»êÇü ÀÚÅ© ver.2.0 / ÆÇ¸ÅÁß / https://www.gundamshop.co.kr/Goods/View.html?ItemCode=10011146
+º´ÇÕ ÀúÀå: BANDAI SPIRITS: Hobby BB Senshi / »óÅÂ È®ÀÎ ÇÊ¿ä / 
+º´ÇÕ ÀúÀå: BANDAI SPIRITS: Hobby BB Senshi BB332 / »óÅÂ È®ÀÎ ÇÊ¿ä / 
+º´ÇÕ ÀúÀå: MGSD Wing Gundam Zero EW / »óÅÂ È®ÀÎ ÇÊ¿ä / 
+º´ÇÕ ÀúÀå: HG][R-04]ºí¸´Ã÷ °Ç´ã / ÆÇ¸ÅÁß / https://www.bnkrmall.co.kr/../goods/detail.do?gno=50843773
+º´ÇÕ ÀúÀå: MG Full Armor Gundam Ver.Ka (Gundam Thunderbolt Ver.) / »óÅÂ È®ÀÎ ÇÊ¿ä / 
+º´ÇÕ ÀúÀå: MG]MS-06J ¾ç»êÇü ÀÚÅ© ver.2.0 / ÆÇ¸ÅÁß / https://www.bnkrmall.co.kr/../goods/detail.do?gno=83029407
+º´ÇÕ ÀúÀå: MGSD Destiny Gundam / »óÅÂ È®ÀÎ ÇÊ¿ä / 
+º´ÇÕ ÀúÀå: MG 1/100 Gundam Barbatos Lupus / »óÅÂ È®ÀÎ ÇÊ¿ä / 
+[¿Ï·á] º´ÇÕ ¿Ï·á / ÃÑ ÀúÀå 211°³
+[2026-03-25 21:44:11.31] KR entire operation successfully completed 
+ 

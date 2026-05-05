@@ -1,0 +1,40 @@
+{
+  "KR": {
+    "name": "대한민국",
+    "code": "KR",
+    "currency": "KRW",
+    "flag": "🇰🇷",
+    "sites": [
+      {
+        "id": "gundambase",
+        "name": "건담베이스",
+        "enabled": true
+      },
+      {
+        "id": "gundamshop",
+        "name": "건담샵",
+        "enabled": true
+      },
+      {
+        "id": "bnkrmall",
+        "name": "반케이알몰",
+        "enabled": true
+      },
+      {
+        "id": "hobbyfactory",
+        "name": "하비팩토리",
+        "enabled": true
+      },
+      {
+        "id": "gundamcity",
+        "name": "건담시티",
+        "enabled": true
+      },
+      {
+        "id": "modelsale",
+        "name": "네이버 하비 코리아",
+        "enabled": true
+      }
+    ]
+  }
+}

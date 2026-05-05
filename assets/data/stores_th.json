@@ -1,0 +1,37 @@
+[
+  {
+    "name": "กันดั้มเบส ไทย (Gundam Base Thailand)",
+    "base_url": "https://www.gundam-base.net",
+    "list_url": "https://www.gundam-base.net/products/",
+    "type": "official",
+    "country": "TH"
+  },
+  {
+    "name": "Lazada 태국 (건담 검색)",
+    "base_url": "https://www.lazada.co.th",
+    "list_url": "https://www.lazada.co.th/catalog/?q=gundam",
+    "type": "market",
+    "country": "TH"
+  },
+  {
+    "name": "Shopee 태국 (건담 검색)",
+    "base_url": "https://shopee.co.th",
+    "list_url": "https://shopee.co.th/search?keyword=gundam",
+    "type": "market",
+    "country": "TH"
+  },
+  {
+    "name": "Playasia",
+    "base_url": "https://www.play-asia.com",
+    "list_url": "https://www.play-asia.com/search/gundam",
+    "type": "shop",
+    "country": "TH"
+  },
+  {
+    "name": "Kidultverse Thailand",
+    "base_url": "https://www.kidultverse.com",
+    "list_url": "https://www.kidultverse.com/search?q=gundam",
+    "type": "shop",
+    "country": "TH"
+  }
+]
