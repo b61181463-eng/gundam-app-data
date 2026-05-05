@@ -1,0 +1,35 @@
+name: KR Gundam Sync
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Create serviceAccountKey.json
+        run: |
+          echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}' > serviceAccountKey.json
+
+      - name: Run crawlers
+        run: |
+          python sync_kr_gundamshop.py
+          python sync_kr_gundambase.py
+          python sync_kr_bnkrmall.py
+
+      - name: Normalize and detect alerts
+        run: python scripts/run_after_crawling.py
