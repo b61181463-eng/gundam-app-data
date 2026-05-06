@@ -168,8 +168,8 @@ def crawl_bnkrmall_selenium() -> List[ItemRecord]:
     return results
 
 DEBUG = False
-FAST_TEST_MODE = True
-MAX_LINKS_PER_SITE = 30
+FAST_TEST_MODE = False
+MAX_LINKS_PER_SITE = 9999
 SERVICE_ACCOUNT_PATH = "serviceAccountKey.json"
 COLLECTION_NAME = os.getenv("FIRESTORE_COLLECTION", "aggregated_items")
 
