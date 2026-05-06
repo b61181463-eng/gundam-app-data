@@ -193,6 +193,11 @@ String _normalizeGroupName(String raw) {
     '하비팩토리',
     '건담시티',
     '모델세일',
+    '조이하비',
+    '건담붐',
+    '프라모델매니아',
+    '지온샵',
+    '건담몰',
     '프라모델',
     '건프라',
     '예약판매',
@@ -277,18 +282,43 @@ String _normalizeGroupName(String raw) {
   return result.trim();
 }
 
+
+bool _isBadPlaceholderName(String raw) {
+  final text = raw.trim().toLowerCase();
+  if (text.isEmpty) return true;
+
+  const badExact = {
+    '상품상세 | 반다이남코코리아몰',
+    '상품상세|반다이남코코리아몰',
+    '반다이남코코리아몰',
+    'bnkrmall',
+    '상품명',
+    '건담샵',
+    '건담시티',
+    '하비팩토리',
+    '모델세일',
+  };
+
+  if (badExact.contains(text)) return true;
+  if (text.contains('상품상세') && text.contains('반다이남코코리아몰')) return true;
+  if (text == '상품상세') return true;
+
+  return false;
+}
+
 String _extractGrade(String text) {
   final upper = text.toUpperCase();
   if (upper.contains('MGEX')) return 'MGEX';
   if (upper.contains('MGSD')) return 'MGSD';
-  if (RegExp(r'(^|\s|\[|\()PG($|\s|\]|\))').hasMatch(upper)) return 'PG';
-  if (RegExp(r'(^|\s|\[|\()MG($|\s|\]|\))').hasMatch(upper)) return 'MG';
-  if (RegExp(r'(^|\s|\[|\()RG($|\s|\]|\))').hasMatch(upper)) return 'RG';
-  if (RegExp(r'(^|\s|\[|\()HG($|\s|\]|\))').hasMatch(upper)) return 'HG';
-  if (RegExp(r'(^|\s|\[|\()SD($|\s|\]|\))').hasMatch(upper)) return 'SD';
+  if (RegExp(r'(^|[^A-Z0-9])PG([^A-Z0-9]|$)').hasMatch(upper)) return 'PG';
+  if (RegExp(r'(^|[^A-Z0-9])RG[A-Z]*([^A-Z0-9]|$)').hasMatch(upper)) return 'RG';
+  if (RegExp(r'(^|[^A-Z0-9])MG[A-Z]*([^A-Z0-9]|$)').hasMatch(upper)) return 'MG';
+  if (RegExp(r'(^|[^A-Z0-9])HG[A-Z]*([^A-Z0-9]|$)').hasMatch(upper)) return 'HG';
+  if (RegExp(r'(^|[^A-Z0-9])SD[A-Z]*([^A-Z0-9]|$)').hasMatch(upper)) return 'SD';
+  if (upper.contains('FULL MECHANICS')) return 'FULL MECHANICS';
+  if (upper.contains('RE/100')) return 'RE/100';
   return 'UNKNOWN';
 }
-
 int _offerStatusRank(String status) {
   if (status == '판매중') return 0;
   if (status == '예약중') return 1;
@@ -724,6 +754,21 @@ class StockItem {
     if (combined.contains('modelsale') || combined.contains('모델세일')) {
       return 'https://www.modelsale.co.kr';
     }
+    if (combined.contains('joyhobby') || combined.contains('조이하비')) {
+      return 'https://www.joyhobby.co.kr';
+    }
+    if (combined.contains('gundamboom') || combined.contains('건담붐')) {
+      return 'https://www.gundamboom.com';
+    }
+    if (combined.contains('plamodelmania') || combined.contains('프라모델매니아')) {
+      return 'https://plamodelmania.com';
+    }
+    if (combined.contains('zeonshop') || combined.contains('지온샵')) {
+      return 'https://zeonshop.net';
+    }
+    if (combined.contains('gundamall') || combined.contains('건담몰')) {
+      return 'https://www.gundamall.com';
+    }
 
     return '';
   }
@@ -920,6 +965,11 @@ class StockApi {
       'hobbyfactory',
       'gundamcity',
       'modelsale',
+      'joyhobby',
+      'gundamboom',
+      'plamodelmania',
+      'zeonshop',
+      'gundamall',
       '건담베이스',
       '건담샵',
       '반케이알몰',
@@ -927,6 +977,11 @@ class StockApi {
       '하비팩토리',
       '건담시티',
       '모델세일',
+      '조이하비',
+    '건담붐',
+    '프라모델매니아',
+    '지온샵',
+    '건담몰',
       '.co.kr',
     ];
 
@@ -937,6 +992,17 @@ class StockApi {
   }
 
   static bool _isValidGundamItemOrNotice(StockItem item) {
+    final name = item.name.trim();
+    final title = item.title.trim();
+
+    // 공지는 통과
+    if (item.status == '공지') return true;
+
+    // BNKR 구형 오류 데이터: 상품명이 전부 사이트 제목으로 들어온 문서 제거
+    if (_isBadPlaceholderName(name) || _isBadPlaceholderName(title)) {
+      return false;
+    }
+
     final text = [
       item.name,
       item.title,
@@ -944,19 +1010,38 @@ class StockApi {
       item.mallName,
     ].join(' ').toLowerCase();
 
-    final isBnkr = item.site.toLowerCase().contains('bnkr') ||
-        item.mallName.contains('반다이남코코리아몰') ||
-        item.sourcePage.toLowerCase().contains('bnkr');
-
-    // 공지는 무조건 통과
-    if (item.status == '공지') return true;
-
-    // 강력 제외
+    // 강력 제외: 피규어/굿즈/타작품/완성품류
     const excludeKeywords = [
       '울트라맨',
       '마블',
       '피규어',
+      'figure',
+      '완성품',
+      'action figure',
       '넨도로이드',
+      'nendoroid',
+      '프라イズ',
+      '경품',
+      '봉제',
+      '인형',
+      '아크릴',
+      '스탠드',
+      '포스터',
+      '캔뱃지',
+      '키링',
+      '머그컵',
+      '의류',
+      '티셔츠',
+      '쿠션',
+      '가방',
+      '메탈빌드',
+      'metal build',
+      '로봇혼',
+      'robot魂',
+      '초합금',
+      's.h.figuarts',
+      'shfiguarts',
+      '피규아츠',
       '세피로스',
       '파이널 판타지',
       '하츠네 미쿠',
@@ -966,30 +1051,54 @@ class StockApi {
       '포켓몬',
       '원피스',
       '디지몬',
+      '니케',
+      '붕괴',
+      '죠죠',
+      '트랜스포머',
+      '프리렌',
     ];
 
     for (final keyword in excludeKeywords) {
       if (text.contains(keyword)) return false;
     }
 
-    // BNKR는 크롤링 단계에서 이미 한 번 건담 필터를 통과했으므로 통과
-    if (isBnkr) {
-      return true;
-    }
-
-    // 일반 사이트는 건담 관련 키워드 필수
+    // 건담 프라모델로 볼 수 있는 키워드
     const includeKeywords = [
       '건담',
       'gundam',
+      '건프라',
+      'gunpla',
+      'rx-',
+      'msn-',
+      'zgmf-',
+      'gat-',
+      'gn-',
+      'xxxg-',
       'hg',
+      'hguc',
+      'hgce',
+      'hgbf',
       'mg',
       'rg',
       'pg',
       'sd',
       'mgex',
       'mgsd',
-      '건프라',
-      'gunpla',
+      'full mechanics',
+      're/100',
+      '에어리얼',
+      '유니콘',
+      '사자비',
+      '자쿠',
+      '뉴건담',
+      '스트라이크',
+      '프리덤',
+      '저스티스',
+      '데스티니',
+      '바르바토스',
+      '시난주',
+      '제타',
+      '엑시아',
     ];
 
     for (final keyword in includeKeywords) {
@@ -1018,11 +1127,6 @@ class StockApi {
         final a = existing.first;
         final b = group.first;
 
-        // BNKR는 퍼지 병합 금지: exact key 그룹만 유지
-        if (_isBnkrItem(a) || _isBnkrItem(b)) {
-          continue;
-        }
-
         if (StockApi._isSimilarItem(a, b)) {
           existing.addAll(group);
           merged = true;
@@ -1042,7 +1146,7 @@ class StockApi {
 
       final offers = groupedItems
           .map((e) => StockOffer(
-                seller: e.mallName.isNotEmpty ? e.mallName : e.site,
+                seller: _prettySellerName(e.mallName.isNotEmpty ? e.mallName : e.site),
                 price: _normalizePriceText(e.price),
                 status: e.status,
                 resolvedUrl: e.resolvedUrl,
@@ -1135,10 +1239,6 @@ class StockApi {
   }
 
   static String _groupKey(StockItem item) {
-    if (_isBnkrItem(item)) {
-      return 'BNKR_${item.itemId}';
-    }
-    
     if (item.status == '공지') {
       final title = _canonicalName(
         item.title.isNotEmpty ? item.title : item.name,
@@ -1186,6 +1286,11 @@ class StockApi {
     if (text.contains('bnkrmall') || text.contains('반다이남코코리아몰')) {
       return '반다이남코코리아몰';
     }
+    if (text.contains('joyhobby') || text.contains('조이하비')) return '조이하비';
+    if (text.contains('gundamboom') || text.contains('건담붐')) return '건담붐';
+    if (text.contains('plamodelmania') || text.contains('프라모델매니아')) return '프라모델매니아';
+    if (text.contains('zeonshop') || text.contains('지온샵')) return '지온샵';
+    if (text.contains('gundamall') || text.contains('건담몰')) return '건담몰';
 
     return raw.trim();
   }

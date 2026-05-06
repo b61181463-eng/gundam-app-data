@@ -225,13 +225,21 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       itemCount: item.offers.length,
                       itemBuilder: (context, index) {
                         final offer = item.offers[index];
+                        final isLowest = _isLowestOffer(item, offer);
 
                         return Container(
                           margin: const EdgeInsets.only(bottom: 10),
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: Colors.grey.shade100,
+                            color: isLowest
+                                ? Colors.teal.shade50
+                                : Colors.grey.shade100,
                             borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: isLowest
+                                  ? Colors.teal.shade100
+                                  : Colors.transparent,
+                            ),
                           ),
                           child: Row(
                             children: [
@@ -239,11 +247,25 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(
-                                      offer.seller,
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                      ),
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: Text(
+                                            offer.seller,
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ),
+                                        if (isLowest)
+                                          _buildBadge(
+                                            text: '최저가',
+                                            bgColor: Colors.teal.shade100,
+                                            textColor: Colors.teal.shade900,
+                                          ),
+                                      ],
                                     ),
                                     const SizedBox(height: 4),
                                     Text(
@@ -254,8 +276,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                       offer.status,
                                       style: TextStyle(
                                         fontSize: 12,
-                                        color: Colors.grey.shade600,
-                                        fontWeight: FontWeight.w700,
+                                        color: offerStatusColor(offer.status),
+                                        fontWeight: FontWeight.w800,
                                       ),
                                     ),
                                   ],
@@ -375,6 +397,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   String _sellerText(StockItem item) {
     if (_isNoticeItem(item)) return '건담 공지';
+    if (item.sellerCount > 1) return '판매처 ${item.sellerCount}곳';
+    if (item.offers.isNotEmpty && item.offers.first.seller.trim().isNotEmpty) {
+      return item.offers.first.seller.trim();
+    }
     if (item.mallName.trim().isNotEmpty) return item.mallName.trim();
     if (item.site.trim().isNotEmpty) return item.site.trim();
     return '알 수 없음';
@@ -383,9 +409,26 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   bool _isNoticeItem(StockItem item) => item.status == '공지';
   bool _isUnknownStatus(StockItem item) => item.status == '상태 확인중';
 
+  bool _hasAvailableOffer(StockItem item) {
+    return item.status == '판매중' ||
+        item.offers.any((offer) => offer.status == '판매중');
+  }
+
+  bool _isOnlySoldOut(StockItem item) {
+    if (_isNoticeItem(item)) return false;
+    if (_hasAvailableOffer(item)) return false;
+    if (item.offers.isEmpty) return item.status == '품절';
+    return item.offers.every((offer) => offer.status == '품절');
+  }
+
+  bool _isLowestOffer(StockItem item, StockOffer offer) {
+    final offerPrice = offer.price.replaceAll(RegExp(r'[^0-9]'), '');
+    final minPrice = item.minPrice.replaceAll(RegExp(r'[^0-9]'), '');
+    return offerPrice.isNotEmpty && minPrice.isNotEmpty && offerPrice == minPrice;
+  }
+
   bool _isCrossChecked(StockItem item) {
-    final seller = _sellerText(item);
-    return seller.contains('외 ');
+    return !_isNoticeItem(item) && item.sellerCount > 1;
   }
 
   String _itemGrade(StockItem item) {
@@ -481,6 +524,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       final mallName = _searchNormalized(item.mallName);
       final stockText = _searchNormalized(item.stockText);
       final status = _searchNormalized(item.status);
+      final offersText = _searchNormalized(
+        item.offers
+            .map((offer) => '${offer.seller} ${offer.price} ${offer.status}')
+            .join(' '),
+      );
 
       return name.contains(q) ||
           seller.contains(q) ||
@@ -489,7 +537,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           site.contains(q) ||
           mallName.contains(q) ||
           stockText.contains(q) ||
-          status.contains(q);
+          status.contains(q) ||
+          offersText.contains(q);
     }).toList();
   }
 
@@ -670,6 +719,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           ...restockedItems.map((item) {
             final name = _itemName(item);
             final seller = _sellerText(item);
+            final onlySoldOut = _isOnlySoldOut(item);
 
             return Padding(
               padding: const EdgeInsets.only(bottom: 8),
@@ -684,7 +734,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: onlySoldOut ? Colors.grey.shade50 : Colors.white,
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Row(
@@ -780,53 +830,58 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   Widget _buildOfferRow(StockItem item) {
-    if (_isNoticeItem(item)) {
+    if (_isNoticeItem(item) || item.offers.length <= 1) {
       return const SizedBox.shrink();
     }
 
-    if (item.offers.length <= 1) {
-      return const SizedBox.shrink();
-    }
+    final previewOffers = item.offers.take(5).toList();
 
     return Column(
       children: [
         const SizedBox(height: 10),
         SizedBox(
-          height: 34,
+          height: 36,
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
-            itemCount: item.offers.length > 5 ? 5 : item.offers.length,
+            itemCount: previewOffers.length,
             separatorBuilder: (_, __) => const SizedBox(width: 6),
             itemBuilder: (context, index) {
-              final offer = item.offers[index];
-              final isLowest = index == 0;
+              final offer = previewOffers[index];
+              final isLowest = _isLowestOffer(item, offer);
 
               return InkWell(
                 borderRadius: BorderRadius.circular(999),
-                onTap: offer.resolvedUrl.isEmpty
-                    ? null
-                    : () async {
-                        final uri = Uri.tryParse(offer.resolvedUrl);
-                        if (uri != null && await canLaunchUrl(uri)) {
-                          await launchUrl(
-                            uri,
-                            mode: LaunchMode.externalApplication,
-                          );
-                        }
-                      },
+                onTap: () => _showItemOffersSheet(item),
                 child: Container(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
                   decoration: BoxDecoration(
-                    color: Colors.grey.shade100,
+                    color: isLowest ? Colors.teal.shade50 : Colors.grey.shade100,
                     borderRadius: BorderRadius.circular(999),
-                  ),
-                  child: Text(
-                    '${offer.seller} · ${offer.price.isNotEmpty ? offer.price : '-'}',
-                    style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
+                    border: Border.all(
+                      color: isLowest ? Colors.teal.shade100 : Colors.grey.shade200,
                     ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (isLowest) ...[
+                        Icon(
+                          Icons.local_offer,
+                          size: 13,
+                          color: Colors.teal.shade800,
+                        ),
+                        const SizedBox(width: 4),
+                      ],
+                      Text(
+                        '${offer.seller} · ${offer.price.isNotEmpty ? offer.price : '-'}',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w800,
+                          color: isLowest ? Colors.teal.shade900 : Colors.black87,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               );
@@ -836,7 +891,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       ],
     );
   }
-
 
   Future<void> _showPriceHistorySheet(StockItem item) async {
     final history = await PriceHistoryService.loadHistory(item.itemId);
@@ -1049,13 +1103,15 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     final seller = _sellerText(item);
     final price = item.price.isNotEmpty ? item.price : '-';
     final grade = _itemGrade(item);
+    final onlySoldOut = _isOnlySoldOut(item);
+    final primaryPrice = item.minPrice.isNotEmpty ? item.minPrice : price;
 
     return InkWell(
       borderRadius: BorderRadius.circular(16),
       onTap: () => _showItemOffersSheet(item),
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: onlySoldOut ? Colors.grey.shade50 : Colors.white,
           borderRadius: BorderRadius.circular(16),
           boxShadow: const [
             BoxShadow(
@@ -1106,6 +1162,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     text: '최저가 비교',
                     bgColor: Colors.teal.shade50,
                     textColor: Colors.teal.shade900,
+                  ),
+                if (onlySoldOut)
+                  _buildBadge(
+                    text: '전 판매처 품절',
+                    bgColor: Colors.red.shade50,
+                    textColor: Colors.red.shade900,
                   ),
               ],
             ),
@@ -1189,7 +1251,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        item.minPrice.isNotEmpty ? item.minPrice : price,
+                        primaryPrice,
                         style: const TextStyle(
                           fontSize: 19,
                           fontWeight: FontWeight.w900,
@@ -1280,14 +1342,16 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 ],
                 Expanded(
                   child: ElevatedButton.icon(
-                    onPressed: item.resolvedUrl.isEmpty
-                        ? null
-                        : () async => _openExternalLink(item),
+                    onPressed: item.sellerCount > 1
+                        ? () => _showItemOffersSheet(item)
+                        : item.resolvedUrl.isEmpty
+                            ? null
+                            : () async => _openExternalLink(item),
                     icon: Icon(
                       isNotice ? Icons.campaign : Icons.open_in_new,
                       size: 18,
                     ),
-                    label: Text(isNotice ? '공지 보기' : '보기'),
+                    label: Text(isNotice ? '공지 보기' : item.sellerCount > 1 ? '판매처' : '보기'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.black,
                       foregroundColor: Colors.white,
@@ -1319,6 +1383,30 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           child: _buildSummaryCard(items),
         ),
         _buildRestockSection(items),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(12, 0, 12, 4),
+          child: Row(
+            children: [
+              Text(
+                '표시 ${filteredItems.length}개',
+                style: TextStyle(
+                  color: Colors.grey.shade700,
+                  fontWeight: FontWeight.w700,
+                  fontSize: 12,
+                ),
+              ),
+              const Spacer(),
+              Text(
+                '재입고 · 판매중 · 최저가순',
+                style: TextStyle(
+                  color: Colors.grey.shade600,
+                  fontWeight: FontWeight.w700,
+                  fontSize: 12,
+                ),
+              ),
+            ],
+          ),
+        ),
         Expanded(
           child: filteredItems.isEmpty
               ? Center(child: Text(_emptyMessage()))

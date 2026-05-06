@@ -19,17 +19,23 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies
-        run: pip install -r requirements.txt
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
 
       - name: Create serviceAccountKey.json
         run: |
           echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}' > serviceAccountKey.json
 
-      - name: Run crawlers
+      - name: Run KR integrated crawler
+        env:
+          FIRESTORE_COLLECTION: aggregated_items
         run: |
-          python sync_kr_gundamshop.py
-          python sync_kr_gundambase.py
-          python sync_kr_bnkrmall.py
+          python merge_kr_crosscheck.py
 
-      - name: Normalize and detect alerts
-        run: python scripts/run_after_crawling.py
+      - name: Upload local debug backup
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: kr-aggregated-debug
+          path: kr_aggregated_debug.json
