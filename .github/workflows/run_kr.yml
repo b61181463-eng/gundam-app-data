@@ -53,5 +53,7 @@ jobs:
           name: kr-crawler-backups
           path: |
             kr_aggregated_debug.json
+            failed_links_report.json
+            crawler_health_history.json
             backups/*.json
           if-no-files-found: ignore

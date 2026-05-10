@@ -211,6 +211,18 @@ BAD_TITLE_EXACT = {
     "gundamcity",
 }
 
+# ===== 운영 관측/실패 리포트 =====
+FAILED_EVENTS: List[Dict[str, str]] = []
+
+
+def record_failure(site: str, url: str, error: Exception | str):
+    message = str(error)
+    FAILED_EVENTS.append({
+        "site": site,
+        "url": url or "",
+        "error": message[:500],
+    })
+
 
 HEADERS = {
     "User-Agent": (
@@ -1099,10 +1111,12 @@ def parse_generic_shop_detail(
             detail_url=url,
         )
     except requests.exceptions.HTTPError as e:
+        record_failure(mall_name, url, e)
         if DEBUG:
             print(f"[{mall_name} HTTP 탈락] {url} / {e}")
         return None
     except Exception as e:
+        record_failure(mall_name, url, e)
         print(f"[{mall_name} 상세 파싱 실패] {url} / {type(e).__name__}: {e}")
         return None
 
@@ -1302,6 +1316,7 @@ def parse_modelsale_detail(session: requests.Session, url: str) -> Optional[Item
             detail_url=url,
         )
     except Exception as e:
+        record_failure("모델세일", url, e)
         print(f"[모델세일 상세 파싱 실패] {url} / {type(e).__name__}: {e}")
         return None
 
@@ -1347,6 +1362,7 @@ def parse_gundambase_detail(session: requests.Session, url: str) -> Optional[Ite
             detail_url=url,
         )
     except Exception as e:
+        record_failure("건담베이스", url, e)
         print(f"[건담베이스 상세 파싱 실패] {url} / {type(e).__name__}: {e}")
         return None
 
@@ -1357,7 +1373,8 @@ def parse_hobbyfactory_detail(session: requests.Session, url: str) -> Optional[I
         title = parse_title_from_soup(soup)
         title_only = clean_product_name(title)
         joined = f"{title_only} {page_text}"
-        print(f"[하비팩토리 상세 진입] {url}")
+        if DEBUG:
+            print(f"[하비팩토리 상세 진입] {url}")
 
         if not title_only:
             print(f"[하비팩토리 탈락:title없음] {url}")
@@ -1398,6 +1415,7 @@ def parse_hobbyfactory_detail(session: requests.Session, url: str) -> Optional[I
             detail_url=url,
         )
     except Exception as e:
+        record_failure("하비팩토리", url, e)
         print(f"[하비팩토리 상세 파싱 실패] {url} / {type(e).__name__}: {e}")
         return None
 
@@ -1468,6 +1486,7 @@ def parse_gundamcity_detail(session: requests.Session, url: str) -> Optional[Ite
             detail_url=url,
         )
     except Exception as e:
+        record_failure("건담시티", url, e)
         print(f"[건담시티 상세 파싱 실패] {url} / {type(e).__name__}: {e}")
         return None
 
@@ -1609,10 +1628,12 @@ def parse_joyhobby_detail(session: requests.Session, url: str) -> Optional[ItemR
             detail_url=url,
         )
     except requests.exceptions.HTTPError as e:
+        record_failure("조이하비", url, e)
         if DEBUG:
             print(f"[조이하비 HTTP 탈락] {url} / {e}")
         return None
     except Exception as e:
+        record_failure("조이하비", url, e)
         print(f"[조이하비 상세 파싱 실패] {url} / {type(e).__name__}: {e}")
         return None
 
@@ -1673,6 +1694,7 @@ def parse_gundamshop_detail(session: requests.Session, url: str) -> Optional[Ite
             detail_url=url,
         )
     except Exception as e:
+        record_failure("건담샵", url, e)
         print(f"[건담샵 상세 파싱 실패] {url} / {type(e).__name__}: {e}")
         return None
 
@@ -1757,6 +1779,7 @@ def parse_bnkr_detail(session: requests.Session, url: str) -> Optional[ItemRecor
             detail_url=url,
         )
     except Exception as e:
+        record_failure("반다이남코코리아몰", url, e)
         print(f"[BNKR 상세 파싱 실패] {url} / {type(e).__name__}: {e}")
         return None
 
@@ -2471,6 +2494,7 @@ def run_crawler_safely(label: str, func, *args) -> List[ItemRecord]:
         return items
     except Exception as e:
         elapsed = time.time() - started
+        record_failure(label, "SITE_LEVEL", e)
         print(f"[사이트 실패] {label}: {type(e).__name__}: {e} / {elapsed:.1f}s")
         return []
 
@@ -2504,6 +2528,71 @@ def print_site_counts(title: str, items: List[ItemRecord]):
         print(f"{mall}: {count}")
     print("==================================")
     return counter
+
+
+
+def save_failed_events_report(path: str = "failed_links_report.json"):
+    backup_dir = Path("backups")
+    backup_dir.mkdir(exist_ok=True)
+    ts = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+
+    grouped: Dict[str, List[Dict[str, str]]] = {}
+    for event in FAILED_EVENTS:
+        grouped.setdefault(event.get("site", "unknown"), []).append(event)
+
+    report = {
+        "generatedAtUtc": datetime.now(timezone.utc).isoformat(),
+        "totalFailures": len(FAILED_EVENTS),
+        "failuresBySite": {site: len(events) for site, events in sorted(grouped.items())},
+        "events": FAILED_EVENTS,
+    }
+
+    targets = [Path(path), backup_dir / "failed_links_latest.json", backup_dir / f"failed_links_{ts}.json"]
+    for out in targets:
+        with open(out, "w", encoding="utf-8") as f:
+            json.dump(report, f, ensure_ascii=False, indent=2)
+
+    print(f"[실패 URL 저장] {path} / 실패 {len(FAILED_EVENTS)}건")
+
+
+def save_health_history(items: List[ItemRecord], upload_allowed: bool, path: str = "crawler_health_history.json"):
+    backup_dir = Path("backups")
+    backup_dir.mkdir(exist_ok=True)
+    counter = count_by_mall(items)
+    now = datetime.now(timezone.utc).isoformat()
+    entry = {
+        "generatedAtUtc": now,
+        "total": len(items),
+        "uploadAllowed": upload_allowed,
+        "fastTestMode": FAST_TEST_MODE,
+        "countsByMall": dict(sorted(counter.items())),
+        "failureCount": len(FAILED_EVENTS),
+        "criticalThresholds": CRITICAL_SITE_MIN_COUNTS,
+        "warningThresholds": WARNING_SITE_MIN_COUNTS,
+    }
+
+    history: List[Dict] = []
+    latest = backup_dir / path
+    if latest.exists():
+        try:
+            history = json.loads(latest.read_text(encoding="utf-8"))
+            if not isinstance(history, list):
+                history = []
+        except Exception:
+            history = []
+    history.append(entry)
+    history = history[-100:]
+
+    for out in [Path(path), latest]:
+        with open(out, "w", encoding="utf-8") as f:
+            json.dump(history, f, ensure_ascii=False, indent=2)
+
+    ts = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+    snapshot = backup_dir / f"crawler_health_{ts}.json"
+    with open(snapshot, "w", encoding="utf-8") as f:
+        json.dump(entry, f, ensure_ascii=False, indent=2)
+
+    print(f"[건강 기록 저장] {path} / {snapshot}")
 
 
 def validate_crawl_health(items: List[ItemRecord]) -> bool:
@@ -2603,8 +2692,12 @@ def main():
     print(f"[정렬 후] 총 {len(merged)}개")
 
     save_local_backup(merged)
+    save_failed_events_report()
 
-    if not validate_crawl_health(merged):
+    upload_allowed = validate_crawl_health(merged)
+    save_health_history(merged, upload_allowed)
+
+    if not upload_allowed:
         raise RuntimeError("크롤링 건강 상태가 기준 미달이라 Firestore 업로드를 중단했습니다.")
 
     upload_to_firestore(db, merged)
