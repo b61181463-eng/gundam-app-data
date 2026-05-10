@@ -1,6 +1,5 @@
 import json
 import os
-SERVICE_ACCOUNT_PATH = "serviceAccountKey.json"
 import re
 import time
 import hashlib
@@ -18,6 +17,13 @@ from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.by import By
 import time
 
+# ===== 기본 설정값: GitHub Actions/로컬 공통 =====
+DEBUG = False
+FAST_TEST_MODE = False
+MAX_LINKS_PER_SITE = 9999
+SERVICE_ACCOUNT_PATH = "serviceAccountKey.json"
+COLLECTION_NAME = os.getenv("FIRESTORE_COLLECTION", "aggregated_items")
+
 
 @dataclass
 class ItemRecord:
@@ -34,18 +40,14 @@ class ItemRecord:
     product_url: str
     detail_url: str
 
-
 def crawl_bnkrmall_selenium() -> List[ItemRecord]:
-    """BNKR 크롤러.
+    from selenium import webdriver
+    from selenium.webdriver.chrome.service import Service
+    from selenium.webdriver.common.by import By
+    from webdriver_manager.chrome import ChromeDriverManager
 
-    1순위: Selenium으로 실제 페이지에서 gno 추출
-    2순위: requests로 seed HTML에서 gno 추출
-    BNKR은 페이지 title이 '상품상세 | 반다이남코코리아몰'로 잡히는 경우가 많아서
-    제목 파싱에 실패하면 해당 상품은 안전하게 버린다.
-    """
     results: List[ItemRecord] = []
     seen_ids: Set[str] = set()
-    links: Set[str] = set()
 
     print("[BNKR Selenium 시작]")
 
@@ -54,93 +56,140 @@ def crawl_bnkrmall_selenium() -> List[ItemRecord]:
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
     options.add_argument("--disable-gpu")
-    options.add_argument("--window-size=1400,2400")
-    options.add_argument("--lang=ko-KR")
-    options.add_argument("--user-agent=" + HEADERS["User-Agent"])
+    options.add_argument("--window-size=1400,2200")
 
-    driver = None
+    driver = webdriver.Chrome(
+        service=Service(ChromeDriverManager().install()),
+        options=options,
+    )
+
     try:
-        driver = webdriver.Chrome(
-            service=Service(ChromeDriverManager().install()),
-            options=options,
-        )
+        url = "https://m.bnkrmall.co.kr/mw/goods/category.do?cate=1576&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&endGoods=Y"
+        driver.get(url)
+        time.sleep(4)
 
-        seed_urls = [
-            "https://www.bnkrmall.co.kr/goods/list.do?cate=1576&endGoods=Y",
-            "https://m.bnkrmall.co.kr/mw/goods/category.do?cate=1576&cateName=%EA%B1%B4%ED%94%84%EB%9D%BC&endGoods=Y",
-            "https://m.bnkrmall.co.kr/mw/goods/new.do?endGoods=Y",
-        ]
+        anchors = driver.find_elements(By.CSS_SELECTOR, "a[href*='detail.do']")
+        print(f"[BNKR 링크 개수] {len(anchors)}")
 
-        for seed in seed_urls:
+        links: Set[str] = set()
+        for el in anchors:
+            href = (el.get_attribute("href") or "").strip()
+            if href and "detail.do" in href and "gno=" in href:
+                links.add(href)
+
+        print(f"[BNKR 상세 링크] {len(links)}")
+
+        for idx, link in enumerate(sorted(links), start=1):
             try:
-                print(f"[BNKR 목록] {seed}")
-                driver.get(seed)
-                time.sleep(4)
-
-                # 스크롤해야 상품 링크가 생기는 경우 대응
-                for _ in range(4):
-                    driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-                    time.sleep(1)
+                driver.get(link)
+                time.sleep(2)
 
                 html = driver.page_source
                 soup = BeautifulSoup(html, "html.parser")
-                links.update(extract_bnkr_candidate_links(soup, seed))
+                page_text = soup.get_text(" ", strip=True)
 
-                anchors = driver.find_elements(By.CSS_SELECTOR, "a[href]")
-                for el in anchors:
-                    href = (el.get_attribute("href") or "").strip()
-                    if href:
-                        parsed = urljoin(seed, href)
-                        lower = parsed.lower()
-                        if "bnkrmall.co.kr" in lower and "detail.do" in lower and ("gno=" in lower or "goodsno=" in lower):
-                            links.add(parsed)
-                print(f"  [BNKR 누적 링크] {len(links)}개")
-            except Exception as e:
-                print(f"[BNKR Selenium 목록 실패] {seed} / {type(e).__name__}: {e}")
-    except Exception as e:
-        print(f"[BNKR Selenium 초기화 실패] {type(e).__name__}: {e}")
-    finally:
-        if driver:
-            driver.quit()
+                raw_title = parse_title_from_soup(soup) or ""
+                title_only = clean_product_name(raw_title)
+                joined = f"{title_only} {page_text}".strip()
 
-    # Selenium이 0개면 requests로 한 번 더 시도
-    if not links:
-        session = make_session()
-        for seed in BNKR_SEEDS:
-            try:
-                print(f"[BNKR requests 목록] {seed}")
-                soup = soup_from_url(session, seed)
-                links.update(extract_bnkr_candidate_links(soup, seed))
-                print(f"  [BNKR requests 누적 링크] {len(links)}개")
-            except Exception as e:
-                print(f"[BNKR requests 목록 실패] {seed} / {type(e).__name__}: {e}")
-
-    print(f"[BNKR 상세 링크] {len(links)}")
-
-    # 너무 많으면 GitHub Actions 시간 부담이 크므로 기본 200개까지만.
-    # 필요하면 BNKR_MAX_LINKS 환경변수로 조정 가능.
-    max_bnkr = int(os.getenv("BNKR_MAX_LINKS", "200"))
-    links_to_crawl = sorted(links)[:max_bnkr]
-
-    session = make_session()
-    for idx, link in enumerate(links_to_crawl, start=1):
-        try:
-            item = parse_bnkr_detail(session, link)
-            if item and item.item_id not in seen_ids:
-                # 잘못 잡힌 BNKR 제목 방지
-                if is_bad_title(item.name):
+                if not title_only:
+                    if DEBUG:
+                        print(f"[BNKR 탈락:title없음] {link}")
                     continue
-                results.append(item)
-                seen_ids.add(item.item_id)
-        except Exception as e:
-            print(f"[BNKR 상세 루프 실패] {link} / {type(e).__name__}: {e}")
 
-        if idx % 20 == 0:
-            print(f"[BNKR 진행] {idx}/{len(links_to_crawl)}")
-        time.sleep(REQUEST_SLEEP)
+                invalid_titles = {
+                    "반다이남코코리아몰",
+                    "bnkrmall",
+                    "상품명",
+                }
+                if title_only.strip().lower() in invalid_titles:
+                    if DEBUG:
+                        print(f"[BNKR 탈락:잘못된제목] {title_only} / {link}")
+                    continue
+
+                if is_excluded(title_only):
+                    if DEBUG:
+                        print(f"[BNKR 탈락:제외키워드] {title_only} / {link}")
+                    continue
+
+                if is_non_gundam_figure_like(title_only):
+                    if DEBUG:
+                        print(f"[BNKR 탈락:피규어류] {title_only} / {link}")
+                    continue
+
+                if not is_valid_gundam_plamodel(title_only, joined):
+                    if DEBUG:
+                        print(f"[BNKR 탈락:건담판별실패] {title_only} / {link}")
+                    continue
+
+                price = parse_price_from_soup(soup) or ""
+                status = parse_status_from_soup(soup) or "상태 확인중"
+                stock_text = status
+
+                parsed_price = price_to_int(price)
+                if parsed_price is not None and parsed_price < 3000:
+                    if DEBUG:
+                        print(f"[BNKR 탈락:비정상가격] {title_only} / {price} / {link}")
+                    continue
+
+                parsed = urlparse(link)
+                qs = parse_qs(parsed.query)
+                gno = qs.get("gno", [""])[0]
+                goodsno = qs.get("goodsno", [""])[0]
+                stable_key = gno or goodsno or link
+                item_id = f"bnkr_{sha_id(stable_key)}"
+
+                if item_id in seen_ids:
+                    continue
+                seen_ids.add(item_id)
+
+                results.append(
+                    ItemRecord(
+                        item_id=item_id,
+                        name=title_only,
+                        title=title_only,
+                        price=price,
+                        status=status,
+                        stock_text=stock_text,
+                        mall_name="반다이남코코리아몰",
+                        site="bnkrmall",
+                        source_page="kr_bnkrmall",
+                        url=link,
+                        product_url=link,
+                        detail_url=link,
+                    )
+                )
+
+                if DEBUG:
+                    print(f"[BNKR 통과] {title_only} / {price} / {status}")
+
+            except Exception as e:
+                print(f"[BNKR 상세 루프 실패] {link} / {type(e).__name__}: {e}")
+
+            if idx % 10 == 0:
+                print(f"[BNKR 진행] {idx}/{len(links)}")
+
+    finally:
+        driver.quit()
 
     print(f"[BNKR 최종] {len(results)}")
     return results
+
+
+HEADERS = {
+    "User-Agent": (
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+        "AppleWebKit/537.36 (KHTML, like Gecko) "
+        "Chrome/146.0.0.0 Safari/537.36"
+    ),
+    "Accept-Language": "ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7",
+    "Cache-Control": "no-cache",
+    "Pragma": "no-cache",
+}
+
+TIMEOUT = 20
+REQUEST_SLEEP = 0.3
+
 
 def is_notice_like(title: str, text: str) -> bool:
     t = f"{title} {text}".lower()
@@ -325,81 +374,23 @@ def normalize_status(text: str) -> str:
     return "상태 확인중"
 
 
-
 def make_session() -> requests.Session:
-    """크롤링용 세션 생성.
-
-    GitHub Actions/서버 환경에서 일부 Cafe24 계열 쇼핑몰이 기본 requests를
-    차단하는 경우가 있어 브라우저에 가까운 헤더를 추가한다.
-    """
     s = requests.Session()
     s.headers.update(HEADERS)
-    s.headers.update({
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
-        "Accept-Encoding": "gzip, deflate, br",
-        "Connection": "keep-alive",
-        "Upgrade-Insecure-Requests": "1",
-        "Sec-Fetch-Dest": "document",
-        "Sec-Fetch-Mode": "navigate",
-        "Sec-Fetch-Site": "none",
-        "Sec-Fetch-User": "?1",
-    })
     return s
 
 
 def fetch_html(session: requests.Session, url: str, encoding: Optional[str] = None) -> str:
-    """HTML 요청.
+    resp = session.get(url, timeout=TIMEOUT)
+    resp.raise_for_status()
 
-    403이 자주 나는 쇼핑몰은 헤더를 한 번 더 바꿔 재시도한다.
-    그래도 실패하면 예외를 올려 개별 사이트 로그에 남긴다.
-    """
-    last_exc = None
+    if encoding:
+        resp.encoding = encoding
+    elif not resp.encoding or resp.encoding.lower() == "iso-8859-1":
+        resp.encoding = resp.apparent_encoding or "utf-8"
 
-    header_variants = [
-        {},
-        {
-            "User-Agent": (
-                "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
-                "AppleWebKit/537.36 (KHTML, like Gecko) "
-                "Chrome/146.0.0.0 Safari/537.36"
-            ),
-            "Referer": "https://www.google.com/",
-        },
-        {
-            "User-Agent": (
-                "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:146.0) "
-                "Gecko/20100101 Firefox/146.0"
-            ),
-            "Referer": url,
-        },
-    ]
+    return resp.text
 
-    for extra_headers in header_variants:
-        try:
-            resp = session.get(url, timeout=TIMEOUT, headers=extra_headers or None)
-            resp.raise_for_status()
-
-            if encoding:
-                resp.encoding = encoding
-            elif not resp.encoding or resp.encoding.lower() == "iso-8859-1":
-                resp.encoding = resp.apparent_encoding or "utf-8"
-
-            return resp.text
-        except requests.exceptions.HTTPError as e:
-            last_exc = e
-            # 403/429는 다른 헤더로 재시도
-            code = getattr(e.response, "status_code", None)
-            if code in {403, 429}:
-                time.sleep(REQUEST_SLEEP + 0.5)
-                continue
-            raise
-        except Exception as e:
-            last_exc = e
-            raise
-
-    if last_exc:
-        raise last_exc
-    raise RuntimeError(f"fetch_html failed: {url}")
 
 def soup_from_url(session: requests.Session, url: str, encoding: Optional[str] = None) -> BeautifulSoup:
     html = fetch_html(session, url, encoding=encoding)
@@ -455,6 +446,7 @@ def parse_title_from_soup(soup: BeautifulSoup) -> str:
         "상품명",
         "상품상세",
         "상품상세 | 반다이남코코리아몰",
+        "상품상세|반다이남코코리아몰",
     }
 
     # 1순위: 화면 본문 selector
@@ -510,6 +502,7 @@ def is_bad_title(title: str) -> bool:
         "상품명",
         "상품상세",
         "상품상세 | 반다이남코코리아몰",
+        "상품상세|반다이남코코리아몰",
         "건담시티",
         "gundamcity",
     }
@@ -653,15 +646,11 @@ ZEONSHOP_SEEDS = [
 
 GUNDAMALL_SEEDS = [
     "https://www.gundamall.com/",
+    "https://m.gundamall.com/",
     "https://www.gundamall.com/product/search.html?keyword=%EA%B1%B4%EB%8B%B4",
     "https://www.gundamall.com/product/search.html?keyword=MG",
     "https://www.gundamall.com/product/search.html?keyword=RG",
     "https://www.gundamall.com/product/search.html?keyword=HG",
-    "https://www.gundamall.com/product/search.html?keyword=SD",
-    "https://www.gundamall.com/category/%EA%B1%B4%EB%8B%B4/24/",
-    "https://www.gundamall.com/category/mg/27/",
-    "https://www.gundamall.com/category/rg/28/",
-    "https://www.gundamall.com/category/hg/29/",
 ]
 
 BNKR_SEEDS = [
@@ -889,22 +878,19 @@ def extract_joyhobby_candidate_links(soup: BeautifulSoup, base_url: str) -> Set[
     return links
 
 
-
 def extract_cafe24_candidate_links(soup: BeautifulSoup, base_url: str, domain: str, label: str) -> Set[str]:
     """
     Cafe24 계열 쇼핑몰에서 상품 상세 링크를 넓게 수집한다.
-    핵심 수정:
-    - /product/상품명/번호/category/... 형태를 정상 상품 링크로 인정
-    - category/가 들어간 상품 URL을 버리지 않음
-    - href 외 data-* / JS 내부 URL도 스캔
+    - gundamboom: /product/detail.html?product_no=..., /product/detail.php?product_no=...
+    - plamodelmania/zeonshop/gundamall: /product/.../상품번호/category/...
     """
     links: Set[str] = set()
 
     exclude_patterns = [
         '/board/', '/member/', '/order/', '/cart/', '/myshop/', '/exec/front/',
         '/article/', '/notice/', '/faq/', '/event/', '/shopinfo/', '/coupon/',
-        'javascript:', 'mailto:', 'basket.html', 'login', 'review', 'qna',
-        'popup', 'recommend', 'wishlist', 'add_basket',
+        'javascript:', 'mailto:', 'basket.html', 'login', 'review', 'qna.php',
+        'popup', 'recommend', 'wishlist', 'add_basket', 'category/', 'search.html?'
     ]
 
     detail_patterns = [
@@ -912,67 +898,38 @@ def extract_cafe24_candidate_links(soup: BeautifulSoup, base_url: str, domain: s
         'product_no=', 'itemno=', 'goodsno=', 'goods_no=', 'productcode=',
     ]
 
-    def normalize_url(raw: str) -> Optional[str]:
+    def try_add(raw: str):
         raw = (raw or '').strip()
         if not raw or raw.startswith('#'):
-            return None
-
-        # JS 문자열 안에 URL이 들어간 케이스 대응
-        m = re.search(r"((?:https?:)?//[^'\"\s<>]+|/product/[^'\"\s<>]+|/goods/[^'\"\s<>]+)", raw, re.IGNORECASE)
-        if m:
-            raw = m.group(1)
-
-        if raw.startswith("//"):
-            raw = "https:" + raw
-
+            return
         full = urljoin(base_url, raw)
         lower = full.lower()
-
-        if domain.lower() not in lower:
-            return None
+        if domain not in lower:
+            return
         if any(x in lower for x in exclude_patterns):
-            return None
-        if not any(x in lower for x in detail_patterns):
-            return None
-
-        # Cafe24 상품 URL은 /product/상품명/123/category/42/display/1/ 형태가 많다.
-        if '/product/' in lower:
-            if not re.search(r'(product_no=|itemno=|goodsno=|goods_no=|/\d+(?:/|$|\?))', lower):
-                return None
-
-        return full.split("#")[0]
-
-    for a in soup.select('a[href]'):
-        full = normalize_url(a.get('href') or '')
-        if full:
+            return
+        if any(x in lower for x in detail_patterns):
+            # Cafe24 /product/상품명/번호/category/번호/ 형태는 category 목록과 구분하기 위해 숫자 포함 확인
+            if '/product/' in lower and not re.search(r'(product_no=|itemno=|goodsno=|/\d+(?:/|$|\?))', lower):
+                return
             links.add(full)
 
-        for attr in ["data-url", "data-href", "ec-data-href", "onclick"]:
-            full = normalize_url(a.get(attr) or '')
-            if full:
-                links.add(full)
+    for a in soup.select('a[href]'):
+        try_add(a.get('href') or '')
 
     html = str(soup)
-
-    regexes = [
-        r"(?:href|data-url|ec-data-href|data-href)=['\"]([^'\"]+)['\"]",
-        r"(?:location\.href|window\.open|goDetail|product_submit)\(['\"]([^'\"]+)['\"]",
-        r"['\"]((?:https?:)?//[^'\"]*?/product/[^'\"]+?)['\"]",
-        r"['\"](/product/[^'\"]+?)['\"]",
-    ]
-
-    for rx in regexes:
-        for raw in re.findall(rx, html, re.IGNORECASE):
-            full = normalize_url(raw)
-            if full:
-                links.add(full)
+    for raw in re.findall(r"(?:href|data-url|ec-data-href)=['\"]([^'\"]+)['\"]", html, re.IGNORECASE):
+        try_add(raw)
+    for raw in re.findall(r"(?:location\.href|window\.open)\(['\"]([^'\"]+)['\"]", html, re.IGNORECASE):
+        try_add(raw)
 
     print(f"[{label} 링크 디버그] 상품 후보 {len(links)}개")
     if DEBUG:
-        for link in sorted(list(links))[:50]:
+        for link in sorted(list(links))[:30]:
             print(f"  [{label} 후보] {link}")
 
     return links
+
 
 def parse_generic_shop_title(soup: BeautifulSoup, page_text: str, mall_label: str) -> str:
     candidates: List[str] = []
@@ -1150,15 +1107,15 @@ def crawl_generic_shop(
         except Exception as e:
             print(f"[{label} 목록 실패] {seed} / {type(e).__name__}: {e}")
 
-    print(f"[{label}] 상세 후보 총 {len(links_to_crawl)}개")
-
-    results: List[ItemRecord] = []
-    seen_ids: Set[str] = set()
-
     links_to_crawl = sorted(all_links)
 
     if FAST_TEST_MODE:
         links_to_crawl = links_to_crawl[:MAX_LINKS_PER_SITE]
+
+    print(f"[{label}] 상세 후보 총 {len(links_to_crawl)}개")
+
+    results: List[ItemRecord] = []
+    seen_ids: Set[str] = set()
 
     for idx, link in enumerate(links_to_crawl, start=1):
         try:
@@ -1793,12 +1750,13 @@ def crawl_gundambase(session: requests.Session) -> List[ItemRecord]:
         except Exception as e:
             print(f"[건담베이스 목록 실패] {seed} / {type(e).__name__}: {e}")
 
+    links_to_crawl = limit_links(all_links)
     print(f"[건담베이스] 상세 후보 총 {len(links_to_crawl)}개")
 
     results: List[ItemRecord] = []
     seen_ids: Set[str] = set()
 
-    for idx, link in enumerate(sorted(all_links), start=1):
+    for idx, link in enumerate(links_to_crawl, start=1):
         try:
             item = parse_gundambase_detail(session, link)
             if item and item.item_id not in seen_ids:
@@ -1829,13 +1787,12 @@ def crawl_modelsale(session: requests.Session) -> List[ItemRecord]:
         except Exception as e:
             print(f"[모델세일 목록 실패] {seed} / {type(e).__name__}: {e}")
 
-    print(f"[모델세일] 상세 후보 총 {len(links_to_crawl)}개")
-
     links_to_crawl = limit_links(all_links)
+    print(f"[모델세일] 상세 후보 총 {len(links_to_crawl)}개")
     results: List[ItemRecord] = []
     seen_ids: Set[str] = set()
 
-    for idx, link in enumerate(sorted(all_links), start=1):
+    for idx, link in enumerate(links_to_crawl, start=1):
         try:
             item = parse_modelsale_detail(session, link)
             if item and item.item_id not in seen_ids:
@@ -1872,7 +1829,7 @@ def crawl_hobbyfactory(session: requests.Session) -> List[ItemRecord]:
     results: List[ItemRecord] = []
     seen_ids: Set[str] = set()
 
-    for idx, link in enumerate(sorted(all_links), start=1):
+    for idx, link in enumerate(links_to_crawl, start=1):
         try:
             item = parse_hobbyfactory_detail(session, link)
             if item and item.item_id not in seen_ids:
@@ -1903,13 +1860,12 @@ def crawl_gundamcity(session: requests.Session) -> List[ItemRecord]:
         except Exception as e:
             print(f"[건담시티 목록 실패] {seed} / {type(e).__name__}: {e}")
 
-    print(f"[건담시티] 상세 후보 총 {len(links_to_crawl)}개")
-
     links_to_crawl = limit_links(all_links)
+    print(f"[건담시티] 상세 후보 총 {len(links_to_crawl)}개")
     results: List[ItemRecord] = []
     seen_ids: Set[str] = set()
 
-    for idx, link in enumerate(sorted(all_links), start=1):
+    for idx, link in enumerate(links_to_crawl, start=1):
         try:
             item = parse_gundamcity_detail(session, link)
             if item and item.item_id not in seen_ids:
@@ -1940,12 +1896,13 @@ def crawl_joyhobby(session: requests.Session) -> List[ItemRecord]:
         except Exception as e:
             print(f"[조이하비 목록 실패] {seed} / {type(e).__name__}: {e}")
 
+    links_to_crawl = limit_links(all_links)
     print(f"[조이하비] 상세 후보 총 {len(links_to_crawl)}개")
 
     results: List[ItemRecord] = []
     seen_ids: Set[str] = set()
 
-    for idx, link in enumerate(sorted(all_links), start=1):
+    for idx, link in enumerate(links_to_crawl, start=1):
         try:
             item = parse_joyhobby_detail(session, link)
             if item and item.item_id not in seen_ids:
@@ -1976,13 +1933,12 @@ def crawl_gundamshop(session: requests.Session) -> List[ItemRecord]:
         except Exception as e:
             print(f"[건담샵 목록 실패] {seed} / {type(e).__name__}: {e}")
 
-    print(f"[건담샵] 상세 후보 총 {len(links_to_crawl)}개")
-
     links_to_crawl = limit_links(all_links)
+    print(f"[건담샵] 상세 후보 총 {len(links_to_crawl)}개")
     results: List[ItemRecord] = []
     seen_ids: Set[str] = set()
 
-    for idx, link in enumerate(sorted(all_links), start=1):
+    for idx, link in enumerate(links_to_crawl, start=1):
         try:
             item = parse_gundamshop_detail(session, link)
             if item and item.item_id not in seen_ids:
@@ -2242,44 +2198,18 @@ def filter_bad_records(records: List[ItemRecord]) -> List[ItemRecord]:
     return clean
 
 
-
 def dedupe_records(records: List[ItemRecord]) -> List[ItemRecord]:
     """
-    판매처 내부 중복 제거.
-
-    이전 버전은 normalize_product_key(item.name)을 기준으로 dedupe해서
-    조이하비처럼 상품명이 짧거나 비슷하게 파싱되는 사이트의 상품 188개가
-    1개로 합쳐지는 문제가 있었다.
-
-    수정 원칙:
-    - 같은 판매처에서도 상품 고유 ID(item_id)가 다르면 다른 문서로 유지
-    - item_id가 겹치는 진짜 중복만 상태/가격 기준으로 1개 선택
-    - URL에서 product_no/itemid/gno/branduid 등 고유 번호가 있으면 보조키로 사용
+    안전한 중복 제거.
+    예전 방식은 normalize_product_key가 너무 강해서 조이하비 상품 188개가 1개로 합쳐지는 문제가 있었다.
+    이제는 같은 판매처 안에서 item_id가 같거나, URL이 완전히 같은 경우만 중복으로 본다.
+    상품명이 비슷해도 다른 링크면 별도 상품으로 유지한다.
     """
     by_key: Dict[str, ItemRecord] = {}
 
-    def stable_item_key(item: ItemRecord) -> str:
-        parsed = urlparse(item.url or item.product_url or item.detail_url or "")
-        qs = parse_qs(parsed.query)
-        for k in [
-            "ItemCode", "itemcode", "goodsNo", "goodsno", "product_no",
-            "productNo", "gno", "branduid", "itemid", "productcode", "no",
-        ]:
-            if qs.get(k):
-                return f"{item.site}|{k.lower()}={qs[k][0]}"
-
-        m = re.search(r"/product/[^/]+/(\d+)(?:/|$|\?)", parsed.path or "", re.IGNORECASE)
-        if m:
-            return f"{item.site}|product={m.group(1)}"
-
-        # 마지막 보루: item_id 우선. item_id는 크롤러가 이미 사이트별 고유값으로 만든 값이다.
-        if item.item_id:
-            return f"{item.site}|id={item.item_id}"
-
-        return f"{item.site}|name={normalize_space(item.name).lower()}|price={price_to_int(item.price)}"
-
     for item in records:
-        key = stable_item_key(item)
+        stable = item.item_id or item.detail_url or item.product_url or item.url
+        key = f"{item.site}|{stable}"
 
         old = by_key.get(key)
         if old is None:
@@ -2289,22 +2219,19 @@ def dedupe_records(records: List[ItemRecord]) -> List[ItemRecord]:
         old_score = status_score(old.status)
         new_score = status_score(item.status)
 
-        # 판매중 > 예약중 > 입고예정 > 품절 > 확인중
         if new_score > old_score:
             by_key[key] = item
             continue
 
-        # 상태가 같으면 더 싼 가격 우선
         if new_score == old_score:
             old_price = price_to_int(old.price)
             new_price = price_to_int(item.price)
-
             if old_price is None and new_price is not None:
                 by_key[key] = item
             elif old_price is not None and new_price is not None and new_price < old_price:
                 by_key[key] = item
 
-    print(f"[중복 제거] {len(records)}개 -> {len(by_key)}개")
+    print(f"[중복 제거:안전모드] {len(records)}개 -> {len(by_key)}개")
     return list(by_key.values())
 
 def sort_records(records: List[ItemRecord]) -> List[ItemRecord]:
