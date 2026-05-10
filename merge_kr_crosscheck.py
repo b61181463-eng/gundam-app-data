@@ -183,22 +183,23 @@ FORCE_UPLOAD_LOW_COUNT = os.getenv("FORCE_UPLOAD_LOW_COUNT", "0").strip().lower(
 
 # 핵심 사이트: 이 사이트들이 크게 무너지면 데이터 품질에 직접 영향이 크다.
 CRITICAL_SITE_MIN_COUNTS = {
+    # 정말 핵심인 두 사이트만 업로드 차단 기준으로 둔다.
+    # 나머지 사이트는 순간적인 차단/인코딩/구조 변경이 잦아서 경고로만 관리한다.
     "건담샵": 120,
     "모델세일": 80,
-    # 하비팩토리는 원격 연결 끊김이 자주 있어 100개 이상이면 운영 가능으로 본다.
-    "하비팩토리": 100,
 }
 
-# 보조 사이트: 0개 또는 급감 시 경고는 남기지만 전체 업로드를 반드시 막지는 않는다.
-# 조이하비는 사이트 구조/인코딩 때문에 필터 과삭제가 발생할 수 있어 핵심 차단이 아니라 경고로 관리한다.
+# 보조 사이트: 0개 또는 급감 시 경고는 남기지만 전체 업로드를 막지는 않는다.
+# 조이하비/하비팩토리는 수집은 되는데 필터/접속 상태에 따라 흔들릴 수 있어 차단 조건에서 제외한다.
 WARNING_SITE_MIN_COUNTS = {
+    "하비팩토리": 70,
     "건담시티": 5,
-    "조이하비": 1,
+    "조이하비": 0,
     "지온샵": 20,
     "프라모델매니아": 5,
-    "반다이남코코리아몰": 10,
-    "건담붐": 1,
-    "건담몰": 1,
+    "반다이남코코리아몰": 0,
+    "건담붐": 0,
+    "건담몰": 0,
 }
 
 BAD_TITLE_EXACT = {
@@ -2301,8 +2302,9 @@ def is_bad_record(item: ItemRecord) -> bool:
         up = name.upper()
         if any(w.upper() in up for w in joy_block_words):
             return True
-        if not looks_like_gundam(joined):
-            return True
+        # 조이하비는 상세명 파싱이 사이트 특성상 짧게 잡히는 경우가 많다.
+        # 여기서 looks_like_gundam으로 다시 걸면 정상 상품 188개가 전부 제거될 수 있으므로
+        # 명백한 옵션/비건담류만 제거하고 나머지는 match_report/needsReview에서 검토한다.
         return False
 
     if is_non_gundam_figure_like(name):
@@ -3575,6 +3577,7 @@ def build_match_report(items: List[ItemRecord], path: str = MATCH_REPORT_PATH) -
 
 def main():
     print("=== KR 통합 크롤링 시작 ===")
+    print("[패치 버전] joyhobby_filter_final_v2 / official_master 유지 / health 차단 완화")
     print(f"[실행 모드] FAST_TEST_MODE={FAST_TEST_MODE} / MAX_LINKS_PER_SITE={MAX_LINKS_PER_SITE}")
     load_manual_aliases()
     load_blocked_matches()
