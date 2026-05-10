@@ -216,7 +216,36 @@ BAD_TITLE_EXACT = {
     "하비팩토리",
     "모델세일",
     "조이하비",
+    "회원게시글검색",
+    "회원게시글검색 재고 문의드립니다",
+    "재고 문의드립니다",
+    "문의드립니다",
 }
+
+BAD_BOARD_PATTERNS = [
+    r"회원\s*게시글\s*검색",
+    r"게시글\s*검색",
+    r"재고\s*문의",
+    r"문의\s*드립니다",
+    r"문의\s*드려요",
+    r"질문\s*드립니다",
+    r"재고\s*있나요",
+    r"재고\s*문의드립니다",
+    r"입고\s*문의",
+    r"예약\s*문의",
+]
+
+def is_board_or_qna_noise(text: str) -> bool:
+    t = normalize_space(text or "")
+    if not t:
+        return False
+    for pat in BAD_BOARD_PATTERNS:
+        if re.search(pat, t, flags=re.IGNORECASE):
+            return True
+    # 날짜가 붙은 게시판/문의성 제목도 제거
+    if re.search(r"\b20\d{2}[./-]?(0?[1-9]|1[0-2])[./-]?(0?[1-9]|[12]\d|3[01])", t) and re.search(r"문의|게시글|검색|재고", t):
+        return True
+    return False
 
 # ===== 운영 관측/실패 리포트 =====
 FAILED_EVENTS: List[Dict[str, str]] = []
@@ -425,6 +454,8 @@ def is_valid_gundam_plamodel(title: str, joined_text: str) -> bool:
     return True
 
 def is_excluded(text: str) -> bool:
+    if is_board_or_qna_noise(text):
+        return True
     t = normalize_space(text).upper()
 
     exclude_keywords = [
@@ -572,6 +603,8 @@ def parse_bnkr_title_from_soup(soup: BeautifulSoup) -> str:
 
 
 def is_bad_title(title: str) -> bool:
+    if is_board_or_qna_noise(title):
+        return True
     t = normalize_space(title).lower()
     if t in {x.lower() for x in BAD_TITLE_EXACT}:
         return True
@@ -757,6 +790,14 @@ def extract_gundamcity_candidate_links(soup: BeautifulSoup, base_url: str) -> Se
         lower = full.lower()
 
         if "gundamcity.co.kr" not in lower:
+            continue
+
+        # 게시판/메인/커뮤니티 링크가 상품처럼 들어오면 앱에 잡문이 노출될 수 있어 제외
+        if any(x in lower for x in [
+            "/community", "/board", "/notice", "/member", "/login", "/join",
+            "/basket", "/cart", "/order", "/mypage", "/main.html",
+            "search_board", "board_no", "article",
+        ]):
             continue
 
         strong_patterns = [
@@ -2278,6 +2319,10 @@ def is_bad_record(item: ItemRecord) -> bool:
     joined = f"{item.name} {item.title} {item.stock_text} {item.url}"
     is_joyhobby = item.mall_name == "조이하비" or item.site == "joyhobby"
 
+    # 게시판/문의글/검색 결과가 상품명으로 잘못 들어온 케이스 제거
+    if is_board_or_qna_noise(joined):
+        return True
+
     if is_bad_title(name):
         return True
 
@@ -3577,6 +3622,7 @@ def build_match_report(items: List[ItemRecord], path: str = MATCH_REPORT_PATH) -
 
 def main():
     print("=== KR 통합 크롤링 시작 ===")
+    print("[패치 버전] board_noise_filter_v1")
     print("[패치 버전] joyhobby_filter_final_v2 / official_master 유지 / health 차단 완화")
     print(f"[실행 모드] FAST_TEST_MODE={FAST_TEST_MODE} / MAX_LINKS_PER_SITE={MAX_LINKS_PER_SITE}")
     load_manual_aliases()
