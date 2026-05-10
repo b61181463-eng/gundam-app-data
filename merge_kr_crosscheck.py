@@ -209,6 +209,10 @@ BAD_TITLE_EXACT = {
     "bnkrmall",
     "건담시티",
     "gundamcity",
+    "건담샵",
+    "하비팩토리",
+    "모델세일",
+    "조이하비",
 }
 
 # ===== 운영 관측/실패 리포트 =====
@@ -376,6 +380,24 @@ def is_non_gundam_figure_like(text: str) -> bool:
         "S.H.FIGUARTS",
         "SHFIGUARTS",
         "피규아츠",
+        "울트라맨",
+        "ULTRAMAN",
+        "스타워즈",
+        "STAR WARS",
+        "타이파이터",
+        "TIE FIGHTER",
+        "드래곤볼",
+        "POKEMON",
+        "포켓몬",
+        "30MS",
+        "30MM",
+        "30MF",
+        "옵션파츠",
+        "OPTION PARTS",
+        "데칼",
+        "스티커",
+        "마커",
+        "도료",
     ]
 
     return any(k in t for k in exclude_keywords)
@@ -469,7 +491,7 @@ def parse_title_from_soup(soup: BeautifulSoup) -> str:
         el = soup.select_one(selector)
         if el and el.get(attr):
             title = normalize_space(el.get(attr))
-            if title:
+            if title and not is_bad_title(title):
                 return title
 
     selectors = [
@@ -2090,21 +2112,22 @@ def price_to_int(price: str) -> Optional[int]:
         return None
 
 
+
 def extract_grade(name: str) -> str:
     t = (name or "").upper()
 
-    # 긴 등급을 먼저 봐야 MGSD가 MG로 잘못 잡히지 않음
+    # 긴 등급을 반드시 먼저 검사한다. MGSD 안의 SD, MGEX 안의 MG가 잡히면 안 된다.
     grade_patterns = [
-        ("MGEX", r"\bMGEX\b|\[MGEX\]"),
-        ("MGSD", r"\bMGSD\b|\[MGSD\]"),
+        ("MGEX", r"(?<![A-Z0-9])MG\s*EX(?![A-Z0-9])|\[\s*MG\s*EX\s*\]"),
+        ("MGSD", r"(?<![A-Z0-9])MG\s*SD(?![A-Z0-9])|\[\s*MG\s*SD\s*\]"),
         ("FULL MECHANICS", r"FULL\s*MECHANICS|풀\s*메카닉스"),
         ("RE/100", r"RE\s*/\s*100"),
-        ("PG", r"\bPG\b|\[PG\]"),
-        ("RG", r"\bRG\b|\[RG\]"),
-        ("MG", r"\bMG\b|\[MG\]"),
-        ("HG", r"\bHG\b|\[HG\]|\bHGUC\b|\bHGCE\b|\bHGBF\b|\bHGAC\b"),
-        ("EG", r"\bEG\b|\[EG\]"),
-        ("SD", r"\bSD\b|\[SD\]|SD삼국|SD건담"),
+        ("PG", r"(?<![A-Z0-9])PG(?![A-Z0-9])|\[\s*PG\s*\]"),
+        ("RG", r"(?<![A-Z0-9])RG(?:\s*\d+)?(?![A-Z0-9])|\[\s*RG[^\]]*\]"),
+        ("MG", r"(?<![A-Z0-9])MG(?:\s*\d+)?(?![A-Z0-9])|\[\s*MG[^\]]*\]"),
+        ("HG", r"(?<![A-Z0-9])HG(?:UC|CE|BF|AC|FC|GW|WM)?(?:\s*\d+)?(?![A-Z0-9])|\[\s*HG[^\]]*\]"),
+        ("EG", r"(?<![A-Z0-9])EG(?![A-Z0-9])|\[\s*EG\s*\]"),
+        ("SD", r"(?<!MG)(?<![A-Z0-9])SD(?:\s*[- ]?\s*EX(?:\s*[- ]?\s*STANDARD)?)?(?![A-Z0-9])|\[\s*SD[^\]]*\]|SD삼국|SD건담|SD건담월드"),
     ]
 
     for grade, pattern in grade_patterns:
@@ -2114,83 +2137,132 @@ def extract_grade(name: str) -> str:
     return "UNKNOWN"
 
 
-def normalize_product_key(name: str) -> str:
-    """
-    판매처별로 제각각인 상품명을 최대한 같은 키로 맞추는 함수.
-    예:
-    [MG]1/100 MSN-04 SAZABI Ver.KA 사자비 Ver.Ka(버카)
-    -> MG|MSN04 SAZABI VERKA 사자비 VERKA
-    """
-    text = normalize_space(name)
-    text = text.upper()
+CANONICAL_ALIAS_RULES = [
+    (r"AERIAL\s*REBUILD|에어리얼\s*개수형", "건담 에어리얼 개수형"),
+    (r"GUNDAM\s*AERIAL|건담\s*에어리얼|에어리얼", "건담 에어리얼"),
+    (r"CALIBARN|캘리번", "건담 캘리번"),
+    (r"SCHWARZETTE|슈바르제테", "건담 슈바르제테"),
+    (r"LFRITH\s*UR|르브리스\s*울", "건담 르브리스 울"),
+    (r"LFRITH\s*THORN|르브리스\s*손", "건담 르브리스 손"),
+    (r"LFRITH|르브리스", "건담 르브리스"),
+    (r"MIGHTY\s*STRIKE\s*FREEDOM|마이티\s*스트라이크\s*프리덤", "마이티 스트라이크 프리덤 건담"),
+    (r"RISING\s*FREEDOM|라이징\s*프리덤", "라이징 프리덤 건담"),
+    (r"IMMORTAL\s*JUSTICE|임모탈\s*저스티스", "임모탈 저스티스 건담"),
+    (r"STRIKE\s*FREEDOM|스트라이크\s*프리덤", "스트라이크 프리덤 건담"),
+    (r"FREEDOM\s*GUNDAM|프리덤\s*건담", "프리덤 건담"),
+    (r"AILE\s*STRIKE|에일\s*스트라이크", "에일 스트라이크 건담"),
+    (r"BUILD\s*STRIKE|빌드\s*스트라이크", "빌드 스트라이크 건담"),
+    (r"STRIKE\s*GUNDAM|스트라이크\s*건담", "스트라이크 건담"),
+    (r"NU\s*GUNDAM|ν\s*GUNDAM|뉴\s*건담", "뉴 건담"),
+    (r"HI[-\s]*NU|하이\s*뉴|HI\s*ν", "하이 뉴 건담"),
+    (r"SAZABI|사자비", "사자비"),
+    (r"SINANJU\s*STEIN|시난주\s*스타인", "시난주 스타인"),
+    (r"SINANJU|시난주", "시난주"),
+    (r"UNICORN.*BANSHEE\s*NORN|밴시\s*노른|밴시노른", "유니콘 건담 2호기 밴시 노른"),
+    (r"UNICORN.*DESTROY|유니콘.*디스트로이", "유니콘 건담 디스트로이 모드"),
+    (r"UNICORN\s*GUNDAM|유니콘\s*건담", "유니콘 건담"),
+    (r"BARBATOS\s*LUPUS\s*REX|발바토스\s*루프스\s*렉스", "건담 발바토스 루프스 렉스"),
+    (r"BARBATOS\s*LUPUS|발바토스\s*루프스", "건담 발바토스 루프스"),
+    (r"BARBATOS|발바토스", "건담 발바토스"),
+    (r"EXIA\s*REPAIR\s*II|엑시아\s*리페어", "건담 엑시아 리페어 II"),
+    (r"EXIA|엑시아", "건담 엑시아"),
+    (r"RX[-\s]*78[-\s]*2|퍼스트\s*건담", "퍼스트 건담"),
+    (r"ZETA\s*GUNDAM|제타\s*건담", "제타 건담"),
+    (r"ZZ\s*GUNDAM|더블제타", "ZZ 건담"),
+    (r"GOD\s*GUNDAM|갓\s*건담", "갓 건담"),
+    (r"WING\s*GUNDAM\s*ZERO|윙\s*건담\s*제로", "윙 건담 제로"),
+    (r"WING\s*GUNDAM|윙\s*건담", "윙 건담"),
+    (r"DEATHSCYTHE|데스사이즈", "건담 데스사이즈"),
+    (r"HEAVY\s*ARMS|헤비암즈", "건담 헤비암즈"),
+    (r"GUNTANK|건탱크", "건탱크"),
+    (r"GUNCANNON|건캐논", "건캐논"),
+    (r"CHAR.*ZAKU|샤아.*자쿠", "샤아 전용 자쿠 II"),
+    (r"ZAKU\s*II|자쿠\s*2|자쿠\s*II", "자쿠 II"),
+]
 
-    replace_rules = {
-        "버카": "VER.KA",
-        "브이카": "VER.KA",
-        "VER KA": "VER.KA",
-        "VER. KA": "VER.KA",
-        "VER.KA": "VERKA",
-        "ν": "뉴",
-        "NU GUNDAM": "뉴건담",
-        "RX-O": "RX-0",
-        "O2": "02",
-        "MODE": "모드",
-        "REVIVE": "리바이브",
-    }
 
-    for old, new in replace_rules.items():
-        text = text.replace(old.upper(), new.upper())
+def _normalize_alias_source(text: str) -> str:
+    t = normalize_space(text)
+    t = t.replace("ν", "NU")
+    t = re.sub(r"VER\s*\.?\s*KA|버카|브이카", "Ver.Ka", t, flags=re.IGNORECASE)
+    t = re.sub(r"\bRX[-\s]*O\b", "RX-0", t, flags=re.IGNORECASE)
+    t = re.sub(r"\bO2\b", "02", t, flags=re.IGNORECASE)
+    return t
 
-    # 쇼핑몰 홍보/상태/분류 태그 제거
+
+def canonical_core_name(name: str) -> str:
+    source = _normalize_alias_source(name)
+    probe = source.upper()
+
+    for pattern, replacement in CANONICAL_ALIAS_RULES:
+        if re.search(pattern, probe, flags=re.IGNORECASE):
+            core = replacement
+            break
+    else:
+        core = source
+
+    # 등급, 스케일, 상품번호, 쇼핑몰 홍보 문구 제거
+    core = re.sub(r"\[[^\]]*\]", " ", core)
+    core = re.sub(r"\([^)]*\)", " ", core)
+    core = re.sub(r"\b1\s*/\s*(60|72|100|144|220|400|550)\b", " ", core)
+    core = re.sub(r"\b(BAN|BD)\s*\d{4,}\b", " ", core, flags=re.IGNORECASE)
+    core = re.sub(r"\b\d{6,}\b", " ", core)
+    core = re.sub(r"\[[0-9]{1,4}\]", " ", core)
+    core = re.sub(r"\b(MGEX|MGSD|FULL\s*MECHANICS|RE\s*/\s*100|HGUC|HGCE|HGBF|HGAC|HGFC|HGGW|HGWM|PG|MG|RG|HG|EG|SD)\b", " ", core, flags=re.IGNORECASE)
+
     remove_words = [
-        "재입고",
-        "예약",
-        "입고예정",
-        "판매중",
-        "품절",
-        "일시품절",
-        "강력추천",
-        "MD추천",
-        "추천",
-        "한정판",
-        "한정",
-        "프라모델",
-        "건프라",
-        "기동전사",
-        "수성의마녀",
-        "섬광의 하사웨이",
+        "재입고", "예약판매", "예약", "입고예정", "판매중", "품절", "일시품절", "강력추천", "MD추천", "추천",
+        "한정판", "한정", "프라모델", "건프라", "기동전사", "수성의 마녀", "수성의마녀", "섬광의 하사웨이",
+        "GUNDAM", "건담 건담",
     ]
-
     for word in remove_words:
-        text = text.replace(word.upper(), " ")
+        core = re.sub(re.escape(word), " ", core, flags=re.IGNORECASE)
 
-    # [MG], [HGUC 229], (버카), 번호 태그 등 제거
-    text = re.sub(r"\[[^\]]*\]", " ", text)
-    text = re.sub(r"\([^)]*\)", " ", text)
+    # 대표명에 이미 건담이 포함된 경우는 살리고, 중복만 줄인다.
+    core = normalize_space(core)
+    core = re.sub(r"건담\s+건담", "건담", core)
+    core = re.sub(r"\s+", " ", core).strip(" -_/[]()")
+    return normalize_space(core)
 
-    # 스케일 제거
-    text = re.sub(r"\b1\s*/\s*\d+\b", " ", text)
 
-    # 끝의 제품 번호 제거: [003] 제거 이후에도 남는 단독 숫자 처리
-    text = re.sub(r"\b\d{1,3}\b$", " ", text)
+def standardize_product_name(name: str) -> str:
+    original = clean_product_name(name)
+    if not original:
+        return ""
+    grade = extract_grade(original)
+    core = canonical_core_name(original)
 
-    # 불필요한 기호 제거. 단, 모델명 구분용 영문/숫자/한글은 남김
-    text = re.sub(r"[^0-9A-Z가-힣]+", " ", text)
+    if not core:
+        return ""
 
-    # 등급 계열 단어는 key 앞에 따로 붙일 거라 본문에서는 제거
-    grade_words = [
-        "MGEX", "MGSD", "FULL MECHANICS", "RE 100",
-        "HGUC", "HGCE", "HGBF", "HGAC",
-        "PG", "MG", "RG", "HG", "EG", "SD",
-    ]
-    for g in grade_words:
-        text = re.sub(rf"\b{re.escape(g)}\b", " ", text)
+    # Ver.Ka 표기는 대표명 뒤에 통일해서 붙인다.
+    if re.search(r"VER\s*\.?\s*KA|버카|브이카", original, re.IGNORECASE) and "Ver.Ka" not in core:
+        core = f"{core} Ver.Ka"
 
-    text = normalize_space(text)
+    # 너무 일반적인 결과는 원본 정리값을 사용하되 prefix는 붙인다.
+    if core.upper() in {"GUNDAM", "건담", "MODEL", "KIT"}:
+        core = clean_product_name(original)
 
+    prefix = f"[{grade}] " if grade != "UNKNOWN" else ""
+    return normalize_space(f"{prefix}{core}")
+
+
+def normalize_product_key(name: str) -> str:
+    """동일 상품 묶기/최저가 비교용 내부 키. displayName과 분리해서 더 공격적으로 정규화한다."""
     grade = extract_grade(name)
-    return f"{grade}|{text}"
+    core = canonical_core_name(name)
+    if re.search(r"VER\s*\.?\s*KA|버카|브이카", name or "", re.IGNORECASE) and "Ver.Ka" not in core:
+        core = f"{core} Ver.Ka"
 
+    key = core.upper()
+    key = key.replace("VER.KA", "VERKA")
+    key = re.sub(r"[^0-9A-Z가-힣]+", " ", key)
+    key = normalize_space(key)
+
+    # 혼동 방지: 프리덤/스트라이크 프리덤/마이티 스트라이크 프리덤은 core가 다르게 남아야 한다.
+    if not key:
+        return f"{grade}|"
+    return f"{grade}|{key}"
 
 def is_bad_record(item: ItemRecord) -> bool:
     name = normalize_space(item.name or item.title)
@@ -2235,9 +2307,16 @@ def filter_bad_records(records: List[ItemRecord]) -> List[ItemRecord]:
         item.status = normalize_status(item.status or item.stock_text)
         item.stock_text = item.status
 
-        # 이름 공백 정리
-        item.name = clean_product_name(item.name)
-        item.title = clean_product_name(item.title or item.name)
+        # 앱 표시용 이름과 내부 비교용 이름을 통일한다.
+        display_name = standardize_product_name(item.name or item.title)
+        if not display_name or is_bad_title(display_name):
+            removed += 1
+            if DEBUG:
+                print(f"[필터 제거:표시명 실패] {item.mall_name} / {item.name} / {item.url}")
+            continue
+
+        item.name = display_name
+        item.title = display_name
 
         clean.append(item)
 
@@ -2353,9 +2432,15 @@ def to_firestore_doc(item: ItemRecord, previous: Optional[Dict] = None) -> Dict:
         and old_price_int > price_int
     )
 
+    display_name = standardize_product_name(item.name or item.title) or item.name
+
     return {
-        "name": item.name,
-        "title": item.title,
+        "name": display_name,
+        "title": display_name,
+        "displayName": display_name,
+        "normalizedName": product_key,
+        "rawName": item.name,
+        "rawTitle": item.title,
         "price": item.price,
         "priceInt": price_int,
         "grade": grade,

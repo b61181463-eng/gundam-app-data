@@ -93,15 +93,16 @@ String _bestUrl(Map<String, dynamic> data) {
 
 String _extractGrade(String text) {
   final upper = text.toUpperCase();
-  if (upper.contains('MGEX')) return 'MGEX';
-  if (upper.contains('MGSD')) return 'MGSD';
-  if (RegExp(r'(^|[^A-Z0-9])PG([^A-Z0-9]|$)').hasMatch(upper)) return 'PG';
-  if (RegExp(r'(^|[^A-Z0-9])RG[A-Z]*([^A-Z0-9]|$)').hasMatch(upper)) return 'RG';
-  if (RegExp(r'(^|[^A-Z0-9])MG[A-Z]*([^A-Z0-9]|$)').hasMatch(upper)) return 'MG';
-  if (RegExp(r'(^|[^A-Z0-9])HG[A-Z]*([^A-Z0-9]|$)').hasMatch(upper)) return 'HG';
-  if (RegExp(r'(^|[^A-Z0-9])SD[A-Z]*([^A-Z0-9]|$)').hasMatch(upper)) return 'SD';
+  if (RegExp(r'(^|[^A-Z0-9])MG\s*EX([^A-Z0-9]|$)').hasMatch(upper)) return 'MGEX';
+  if (RegExp(r'(^|[^A-Z0-9])MG\s*SD([^A-Z0-9]|$)').hasMatch(upper)) return 'MGSD';
   if (upper.contains('FULL MECHANICS')) return 'FULL MECHANICS';
   if (upper.contains('RE/100')) return 'RE/100';
+  if (RegExp(r'(^|[^A-Z0-9])PG([^A-Z0-9]|$)').hasMatch(upper)) return 'PG';
+  if (RegExp(r'(^|[^A-Z0-9])RG[A-Z]*([^A-Z0-9]|$)').hasMatch(upper)) return 'RG';
+  if (RegExp(r'(^|[^A-Z0-9])MG([^A-Z0-9]|$)').hasMatch(upper)) return 'MG';
+  if (RegExp(r'(^|[^A-Z0-9])HG[A-Z]*([^A-Z0-9]|$)').hasMatch(upper)) return 'HG';
+  if (RegExp(r'(^|[^A-Z0-9])EG([^A-Z0-9]|$)').hasMatch(upper)) return 'EG';
+  if (RegExp(r'(^|[^A-Z0-9])SD(?:[- ]?EX(?:[- ]?STANDARD)?)?([^A-Z0-9]|$)').hasMatch(upper)) return 'SD';
   return 'UNKNOWN';
 }
 
@@ -230,8 +231,8 @@ class GroupedProductService {
 
       for (final doc in snapshot.docs) {
         final data = doc.data();
-        final rawName = (data['name'] ?? data['title'] ?? '').toString().trim();
-        final rawTitle = (data['title'] ?? '').toString().trim();
+        final rawName = (data['displayName'] ?? data['name'] ?? data['title'] ?? '').toString().trim();
+        final rawTitle = (data['displayName'] ?? data['title'] ?? '').toString().trim();
         final name = rawName.isNotEmpty ? rawName : rawTitle;
         if (_badPlaceholderName(name)) continue;
 
@@ -248,13 +249,22 @@ class GroupedProductService {
             ? data['grade'].toString().trim()
             : _extractGrade('$name $rawTitle');
 
-        final productKey = (data['productKey'] ?? '').toString().trim();
-        final canonicalBase = productKey.isNotEmpty ? productKey : name;
-        final canonical = _canonicalKey(canonicalBase);
+        final productKey = (data['productKey'] ?? data['normalizedName'] ?? '').toString().trim();
+        String productGrade = grade;
+        String canonical = '';
+        if (productKey.contains('|')) {
+          final parts = productKey.split('|');
+          if (parts.isNotEmpty && parts.first.trim().isNotEmpty) productGrade = parts.first.trim();
+          canonical = parts.length > 1 ? parts.sublist(1).join('|').trim() : '';
+          canonical = _canonicalKey(canonical);
+        } else {
+          final canonicalBase = productKey.isNotEmpty ? productKey : name;
+          canonical = _canonicalKey(canonicalBase);
+        }
 
         // 너무 짧은 키는 서로 다른 상품을 위험하게 합칠 수 있어서 문서 단위로 유지.
         final groupKey = canonical.length >= 6
-            ? '${grade.toUpperCase()}_$canonical'
+            ? '${productGrade.toUpperCase()}_$canonical'
             : '${site}_${doc.id}';
 
         final updatedAtRaw = data['updatedAt'];

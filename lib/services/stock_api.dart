@@ -33,6 +33,9 @@ bool _containsAny(String text, List<String> keywords) {
 String _cleanDisplayNameRaw(String raw) {
   var text = raw.trim();
   if (text.isEmpty) return '';
+  final lowered = text.toLowerCase();
+  if (lowered == '상품상세 | 반다이남코리아몰' || lowered == '상품상세 | 반다이남코코리아몰') return '';
+  if (lowered.contains('상품상세') && lowered.contains('반다이남코')) return '';
 
   text = text
       .replaceAll('&nbsp;', ' ')
@@ -308,15 +311,16 @@ bool _isBadPlaceholderName(String raw) {
 
 String _extractGrade(String text) {
   final upper = text.toUpperCase();
-  if (upper.contains('MGEX')) return 'MGEX';
-  if (upper.contains('MGSD')) return 'MGSD';
-  if (RegExp(r'(^|[^A-Z0-9])PG([^A-Z0-9]|$)').hasMatch(upper)) return 'PG';
-  if (RegExp(r'(^|[^A-Z0-9])RG[A-Z]*([^A-Z0-9]|$)').hasMatch(upper)) return 'RG';
-  if (RegExp(r'(^|[^A-Z0-9])MG[A-Z]*([^A-Z0-9]|$)').hasMatch(upper)) return 'MG';
-  if (RegExp(r'(^|[^A-Z0-9])HG[A-Z]*([^A-Z0-9]|$)').hasMatch(upper)) return 'HG';
-  if (RegExp(r'(^|[^A-Z0-9])SD[A-Z]*([^A-Z0-9]|$)').hasMatch(upper)) return 'SD';
+  if (RegExp(r'(^|[^A-Z0-9])MG\s*EX([^A-Z0-9]|$)').hasMatch(upper)) return 'MGEX';
+  if (RegExp(r'(^|[^A-Z0-9])MG\s*SD([^A-Z0-9]|$)').hasMatch(upper)) return 'MGSD';
   if (upper.contains('FULL MECHANICS')) return 'FULL MECHANICS';
   if (upper.contains('RE/100')) return 'RE/100';
+  if (RegExp(r'(^|[^A-Z0-9])PG([^A-Z0-9]|$)').hasMatch(upper)) return 'PG';
+  if (RegExp(r'(^|[^A-Z0-9])RG[A-Z]*([^A-Z0-9]|$)').hasMatch(upper)) return 'RG';
+  if (RegExp(r'(^|[^A-Z0-9])MG([^A-Z0-9]|$)').hasMatch(upper)) return 'MG';
+  if (RegExp(r'(^|[^A-Z0-9])HG[A-Z]*([^A-Z0-9]|$)').hasMatch(upper)) return 'HG';
+  if (RegExp(r'(^|[^A-Z0-9])EG([^A-Z0-9]|$)').hasMatch(upper)) return 'EG';
+  if (RegExp(r'(^|[^A-Z0-9])SD(?:[- ]?EX(?:[- ]?STANDARD)?)?([^A-Z0-9]|$)').hasMatch(upper)) return 'SD';
   return 'UNKNOWN';
 }
 int _offerStatusRank(String status) {
@@ -452,8 +456,8 @@ class StockItem {
     final data = doc.data();
 
     final sourcePage = _readString(data, ['sourcePage', 'source_page']);
-    final rawName = _readString(data, ['name', 'item_name']);
-    final rawTitle = _readString(data, ['title']);
+    final rawName = _readString(data, ['displayName', 'name', 'item_name']);
+    final rawTitle = _readString(data, ['displayName', 'title']);
     final price = _normalizePriceText(_readString(data, ['price']));
     final site = _readString(data, ['site', 'source']);
     final rawStatus = _readString(data, ['status']);
