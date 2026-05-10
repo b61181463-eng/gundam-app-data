@@ -17,6 +17,8 @@ from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.by import By
 import time
 
+SERVICE_ACCOUNT_PATH = "serviceAccountKey.json"
+
 @dataclass
 class ItemRecord:
     item_id: str
