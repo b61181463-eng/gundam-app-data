@@ -2732,9 +2732,462 @@ def validate_crawl_health(items: List[ItemRecord]) -> bool:
     print("============================")
     return True
 
+
+# ===== 데이터 정규화 운영 보정: 수동 alias / blocked match / 신뢰도 / 자동 리포트 =====
+ALIAS_PATH = os.getenv("ALIAS_PATH", "aliases.json")
+BLOCKED_MATCHES_PATH = os.getenv("BLOCKED_MATCHES_PATH", "blocked_matches.json")
+MATCH_REPORT_PATH = os.getenv("MATCH_REPORT_PATH", "match_report.json")
+
+DEFAULT_ALIASES = {
+    "aliases": {
+        "AERIAL REBUILD": "건담 에어리얼 개수형",
+        "GUNDAM AERIAL REBUILD": "건담 에어리얼 개수형",
+        "SAZABI VER.KA": "사자비 Ver.Ka",
+        "MSN-04 SAZABI VER.KA": "사자비 Ver.Ka",
+        "MSN-04 SAZABI": "사자비",
+        "NU GUNDAM": "뉴 건담",
+        "RX-93 NU GUNDAM": "뉴 건담",
+        "HI-NU GUNDAM": "하이 뉴 건담",
+        "UNICORN GUNDAM DESTROY MODE": "유니콘 건담 디스트로이 모드",
+        "AILE STRIKE GUNDAM": "에일 스트라이크 건담",
+        "STRIKE FREEDOM GUNDAM": "스트라이크 프리덤 건담",
+        "MIGHTY STRIKE FREEDOM GUNDAM": "마이티 스트라이크 프리덤 건담",
+        "RISING FREEDOM GUNDAM": "라이징 프리덤 건담",
+        "IMMORTAL JUSTICE GUNDAM": "임모탈 저스티스 건담",
+        "GUNDAM EXIA": "건담 엑시아",
+        "RX-78-2 GUNDAM": "퍼스트 건담",
+        "ZETA GUNDAM": "제타 건담",
+        "WING GUNDAM ZERO": "윙 건담 제로",
+        "GUNDAM BARBATOS": "건담 발바토스"
+    },
+    "notes": [
+        "왼쪽에는 사이트에서 들어올 수 있는 별칭, 오른쪽에는 앱에서 쓰고 싶은 대표 이름을 넣으면 됩니다.",
+        "예: \"MSN-04 SAZABI\": \"사자비\"",
+        "이 파일은 없으면 자동 생성되고, 직접 수정해도 다음 크롤링 때 반영됩니다."
+    ]
+}
+
+DEFAULT_BLOCKED_MATCHES = {
+    "blocked": {
+        "프리덤 건담": ["스트라이크 프리덤 건담", "마이티 스트라이크 프리덤 건담", "라이징 프리덤 건담"],
+        "스트라이크 프리덤 건담": ["마이티 스트라이크 프리덤 건담"],
+        "유니콘 건담": ["유니콘 건담 2호기 밴시", "밴시 노른"],
+        "뉴 건담": ["하이 뉴 건담"],
+        "사자비": ["나이팅게일"],
+        "건담 에어리얼": ["건담 에어리얼 개수형", "건담 캘리번"]
+    },
+    "notes": [
+        "서로 이름이 비슷하지만 절대 같은 상품으로 묶으면 안 되는 조합입니다.",
+        "왼쪽 이름과 오른쪽 목록 중 하나가 같은 productKey 그룹에 들어오면 match_report.json에 위험으로 표시합니다."
+    ]
+}
+
+_MANUAL_ALIAS_CACHE = None
+_BLOCKED_MATCH_CACHE = None
+
+
+def _read_json_with_default(path: str, default: Dict) -> Dict:
+    p = Path(path)
+    if not p.exists():
+        try:
+            p.write_text(json.dumps(default, ensure_ascii=False, indent=2), encoding="utf-8")
+            print(f"[정규화 관리 파일 생성] {path}")
+        except Exception as e:
+            print(f"[정규화 관리 파일 생성 실패] {path} / {type(e).__name__}: {e}")
+        return default
+    try:
+        data = json.loads(p.read_text(encoding="utf-8"))
+        return data if isinstance(data, dict) else default
+    except Exception as e:
+        print(f"[정규화 관리 파일 읽기 실패] {path} / {type(e).__name__}: {e}")
+        return default
+
+
+def load_manual_aliases() -> Dict[str, str]:
+    global _MANUAL_ALIAS_CACHE
+    if _MANUAL_ALIAS_CACHE is not None:
+        return _MANUAL_ALIAS_CACHE
+    data = _read_json_with_default(ALIAS_PATH, DEFAULT_ALIASES)
+    aliases = data.get("aliases", data)
+    if not isinstance(aliases, dict):
+        aliases = {}
+    normalized: Dict[str, str] = {}
+    for k, v in aliases.items():
+        if isinstance(v, str) and str(k).strip() and v.strip():
+            normalized[_alias_probe(str(k))] = normalize_space(v)
+    _MANUAL_ALIAS_CACHE = normalized
+    print(f"[수동 alias] {len(normalized)}개 로드")
+    return normalized
+
+
+def load_blocked_matches() -> List[tuple[str, str]]:
+    global _BLOCKED_MATCH_CACHE
+    if _BLOCKED_MATCH_CACHE is not None:
+        return _BLOCKED_MATCH_CACHE
+    data = _read_json_with_default(BLOCKED_MATCHES_PATH, DEFAULT_BLOCKED_MATCHES)
+    raw = data.get("blocked", data)
+    pairs: List[tuple[str, str]] = []
+    if isinstance(raw, dict):
+        for left, rights in raw.items():
+            if isinstance(rights, str):
+                rights = [rights]
+            if not isinstance(rights, list):
+                continue
+            for right in rights:
+                if str(left).strip() and str(right).strip():
+                    pairs.append((_alias_probe(str(left)), _alias_probe(str(right))))
+    elif isinstance(raw, list):
+        for entry in raw:
+            if isinstance(entry, list) and len(entry) >= 2:
+                pairs.append((_alias_probe(str(entry[0])), _alias_probe(str(entry[1]))))
+            elif isinstance(entry, dict):
+                left = entry.get("left") or entry.get("a")
+                right = entry.get("right") or entry.get("b")
+                if left and right:
+                    pairs.append((_alias_probe(str(left)), _alias_probe(str(right))))
+    _BLOCKED_MATCH_CACHE = pairs
+    print(f"[금지 매칭] {len(pairs)}쌍 로드")
+    return pairs
+
+
+def _alias_probe(text: str) -> str:
+    t = normalize_space(text or "")
+    t = t.replace("ν", "NU")
+    t = re.sub(r"VER\s*\.?\s*KA|버카|브이카", "VERKA", t, flags=re.IGNORECASE)
+    t = re.sub(r"[^0-9A-Z가-힣]+", " ", t.upper())
+    return normalize_space(t)
+
+
+def _strip_grade_prefix(text: str) -> str:
+    t = normalize_space(text)
+    t = re.sub(r"^\[(MGEX|MGSD|FULL MECHANICS|RE/100|PG|MG|RG|HG|EG|SD|UNKNOWN)\]\s*", "", t, flags=re.IGNORECASE)
+    return normalize_space(t)
+
+
+def apply_manual_alias(text: str) -> str:
+    aliases = load_manual_aliases()
+    if not aliases:
+        return ""
+    probe = _alias_probe(text)
+    if not probe:
+        return ""
+    # 긴 alias를 먼저 검사해야 STRIKE FREEDOM이 FREEDOM보다 먼저 잡힌다.
+    for alias_probe, canonical in sorted(aliases.items(), key=lambda kv: len(kv[0]), reverse=True):
+        if alias_probe and (probe == alias_probe or alias_probe in probe):
+            return _strip_grade_prefix(canonical)
+    return ""
+
+
+def _base_canonical_core_name_before_manual_alias(name: str) -> str:
+    source = _normalize_alias_source(name)
+    probe = source.upper()
+
+    for pattern, replacement in CANONICAL_ALIAS_RULES:
+        if re.search(pattern, probe, flags=re.IGNORECASE):
+            core = replacement
+            break
+    else:
+        core = source
+
+    core = re.sub(r"\[[^\]]*\]", " ", core)
+    core = re.sub(r"\([^)]*\)", " ", core)
+    core = re.sub(r"\b1\s*/\s*(60|72|100|144|220|400|550)\b", " ", core)
+    core = re.sub(r"\b(BAN|BD)\s*\d{4,}\b", " ", core, flags=re.IGNORECASE)
+    core = re.sub(r"\b\d{6,}\b", " ", core)
+    core = re.sub(r"\[[0-9]{1,4}\]", " ", core)
+    core = re.sub(r"\b(MGEX|MGSD|FULL\s*MECHANICS|RE\s*/\s*100|HGUC|HGCE|HGBF|HGAC|HGFC|HGGW|HGWM|PG|MG|RG|HG|EG|SD)\b", " ", core, flags=re.IGNORECASE)
+
+    remove_words = [
+        "재입고", "예약판매", "예약", "입고예정", "판매중", "품절", "일시품절", "강력추천", "MD추천", "추천",
+        "한정판", "한정", "프라모델", "건프라", "기동전사", "수성의 마녀", "수성의마녀", "섬광의 하사웨이",
+        "GUNDAM", "건담 건담",
+    ]
+    for word in remove_words:
+        core = re.sub(re.escape(word), " ", core, flags=re.IGNORECASE)
+
+    core = normalize_space(core)
+    core = re.sub(r"건담\s+건담", "건담", core)
+    core = re.sub(r"\s+", " ", core).strip(" -_/[]()")
+    return normalize_space(core)
+
+
+# 기존 canonical_core_name/standardize_product_name/normalize_product_key를 운영형 alias 규칙으로 덮어쓴다.
+def canonical_core_name(name: str) -> str:
+    manual = apply_manual_alias(name)
+    if manual:
+        return manual
+    core = _base_canonical_core_name_before_manual_alias(name)
+    manual_core = apply_manual_alias(core)
+    return manual_core or core
+
+
+def standardize_product_name(name: str) -> str:
+    original = clean_product_name(name)
+    if not original:
+        return ""
+    grade = extract_grade(original)
+    core = canonical_core_name(original)
+    if not core:
+        return ""
+
+    if re.search(r"VER\s*\.?\s*KA|버카|브이카", original, re.IGNORECASE) and "Ver.Ka" not in core:
+        core = f"{core} Ver.Ka"
+
+    if core.upper() in {"GUNDAM", "건담", "MODEL", "KIT"}:
+        core = clean_product_name(original)
+
+    prefix = f"[{grade}] " if grade != "UNKNOWN" else ""
+    return normalize_space(f"{prefix}{core}")
+
+
+def normalize_product_key(name: str) -> str:
+    grade = extract_grade(name)
+    core = canonical_core_name(name)
+    if re.search(r"VER\s*\.?\s*KA|버카|브이카", name or "", re.IGNORECASE) and "Ver.Ka" not in core:
+        core = f"{core} Ver.Ka"
+    key = core.upper().replace("VER.KA", "VERKA")
+    key = re.sub(r"[^0-9A-Z가-힣]+", " ", key)
+    key = normalize_space(key)
+    if not key:
+        return f"{grade}|"
+    return f"{grade}|{key}"
+
+
+def _core_token_set(text: str) -> Set[str]:
+    probe = _alias_probe(text)
+    tokens = {t for t in probe.split() if len(t) >= 2}
+    noise = {"GUNDAM", "건담", "VERKA", "MODEL", "KIT", "HG", "MG", "RG", "PG", "SD", "EG"}
+    return {t for t in tokens if t not in noise}
+
+
+def is_blocked_match(a: str, b: str) -> bool:
+    pa = _alias_probe(a)
+    pb = _alias_probe(b)
+    if not pa or not pb:
+        return False
+    for left, right in load_blocked_matches():
+        if (left in pa and right in pb) or (left in pb and right in pa):
+            return True
+    return False
+
+
+def calculate_match_confidence_for_name(name: str, price: Optional[str] = None, status: Optional[str] = None) -> Dict:
+    grade = extract_grade(name)
+    core = canonical_core_name(name)
+    product_key = normalize_product_key(name)
+    score = 0.48
+    reasons: List[str] = []
+
+    if grade != "UNKNOWN":
+        score += 0.18
+        reasons.append("grade_detected")
+    else:
+        reasons.append("grade_unknown")
+
+    if apply_manual_alias(name) or apply_manual_alias(core):
+        score += 0.18
+        reasons.append("manual_alias")
+
+    tokens = _core_token_set(core)
+    if len(tokens) >= 2:
+        score += 0.10
+        reasons.append("specific_core")
+    elif len(tokens) == 1:
+        score -= 0.08
+        reasons.append("short_core")
+    else:
+        score -= 0.22
+        reasons.append("empty_core")
+
+    if price_to_int(price or "") is not None:
+        score += 0.04
+        reasons.append("price_ok")
+
+    if normalize_status(status or "") != "상태 확인중":
+        score += 0.03
+        reasons.append("status_ok")
+
+    if is_bad_title(name):
+        score = min(score, 0.20)
+        reasons.append("bad_placeholder")
+
+    if product_key.endswith("|"):
+        score = min(score, 0.25)
+        reasons.append("empty_product_key")
+
+    score = max(0.05, min(0.99, score))
+    return {
+        "score": round(score, 2),
+        "reasons": reasons,
+        "core": core,
+        "productKey": product_key,
+    }
+
+
+def to_firestore_doc(item: ItemRecord, previous: Optional[Dict] = None) -> Dict:
+    price_int = price_to_int(item.price)
+    display_name = standardize_product_name(item.name or item.title) or item.name
+    product_key = normalize_product_key(display_name)
+    grade = extract_grade(display_name)
+    confidence = calculate_match_confidence_for_name(display_name, item.price, item.status)
+
+    old_status = _doc_get_str(previous, ["status", "stockText", "stock_text"])
+    old_price_int = _doc_get_int(previous, ["priceInt", "price_int", "price"])
+
+    is_new = previous is None
+    is_restock = False if is_new else _is_restock_transition(old_status, item.status)
+    is_price_drop = (
+        old_price_int is not None
+        and price_int is not None
+        and price_int > 0
+        and old_price_int > price_int
+    )
+
+    return {
+        "name": display_name,
+        "title": display_name,
+        "displayName": display_name,
+        "normalizedName": product_key,
+        "rawName": item.name,
+        "rawTitle": item.title,
+        "price": item.price,
+        "priceInt": price_int,
+        "grade": grade,
+        "productKey": product_key,
+        "matchConfidence": confidence["score"],
+        "matchConfidenceReasons": confidence["reasons"],
+        "canonicalCore": confidence["core"],
+        "needsReview": confidence["score"] < 0.72,
+        "isNew": is_new,
+        "isRestock": is_restock,
+        "isRestocked": is_restock,
+        "isPriceDrop": is_price_drop,
+        "previousPriceInt": old_price_int,
+        "previousStatus": old_status,
+        "status": item.status,
+        "stockText": item.stock_text,
+        "mallName": item.mall_name,
+        "site": item.site,
+        "sourcePage": item.source_page,
+        "url": item.url,
+        "productUrl": item.product_url,
+        "detailUrl": item.detail_url,
+        "updatedAt": firestore.SERVER_TIMESTAMP,
+    }
+
+
+def build_match_report(items: List[ItemRecord], path: str = MATCH_REPORT_PATH) -> Dict:
+    groups: Dict[str, List[ItemRecord]] = {}
+    for item in items:
+        key = normalize_product_key(item.name or item.title)
+        groups.setdefault(key, []).append(item)
+
+    suspicious_groups: List[Dict] = []
+    low_confidence_items: List[Dict] = []
+    alias_candidates: List[Dict] = []
+    blocked_warnings: List[Dict] = []
+
+    for key, group in groups.items():
+        names = sorted({standardize_product_name(i.name or i.title) or i.name for i in group})
+        sellers = sorted({i.mall_name for i in group})
+        prices = [price_to_int(i.price) for i in group if price_to_int(i.price) is not None]
+        confidences = [calculate_match_confidence_for_name(i.name or i.title, i.price, i.status)["score"] for i in group]
+        min_conf = min(confidences) if confidences else 0
+        max_price = max(prices) if prices else None
+        min_price = min(prices) if prices else None
+        price_spread_ratio = round(max_price / min_price, 2) if min_price and max_price and min_price > 0 else None
+
+        blocked_pairs = []
+        for idx, left in enumerate(names):
+            for right in names[idx + 1:]:
+                if is_blocked_match(left, right):
+                    blocked_pairs.append([left, right])
+                    blocked_warnings.append({"productKey": key, "left": left, "right": right, "sellers": sellers})
+
+        reasons = []
+        if key.endswith("|"):
+            reasons.append("empty_product_key")
+        if min_conf < 0.72:
+            reasons.append("low_confidence")
+        if blocked_pairs:
+            reasons.append("blocked_match_violation")
+        if price_spread_ratio is not None and price_spread_ratio >= 3.0 and len(group) >= 2:
+            reasons.append("price_spread_large")
+
+        if reasons:
+            suspicious_groups.append({
+                "productKey": key,
+                "count": len(group),
+                "sellers": sellers,
+                "names": names[:12],
+                "minConfidence": min_conf,
+                "priceRange": [min_price, max_price],
+                "priceSpreadRatio": price_spread_ratio,
+                "blockedPairs": blocked_pairs,
+                "reasons": reasons,
+            })
+
+        for item in group:
+            c = calculate_match_confidence_for_name(item.name or item.title, item.price, item.status)
+            if c["score"] < 0.72:
+                low_confidence_items.append({
+                    "name": item.name,
+                    "mallName": item.mall_name,
+                    "price": item.price,
+                    "status": item.status,
+                    "productKey": c["productKey"],
+                    "confidence": c["score"],
+                    "reasons": c["reasons"],
+                    "url": item.url,
+                })
+
+    # 같은 core인데 grade만 다르거나 key가 갈라진 후보를 잡는다.
+    by_core: Dict[str, List[str]] = {}
+    for key in groups.keys():
+        parts = key.split("|", 1)
+        core = parts[1] if len(parts) > 1 else key
+        if core:
+            by_core.setdefault(core, []).append(key)
+    for core, keys in by_core.items():
+        unique_keys = sorted(set(keys))
+        if len(unique_keys) >= 2:
+            alias_candidates.append({
+                "canonicalCore": core,
+                "productKeys": unique_keys,
+                "reason": "same_core_different_grade_or_key",
+            })
+
+    report = {
+        "generatedAt": datetime.now(timezone.utc).isoformat(),
+        "totalItems": len(items),
+        "totalGroups": len(groups),
+        "suspiciousGroupCount": len(suspicious_groups),
+        "lowConfidenceItemCount": len(low_confidence_items),
+        "aliasCandidateCount": len(alias_candidates),
+        "blockedWarningCount": len(blocked_warnings),
+        "suspiciousGroups": suspicious_groups[:200],
+        "lowConfidenceItems": low_confidence_items[:300],
+        "aliasCandidates": alias_candidates[:200],
+        "blockedWarnings": blocked_warnings[:200],
+        "howToUse": {
+            "aliases.json": "같은 상품으로 강제 통일하고 싶은 이름을 추가하세요.",
+            "blocked_matches.json": "절대 같은 상품으로 묶으면 안 되는 조합을 추가하세요.",
+            "matchConfidence": "0.72 미만이면 검토 권장, 0.85 이상이면 비교적 안정적입니다."
+        }
+    }
+    try:
+        Path(path).write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
+        print(f"[매칭 리포트 저장] {path} / 의심 그룹 {len(suspicious_groups)}개 / 낮은 신뢰도 {len(low_confidence_items)}개")
+    except Exception as e:
+        print(f"[매칭 리포트 저장 실패] {path} / {type(e).__name__}: {e}")
+    return report
+
+
 def main():
     print("=== KR 통합 크롤링 시작 ===")
     print(f"[실행 모드] FAST_TEST_MODE={FAST_TEST_MODE} / MAX_LINKS_PER_SITE={MAX_LINKS_PER_SITE}")
+    load_manual_aliases()
+    load_blocked_matches()
 
     try:
         db = init_firestore()
@@ -2776,6 +3229,7 @@ def main():
     merged = sort_records(merged)
     print(f"[정렬 후] 총 {len(merged)}개")
 
+    build_match_report(merged)
     save_local_backup(merged)
     save_failed_events_report()
 

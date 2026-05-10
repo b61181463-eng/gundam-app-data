@@ -59,6 +59,18 @@ int _statusRank(String status) {
   }
 }
 
+double _confidenceToDouble(dynamic value) {
+  if (value == null) return 0.80;
+  if (value is num) return value.toDouble();
+  return double.tryParse(value.toString()) ?? 0.80;
+}
+
+String _confidenceLabel(double value) {
+  if (value >= 0.88) return '높음';
+  if (value >= 0.72) return '보통';
+  return '검토 필요';
+}
+
 String _prettySeller(String mallName, String site) {
   final raw = ('$mallName $site').toLowerCase();
   if (raw.contains('gundamshop') || raw.contains('건담샵')) return '건담샵';
@@ -171,6 +183,8 @@ class ProductOffer {
   final String url;
   final String itemId;
   final DateTime? updatedAt;
+  final double matchConfidence;
+  final bool needsReview;
 
   const ProductOffer({
     required this.seller,
@@ -181,6 +195,8 @@ class ProductOffer {
     required this.url,
     required this.itemId,
     required this.updatedAt,
+    required this.matchConfidence,
+    required this.needsReview,
   });
 }
 
@@ -191,6 +207,8 @@ class GroupedProduct {
   final List<ProductOffer> offers;
   final ProductOffer bestOffer;
   final DateTime? updatedAt;
+  final double matchConfidence;
+  final bool needsReview;
 
   const GroupedProduct({
     required this.key,
@@ -199,6 +217,8 @@ class GroupedProduct {
     required this.offers,
     required this.bestOffer,
     required this.updatedAt,
+    required this.matchConfidence,
+    required this.needsReview,
   });
 
   int get sellerCount => offers.map((e) => e.seller).toSet().length;
@@ -206,6 +226,7 @@ class GroupedProduct {
   int? get minPriceInt => bestOffer.priceInt;
   String get status => bestOffer.status;
   String get sellerSummary => sellerCount > 1 ? '${bestOffer.seller} 외 ${sellerCount - 1}곳' : bestOffer.seller;
+  String get confidenceLabel => _confidenceLabel(matchConfidence);
 
   bool get hasAvailable => offers.any((e) => e.status == '판매중');
   bool get hasMultipleSellers => sellerCount > 1;
@@ -267,6 +288,8 @@ class GroupedProductService {
             ? '${productGrade.toUpperCase()}_$canonical'
             : '${site}_${doc.id}';
 
+        final confidence = _confidenceToDouble(data['matchConfidence']);
+        final needsReview = data['needsReview'] == true || confidence < 0.72;
         final updatedAtRaw = data['updatedAt'];
         final updatedAt = updatedAtRaw is Timestamp ? updatedAtRaw.toDate() : null;
 
@@ -284,6 +307,8 @@ class GroupedProductService {
                   url: url,
                   itemId: doc.id,
                   updatedAt: updatedAt,
+                  matchConfidence: confidence,
+                  needsReview: needsReview,
                 ),
                 updatedAt: updatedAt,
               ),
@@ -318,6 +343,11 @@ class GroupedProductService {
           return next.isAfter(prev) ? next : prev;
         });
 
+        final groupConfidence = raws
+            .map((e) => e.offer.matchConfidence)
+            .fold<double>(1.0, (prev, next) => next < prev ? next : prev);
+        final groupNeedsReview = raws.any((e) => e.offer.needsReview) || groupConfidence < 0.72;
+
         products.add(
           GroupedProduct(
             key: entry.key,
@@ -326,6 +356,8 @@ class GroupedProductService {
             offers: offers,
             bestOffer: bestOffer,
             updatedAt: latest,
+            matchConfidence: groupConfidence,
+            needsReview: groupNeedsReview,
           ),
         );
       }

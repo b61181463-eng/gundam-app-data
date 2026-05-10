@@ -1,5 +1,11 @@
 import 'dart:convert';
 
+double _doubleFromAny(dynamic value, {double fallback = 0.0}) {
+  if (value == null) return fallback;
+  if (value is num) return value.toDouble();
+  return double.tryParse(value.toString()) ?? fallback;
+}
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -371,6 +377,8 @@ class StockItem {
   final bool isRestocked;
   final bool isNew;
   final bool isPriceDrop;
+  final double matchConfidence;
+  final bool needsReview;
   final int? previousPriceInt;
   final String previousStatus;
   final List<StockOffer> offers;
@@ -394,6 +402,8 @@ class StockItem {
     required this.isRestocked,
     required this.isNew,
     required this.isPriceDrop,
+    this.matchConfidence = 0.80,
+    this.needsReview = false,
     required this.previousPriceInt,
     required this.previousStatus,
     required this.offers,
@@ -418,6 +428,8 @@ class StockItem {
     bool? isRestocked,
     bool? isNew,
     bool? isPriceDrop,
+    double? matchConfidence,
+    bool? needsReview,
     int? previousPriceInt,
     String? previousStatus,
     List<StockOffer>? offers,
@@ -441,6 +453,8 @@ class StockItem {
       isRestocked: isRestocked ?? this.isRestocked,
       isNew: isNew ?? this.isNew,
       isPriceDrop: isPriceDrop ?? this.isPriceDrop,
+      matchConfidence: matchConfidence ?? this.matchConfidence,
+      needsReview: needsReview ?? this.needsReview,
       previousPriceInt: previousPriceInt ?? this.previousPriceInt,
       previousStatus: previousStatus ?? this.previousStatus,
       offers: offers ?? this.offers,
@@ -479,6 +493,8 @@ class StockItem {
     final isPriceDrop = _readBool(data, ['isPriceDrop', 'priceDrop']);
     final previousPriceInt = _readInt(data, ['previousPriceInt', 'previous_price_int']);
     final previousStatus = _readString(data, ['previousStatus', 'previous_status']);
+    final matchConfidence = _doubleFromAny(data['matchConfidence'], fallback: 0.80);
+    final needsReview = data['needsReview'] == true || matchConfidence < 0.72;
 
     final cleanedName = _cleanDisplayNameRaw(rawName);
     final cleanedTitle = _cleanDisplayNameRaw(rawTitle);
@@ -523,6 +539,8 @@ class StockItem {
       isRestocked: isRestocked,
       isNew: isNew,
       isPriceDrop: isPriceDrop,
+      matchConfidence: matchConfidence,
+      needsReview: needsReview,
       previousPriceInt: previousPriceInt,
       previousStatus: previousStatus,
       offers: [
