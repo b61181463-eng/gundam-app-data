@@ -23,6 +23,12 @@ enum GradeFilterType {
   sd,
 }
 
+enum SortType {
+  availableFirst,
+  priceLow,
+  siteName,
+}
+
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -35,11 +41,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   final FocusNode _searchFocusNode = FocusNode();
 
   Set<String> _favoriteIds = {};
+  List<StockItem> _latestItems = const [];
 
   String _searchQuery = '';
   HomeFilterType _filterType = HomeFilterType.all;
   GradeFilterType _gradeFilter = GradeFilterType.all;
   bool _isGradeExpanded = false;
+  String _selectedSite = '전체';
+  SortType _sortType = SortType.availableFirst;
 
   @override
   void initState() {
@@ -130,8 +139,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   String _searchNormalized(String text) {
     return text
-        .toLowerCase()
-        .replaceAll(RegExp(r'[\s\[\]\(\)\-_/.,:+]+'), '');
+        .toUpperCase()
+        .replaceAll(RegExp(r'[^A-Z0-9가-힣]'), '');
   }
 
   Future<void> _openExternalLink(StockItem item) async {
@@ -486,8 +495,82 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     }
   }
 
+  int _priceInt(String text) {
+    final digits = text.replaceAll(RegExp(r'[^0-9]'), '');
+    if (digits.isEmpty) return 999999999;
+    return int.tryParse(digits) ?? 999999999;
+  }
+
+  int _statusRank(StockItem item) {
+    if (_hasAvailableOffer(item)) return 0;
+    if (item.status.contains('예약')) return 1;
+    if (item.status.contains('입고예정')) return 2;
+    if (item.status.contains('품절')) return 3;
+    if (item.status.contains('확인중')) return 4;
+    return 5;
+  }
+
+  String _sortLabel() {
+    switch (_sortType) {
+      case SortType.availableFirst:
+        return '판매중 우선';
+      case SortType.priceLow:
+        return '낮은 가격순';
+      case SortType.siteName:
+        return '판매처순';
+    }
+  }
+
+  List<String> _siteChoices(List<StockItem> items) {
+    final sites = items
+        .where((item) => !_isNoticeItem(item))
+        .map((item) {
+          final seller = _sellerText(item).trim();
+          if (seller.startsWith('판매처 ')) return item.mallName.trim();
+          return seller.isNotEmpty ? seller : item.mallName.trim();
+        })
+        .where((site) => site.isNotEmpty && !site.startsWith('판매처 '))
+        .toSet()
+        .toList();
+
+    sites.sort();
+    return ['전체', ...sites];
+  }
+
+  void _sortFilteredItems(List<StockItem> items) {
+    switch (_sortType) {
+      case SortType.availableFirst:
+        items.sort((a, b) {
+          final statusCompare = _statusRank(a).compareTo(_statusRank(b));
+          if (statusCompare != 0) return statusCompare;
+
+          final priceCompare = _priceInt(a.minPrice.isNotEmpty ? a.minPrice : a.price)
+              .compareTo(_priceInt(b.minPrice.isNotEmpty ? b.minPrice : b.price));
+          if (priceCompare != 0) return priceCompare;
+
+          return _itemName(a).compareTo(_itemName(b));
+        });
+        break;
+      case SortType.priceLow:
+        items.sort((a, b) {
+          final priceCompare = _priceInt(a.minPrice.isNotEmpty ? a.minPrice : a.price)
+              .compareTo(_priceInt(b.minPrice.isNotEmpty ? b.minPrice : b.price));
+          if (priceCompare != 0) return priceCompare;
+          return _statusRank(a).compareTo(_statusRank(b));
+        });
+        break;
+      case SortType.siteName:
+        items.sort((a, b) {
+          final sellerCompare = _sellerText(a).compareTo(_sellerText(b));
+          if (sellerCompare != 0) return sellerCompare;
+          return _itemName(a).compareTo(_itemName(b));
+        });
+        break;
+    }
+  }
+
   List<StockItem> _applyFilters(List<StockItem> items) {
-    final typeFiltered = items.where((item) {
+    var filteredItems = items.where((item) {
       switch (_filterType) {
         case HomeFilterType.all:
           return true;
@@ -502,44 +585,58 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       }
     }).toList();
 
-    final gradeFiltered = typeFiltered.where((item) {
+    filteredItems = filteredItems.where((item) {
       if (_isNoticeItem(item)) {
         return _gradeFilter == GradeFilterType.all;
       }
       return _matchesGradeFilter(item);
     }).toList();
 
-    if (_searchNormalized(_searchQuery).isEmpty) {
-      return gradeFiltered;
+    if (_selectedSite != '전체') {
+      filteredItems = filteredItems.where((item) {
+        final seller = _sellerText(item);
+        final mallName = item.mallName.trim();
+        final site = item.site.trim();
+        final offers = item.offers.map((offer) => offer.seller).join(' ');
+        return seller.contains(_selectedSite) ||
+            mallName == _selectedSite ||
+            site == _selectedSite ||
+            offers.contains(_selectedSite);
+      }).toList();
     }
 
     final q = _searchNormalized(_searchQuery);
 
-    return gradeFiltered.where((item) {
-      final name = _searchNormalized(_itemName(item));
-      final seller = _searchNormalized(_sellerText(item));
-      final grade = _searchNormalized(_itemGrade(item));
-      final title = _searchNormalized(item.title);
-      final site = _searchNormalized(item.site);
-      final mallName = _searchNormalized(item.mallName);
-      final stockText = _searchNormalized(item.stockText);
-      final status = _searchNormalized(item.status);
-      final offersText = _searchNormalized(
-        item.offers
-            .map((offer) => '${offer.seller} ${offer.price} ${offer.status}')
-            .join(' '),
-      );
+    if (q.isNotEmpty) {
+      filteredItems = filteredItems.where((item) {
+        final name = _searchNormalized(_itemName(item));
+        final seller = _searchNormalized(_sellerText(item));
+        final grade = _searchNormalized(_itemGrade(item));
+        final title = _searchNormalized(item.title);
+        final site = _searchNormalized(item.site);
+        final mallName = _searchNormalized(item.mallName);
+        final stockText = _searchNormalized(item.stockText);
+        final status = _searchNormalized(item.status);
+        final offersText = _searchNormalized(
+          item.offers
+              .map((offer) => '${offer.seller} ${offer.price} ${offer.status}')
+              .join(' '),
+        );
 
-      return name.contains(q) ||
-          seller.contains(q) ||
-          grade.contains(q) ||
-          title.contains(q) ||
-          site.contains(q) ||
-          mallName.contains(q) ||
-          stockText.contains(q) ||
-          status.contains(q) ||
-          offersText.contains(q);
-    }).toList();
+        return name.contains(q) ||
+            seller.contains(q) ||
+            grade.contains(q) ||
+            title.contains(q) ||
+            site.contains(q) ||
+            mallName.contains(q) ||
+            stockText.contains(q) ||
+            status.contains(q) ||
+            offersText.contains(q);
+      }).toList();
+    }
+
+    _sortFilteredItems(filteredItems);
+    return filteredItems;
   }
 
   Widget _buildTopActionChip({
@@ -1397,7 +1494,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               ),
               const Spacer(),
               Text(
-                '재입고 · 판매중 · 최저가순',
+                '${_selectedSite == '전체' ? '전체 판매처' : _selectedSite} · ${_sortLabel()}',
                 style: TextStyle(
                   color: Colors.grey.shade600,
                   fontWeight: FontWeight.w700,
@@ -1475,7 +1572,105 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildSearchSection() {
+  Widget _buildFilterDropdowns(List<StockItem> items) {
+    final sites = _siteChoices(items);
+    final selectedSite = sites.contains(_selectedSite) ? _selectedSite : '전체';
+
+    if (selectedSite != _selectedSite) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        setState(() {
+          _selectedSite = '전체';
+        });
+      });
+    }
+
+    return Padding(
+      padding: const EdgeInsets.only(top: 10),
+      child: Row(
+        children: [
+          Expanded(
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                border: Border.all(color: Colors.grey.shade300),
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: DropdownButtonHideUnderline(
+                child: DropdownButton<String>(
+                  value: selectedSite,
+                  isExpanded: true,
+                  icon: const Icon(Icons.storefront_outlined, size: 18),
+                  items: sites
+                      .map(
+                        (site) => DropdownMenuItem<String>(
+                          value: site,
+                          child: Text(
+                            site == '전체' ? '전체 판매처' : site,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w700,
+                              fontSize: 13,
+                            ),
+                          ),
+                        ),
+                      )
+                      .toList(),
+                  onChanged: (value) {
+                    if (value == null) return;
+                    setState(() {
+                      _selectedSite = value;
+                    });
+                  },
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                border: Border.all(color: Colors.grey.shade300),
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: DropdownButtonHideUnderline(
+                child: DropdownButton<SortType>(
+                  value: _sortType,
+                  isExpanded: true,
+                  icon: const Icon(Icons.sort, size: 18),
+                  items: const [
+                    DropdownMenuItem<SortType>(
+                      value: SortType.availableFirst,
+                      child: Text('판매중 우선'),
+                    ),
+                    DropdownMenuItem<SortType>(
+                      value: SortType.priceLow,
+                      child: Text('낮은 가격순'),
+                    ),
+                    DropdownMenuItem<SortType>(
+                      value: SortType.siteName,
+                      child: Text('판매처순'),
+                    ),
+                  ],
+                  onChanged: (value) {
+                    if (value == null) return;
+                    setState(() {
+                      _sortType = value;
+                    });
+                  },
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSearchSection(List<StockItem> items) {
     final isNoticeMode = _filterType == HomeFilterType.notice;
     final isFavoriteMode = _filterType == HomeFilterType.favorites;
 
@@ -1559,6 +1754,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             ),
           ),
           _buildGradeExpandableSection(),
+          _buildFilterDropdowns(items),
         ],
       ),
     );
@@ -1600,7 +1796,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       ),
       body: Column(
         children: [
-          _buildSearchSection(),
+          _buildSearchSection(_latestItems),
           Expanded(
             child: StreamBuilder<List<StockItem>>(
               stream: StockApi.watchItems(),
@@ -1618,6 +1814,18 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 }
 
                 final items = snapshot.data ?? [];
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  if (!mounted) return;
+                  final changed = _latestItems.length != items.length ||
+                      (_latestItems.isNotEmpty && items.isNotEmpty &&
+                          _latestItems.first.itemId != items.first.itemId) ||
+                      (_latestItems.isEmpty && items.isNotEmpty);
+                  if (changed) {
+                    setState(() {
+                      _latestItems = items;
+                    });
+                  }
+                });
                 PriceHistoryService.recordSnapshots(items);
 
                 return RefreshIndicator(
