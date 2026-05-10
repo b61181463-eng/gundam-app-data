@@ -885,7 +885,7 @@ def extract_cafe24_candidate_links(soup: BeautifulSoup, base_url: str, domain: s
         '/board/', '/member/', '/order/', '/cart/', '/myshop/', '/exec/front/',
         '/article/', '/notice/', '/faq/', '/event/', '/shopinfo/', '/coupon/',
         'javascript:', 'mailto:', 'basket.html', 'login', 'review', 'qna.php',
-        'popup', 'recommend', 'wishlist', 'add_basket', 'category/', 'search.html?'
+        'popup', 'recommend', 'wishlist', 'add_basket', 'search.html?'
     ]
 
     detail_patterns = [
