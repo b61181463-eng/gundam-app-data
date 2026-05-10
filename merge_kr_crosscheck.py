@@ -3,6 +3,8 @@ import os
 import re
 import time
 import hashlib
+from datetime import datetime, timezone
+from pathlib import Path
 from dataclasses import dataclass, asdict
 from typing import Dict, List, Optional, Set
 from urllib.parse import urljoin, urlparse, parse_qs
@@ -168,10 +170,47 @@ def crawl_bnkrmall_selenium() -> List[ItemRecord]:
     return results
 
 DEBUG = False
-FAST_TEST_MODE = True
-MAX_LINKS_PER_SITE = 30
+FAST_TEST_MODE = os.getenv("FAST_TEST_MODE", "0").strip().lower() in {"1", "true", "yes", "y"}
+MAX_LINKS_PER_SITE = int(os.getenv("MAX_LINKS_PER_SITE", "9999"))
 SERVICE_ACCOUNT_PATH = "serviceAccountKey.json"
 COLLECTION_NAME = os.getenv("FIRESTORE_COLLECTION", "aggregated_items")
+
+# ===== 크롤링 안전장치 / 건강검진 기준 =====
+# 아래 기준보다 너무 적게 수집되면 Firestore 기존 데이터를 지우지 않고 업로드를 중단한다.
+MIN_TOTAL_UPLOAD = int(os.getenv("MIN_TOTAL_UPLOAD", "250"))
+MIN_EXISTING_RATIO = float(os.getenv("MIN_EXISTING_RATIO", "0.60"))
+FORCE_UPLOAD_LOW_COUNT = os.getenv("FORCE_UPLOAD_LOW_COUNT", "0").strip().lower() in {"1", "true", "yes", "y"}
+
+# 핵심 사이트: 이 사이트들이 크게 무너지면 데이터 품질에 직접 영향이 크다.
+CRITICAL_SITE_MIN_COUNTS = {
+    "건담샵": 120,
+    "모델세일": 80,
+    "하비팩토리": 120,
+    "조이하비": 80,
+}
+
+# 보조 사이트: 0개 또는 급감 시 경고는 남기지만 전체 업로드를 반드시 막지는 않는다.
+WARNING_SITE_MIN_COUNTS = {
+    "건담시티": 5,
+    "지온샵": 20,
+    "프라모델매니아": 10,
+    "반다이남코코리아몰": 10,
+    "건담붐": 1,
+    "건담몰": 1,
+}
+
+BAD_TITLE_EXACT = {
+    "",
+    "상품명",
+    "상품상세",
+    "상품상세 | 반다이남코코리아몰",
+    "상품상세|반다이남코코리아몰",
+    "반다이남코코리아몰",
+    "bnkrmall",
+    "건담시티",
+    "gundamcity",
+}
+
 
 HEADERS = {
     "User-Agent": (
@@ -491,17 +530,7 @@ def parse_bnkr_title_from_soup(soup: BeautifulSoup) -> str:
 
 def is_bad_title(title: str) -> bool:
     t = normalize_space(title).lower()
-    bad_exact = {
-        "",
-        "반다이남코코리아몰",
-        "bnkrmall",
-        "상품명",
-        "상품상세",
-        "상품상세 | 반다이남코코리아몰",
-        "건담시티",
-        "gundamcity",
-    }
-    if t in bad_exact:
+    if t in {x.lower() for x in BAD_TITLE_EXACT}:
         return True
 
     bad_contains = [
@@ -2195,15 +2224,15 @@ def filter_bad_records(records: List[ItemRecord]) -> List[ItemRecord]:
 
 def dedupe_records(records: List[ItemRecord]) -> List[ItemRecord]:
     """
-    같은 판매처 안에서 같은 상품이 여러 번 잡힌 경우 1개만 남김.
-    최저가 비교 구조를 위해 '판매처별 문서'는 유지한다.
-    즉, 같은 상품이어도 건담샵/하비팩토리/건담시티는 각각 남긴다.
+    안전한 중복 제거.
+    같은 판매처 안에서 item_id 또는 상세 URL이 같은 경우만 중복으로 본다.
+    productKey만으로 합치면 조이하비/SD/HG 계열이 과하게 합쳐질 수 있어서 업로드 전 데이터 손실을 막는다.
     """
     by_key: Dict[str, ItemRecord] = {}
 
     for item in records:
-        product_key = normalize_product_key(item.name)
-        key = f"{item.site}|{product_key}"
+        stable = item.item_id or item.detail_url or item.product_url or item.url
+        key = f"{item.site}|{stable}"
 
         old = by_key.get(key)
         if old is None:
@@ -2213,22 +2242,19 @@ def dedupe_records(records: List[ItemRecord]) -> List[ItemRecord]:
         old_score = status_score(old.status)
         new_score = status_score(item.status)
 
-        # 판매중 > 예약중 > 입고예정 > 품절 > 확인중
         if new_score > old_score:
             by_key[key] = item
             continue
 
-        # 상태가 같으면 더 싼 가격 우선
         if new_score == old_score:
             old_price = price_to_int(old.price)
             new_price = price_to_int(item.price)
-
             if old_price is None and new_price is not None:
                 by_key[key] = item
             elif old_price is not None and new_price is not None and new_price < old_price:
                 by_key[key] = item
 
-    print(f"[중복 제거] {len(records)}개 -> {len(by_key)}개")
+    print(f"[중복 제거:안전모드] {len(records)}개 -> {len(by_key)}개")
     return list(by_key.values())
 
 def sort_records(records: List[ItemRecord]) -> List[ItemRecord]:
@@ -2332,7 +2358,13 @@ def to_firestore_doc(item: ItemRecord, previous: Optional[Dict] = None) -> Dict:
 def upload_to_firestore(db, items: List[ItemRecord]):
     col = db.collection(COLLECTION_NAME)
 
-    # 기존 문서를 먼저 읽어서 NEW/재입고/가격하락 여부를 계산한다.
+    if len(items) < MIN_TOTAL_UPLOAD and not FORCE_UPLOAD_LOW_COUNT:
+        raise RuntimeError(
+            f"[업로드 중단] 최종 수집 {len(items)}개가 MIN_TOTAL_UPLOAD={MIN_TOTAL_UPLOAD}보다 적습니다. "
+            "기존 Firestore 데이터를 보호하기 위해 삭제/업로드를 중단합니다."
+        )
+
+    # 기존 문서를 먼저 읽어서 NEW/재입고/가격하락 여부를 계산하고, 급감 안전장치를 적용한다.
     previous_by_id: Dict[str, Dict] = {}
     previous_by_site_key: Dict[str, Dict] = {}
     existing_refs = []
@@ -2346,6 +2378,17 @@ def upload_to_firestore(db, items: List[ItemRecord]):
         product_key = _doc_get_str(data, ["productKey", "normalizedName"])
         if site and product_key:
             previous_by_site_key[f"{site}|{product_key}"] = data
+
+    existing_count = len(existing_refs)
+    if (
+        existing_count >= MIN_TOTAL_UPLOAD
+        and len(items) < int(existing_count * MIN_EXISTING_RATIO)
+        and not FORCE_UPLOAD_LOW_COUNT
+    ):
+        raise RuntimeError(
+            f"[업로드 중단] 기존 {existing_count}개 대비 새 수집 {len(items)}개로 급감했습니다. "
+            f"허용 비율 MIN_EXISTING_RATIO={MIN_EXISTING_RATIO}. 기존 Firestore 데이터를 유지합니다."
+        )
 
     delete_count = 0
     batch = db.batch()
@@ -2402,16 +2445,122 @@ def upload_to_firestore(db, items: List[ItemRecord]):
     print(f"[Firestore] 업로드 완료: {write_count}개")
     print(f"[변화 감지] NEW {new_count}개 / 재입고 {restock_count}개 / 가격하락 {price_drop_count}개")
 
-
 def save_local_backup(items: List[ItemRecord], path: str = "kr_aggregated_debug.json"):
     payload = [asdict(x) for x in items]
     with open(path, "w", encoding="utf-8") as f:
         json.dump(payload, f, ensure_ascii=False, indent=2)
     print(f"[로컬 백업 저장] {path} / {len(items)}개")
 
+    backup_dir = Path("backups")
+    backup_dir.mkdir(exist_ok=True)
+    ts = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+    latest_path = backup_dir / "kr_aggregated_latest.json"
+    ts_path = backup_dir / f"kr_aggregated_backup_{ts}.json"
+    for out in [latest_path, ts_path]:
+        with open(out, "w", encoding="utf-8") as f:
+            json.dump(payload, f, ensure_ascii=False, indent=2)
+    print(f"[백업 저장] {latest_path} / {ts_path}")
+
+
+def run_crawler_safely(label: str, func, *args) -> List[ItemRecord]:
+    started = time.time()
+    try:
+        items = func(*args)
+        elapsed = time.time() - started
+        print(f"[사이트 완료] {label}: {len(items)}개 / {elapsed:.1f}s")
+        return items
+    except Exception as e:
+        elapsed = time.time() - started
+        print(f"[사이트 실패] {label}: {type(e).__name__}: {e} / {elapsed:.1f}s")
+        return []
+
+
+def crawl_bnkrmall_resilient(session: requests.Session) -> List[ItemRecord]:
+    # Selenium이 실패하거나 제목이 전부 상품상세로 잡히면 API 방식으로 한 번 더 시도한다.
+    selenium_items = run_crawler_safely("BNKR Selenium", crawl_bnkrmall_selenium)
+    good = [x for x in selenium_items if not is_bad_title(x.name or x.title)]
+    if len(good) >= 10:
+        return good
+
+    if selenium_items and len(good) < len(selenium_items):
+        print(f"[BNKR 경고] 잘못된 제목 제거: {len(selenium_items)}개 -> {len(good)}개")
+
+    api_items = run_crawler_safely("BNKR API fallback", crawl_bnkrmall, session)
+    api_good = [x for x in api_items if not is_bad_title(x.name or x.title)]
+    if len(api_good) >= len(good):
+        return api_good
+    return good
+
+
+def count_by_mall(items: List[ItemRecord]):
+    from collections import Counter
+    return Counter(item.mall_name for item in items)
+
+
+def print_site_counts(title: str, items: List[ItemRecord]):
+    counter = count_by_mall(items)
+    print(title)
+    for mall, count in sorted(counter.items()):
+        print(f"{mall}: {count}")
+    print("==================================")
+    return counter
+
+
+def validate_crawl_health(items: List[ItemRecord]) -> bool:
+    counter = count_by_mall(items)
+    total = len(items)
+    errors: List[str] = []
+    warnings: List[str] = []
+
+    if total < MIN_TOTAL_UPLOAD:
+        errors.append(f"총 수집량 {total}개 < 최소 기준 {MIN_TOTAL_UPLOAD}개")
+
+    for mall, minimum in CRITICAL_SITE_MIN_COUNTS.items():
+        count = counter.get(mall, 0)
+        if count < minimum:
+            errors.append(f"{mall} {count}개 < 핵심 기준 {minimum}개")
+
+    for mall, minimum in WARNING_SITE_MIN_COUNTS.items():
+        count = counter.get(mall, 0)
+        if count < minimum:
+            warnings.append(f"{mall} {count}개 < 권장 기준 {minimum}개")
+
+    print("===== 크롤링 건강 상태 =====")
+    print(f"총 수집량: {total}개")
+    for mall in sorted(set(CRITICAL_SITE_MIN_COUNTS) | set(WARNING_SITE_MIN_COUNTS) | set(counter.keys())):
+        count = counter.get(mall, 0)
+        if mall in CRITICAL_SITE_MIN_COUNTS:
+            minimum = CRITICAL_SITE_MIN_COUNTS[mall]
+            mark = "OK" if count >= minimum else "DANGER"
+            print(f"{mall}: {count}개 / 기준 {minimum}개 / {mark}")
+        elif mall in WARNING_SITE_MIN_COUNTS:
+            minimum = WARNING_SITE_MIN_COUNTS[mall]
+            mark = "OK" if count >= minimum else "WARN"
+            print(f"{mall}: {count}개 / 권장 {minimum}개 / {mark}")
+        else:
+            print(f"{mall}: {count}개")
+
+    if warnings:
+        print("----- 경고 -----")
+        for w in warnings:
+            print(f"[경고] {w}")
+
+    if errors:
+        print("----- 위험 -----")
+        for e in errors:
+            print(f"[위험] {e}")
+        if not FORCE_UPLOAD_LOW_COUNT:
+            print("[업로드 판단] 중단: 기존 Firestore 데이터를 보호합니다.")
+            return False
+        print("[업로드 판단] FORCE_UPLOAD_LOW_COUNT=1 이므로 강제 진행합니다.")
+
+    print("[업로드 판단] 진행 가능")
+    print("============================")
+    return True
 
 def main():
     print("=== KR 통합 크롤링 시작 ===")
+    print(f"[실행 모드] FAST_TEST_MODE={FAST_TEST_MODE} / MAX_LINKS_PER_SITE={MAX_LINKS_PER_SITE}")
 
     try:
         db = init_firestore()
@@ -2425,81 +2574,39 @@ def main():
     print("[초기화] requests 세션 생성 성공")
     print("[활성 사이트] 건담샵, 하비팩토리, 건담시티, 모델세일, 조이하비, 건담붐, 프라모델매니아, 지온샵, 건담몰, BNKR")
 
-    modelsale_items = crawl_modelsale(session)
-    print(f"[모델세일 결과] {len(modelsale_items)}개")
+    site_results: Dict[str, List[ItemRecord]] = {}
+    site_results["모델세일"] = run_crawler_safely("모델세일", crawl_modelsale, session)
+    site_results["하비팩토리"] = run_crawler_safely("하비팩토리", crawl_hobbyfactory, session)
+    site_results["건담시티"] = run_crawler_safely("건담시티", crawl_gundamcity, session)
+    site_results["조이하비"] = run_crawler_safely("조이하비", crawl_joyhobby, session)
+    site_results["건담붐"] = run_crawler_safely("건담붐", crawl_gundamboom, session)
+    site_results["프라모델매니아"] = run_crawler_safely("프라모델매니아", crawl_plamodelmania, session)
+    site_results["지온샵"] = run_crawler_safely("지온샵", crawl_zeonshop, session)
+    site_results["건담몰"] = run_crawler_safely("건담몰", crawl_gundamall, session)
+    site_results["건담샵"] = run_crawler_safely("건담샵", crawl_gundamshop, session)
+    site_results["반다이남코코리아몰"] = crawl_bnkrmall_resilient(session)
+    print(f"[사이트 완료] 반다이남코코리아몰: {len(site_results['반다이남코코리아몰'])}개")
 
-    #gundambase_items = crawl_gundambase(session)
-    #print(f"[건담베이스 결과] {len(gundambase_items)}개")
+    merged: List[ItemRecord] = []
+    for items in site_results.values():
+        merged.extend(items)
 
-    hobbyfactory_items = crawl_hobbyfactory(session)
-    print(f"[하비팩토리 결과] {len(hobbyfactory_items)}개")
+    print_site_counts("===== 사이트별 병합 개수 =====", merged)
 
-    gundamcity_items = crawl_gundamcity(session)
-    print(f"[건담시티 결과] {len(gundamcity_items)}개")
-
-    joyhobby_items = crawl_joyhobby(session)
-    print(f"[조이하비 결과] {len(joyhobby_items)}개")
-
-    gundamboom_items = crawl_gundamboom(session)
-    print(f"[건담붐 결과] {len(gundamboom_items)}개")
-
-    plamodelmania_items = crawl_plamodelmania(session)
-    print(f"[프라모델매니아 결과] {len(plamodelmania_items)}개")
-
-    zeonshop_items = crawl_zeonshop(session)
-    print(f"[지온샵 결과] {len(zeonshop_items)}개")
-
-    gundamall_items = crawl_gundamall(session)
-    print(f"[건담몰 결과] {len(gundamall_items)}개")
-
-    gundamshop_items = crawl_gundamshop(session)
-    print(f"[건담샵 결과] {len(gundamshop_items)}개")
-
-    bnkr_items = crawl_bnkrmall_selenium()
-    print(f"[BNKR 결과] {len(bnkr_items)}개")
-
-    merged = (
-        gundamshop_items
-        + hobbyfactory_items
-        + gundamcity_items
-        + modelsale_items
-        + bnkr_items
-        + joyhobby_items
-        + gundamboom_items
-        + plamodelmania_items
-        + zeonshop_items
-        + gundamall_items
-    )
-
-    from collections import Counter
-
-    site_counter = Counter(item.mall_name for item in merged)
-
-    print("===== 사이트별 병합 개수 =====")
-    for mall, count in sorted(site_counter.items()):
-        print(f"{mall}: {count}")
-    print("==========================")
-
-    # A단계 품질 개선: 잡데이터 제거 + 판매처 내부 중복 제거
     merged = filter_bad_records(merged)
-    site_counter_after_filter = Counter(item.mall_name for item in merged)
-    print("===== 품질 필터 후 사이트별 개수 =====")
-    for mall, count in sorted(site_counter_after_filter.items()):
-        print(f"{mall}: {count}")
-    print("==================================")
+    print_site_counts("===== 품질 필터 후 사이트별 개수 =====", merged)
 
     merged = dedupe_records(merged)
-    site_counter_after_dedupe = Counter(item.mall_name for item in merged)
-    print("===== 중복 제거 후 사이트별 개수 =====")
-    for mall, count in sorted(site_counter_after_dedupe.items()):
-        print(f"{mall}: {count}")
-    print("==================================")
+    print_site_counts("===== 중복 제거 후 사이트별 개수 =====", merged)
 
-    # 최저가 비교를 위해 판매처별 문서는 유지하고 정렬만 수행
     merged = sort_records(merged)
     print(f"[정렬 후] 총 {len(merged)}개")
 
     save_local_backup(merged)
+
+    if not validate_crawl_health(merged):
+        raise RuntimeError("크롤링 건강 상태가 기준 미달이라 Firestore 업로드를 중단했습니다.")
+
     upload_to_firestore(db, merged)
 
     print("=== 완료 ===")

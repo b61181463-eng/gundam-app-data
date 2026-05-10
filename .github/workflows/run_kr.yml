@@ -8,6 +8,7 @@ on:
 jobs:
   crawl:
     runs-on: ubuntu-latest
+    timeout-minutes: 45
 
     steps:
       - name: Checkout
@@ -20,13 +21,37 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install requests beautifulsoup4 firebase-admin
-          pip install selenium webdriver-manager
-        
+          python -m pip install --upgrade pip
+          pip install requests beautifulsoup4 firebase-admin selenium webdriver-manager
+
       - name: Create Firebase key
+        shell: bash
         run: |
-          echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}' > serviceAccountKey.json
+          if [ -n '${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}' ]; then
+            printf '%s' '${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}' > serviceAccountKey.json
+          elif [ -n '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}' ]; then
+            printf '%s' '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}' > serviceAccountKey.json
+          else
+            echo "Missing FIREBASE_SERVICE_ACCOUNT_JSON or FIREBASE_SERVICE_ACCOUNT secret" >&2
+            exit 1
+          fi
 
       - name: Run crawler
+        env:
+          FAST_TEST_MODE: "0"
+          MAX_LINKS_PER_SITE: "9999"
+          MIN_TOTAL_UPLOAD: "250"
+          MIN_EXISTING_RATIO: "0.60"
         run: |
+          python -m py_compile merge_kr_crosscheck.py
           python merge_kr_crosscheck.py
+
+      - name: Upload crawler backups
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: kr-crawler-backups
+          path: |
+            kr_aggregated_debug.json
+            backups/*.json
+          if-no-files-found: ignore
