@@ -2067,82 +2067,212 @@ def extract_grade(name: str) -> str:
     return "UNKNOWN"
 
 
+def extract_scale(name: str) -> str:
+    """상품명에서 1/144, 1/100 같은 스케일을 뽑는다."""
+    t = (name or "").upper()
+    m = re.search(r"1\s*/\s*(60|72|100|144|220|400|550)", t)
+    if not m:
+        return ""
+    return f"1/{m.group(1)}"
+
+
+# 같은 기체/상품명이 사이트마다 영어/한글/약칭으로 달라지는 문제를 줄이기 위한 별칭 사전.
+# 너무 공격적으로 합치면 다른 상품이 섞이므로, 확실한 대표명 위주로만 넣는다.
+PRODUCT_ALIAS_RULES = [
+    # 표기/기호 정리
+    (r"VER\.?\s*KA|버카", "VERKA"),
+    (r"REVIVE|리바이브", "REVIVE"),
+    (r"DESTROY\s*MODE|디스트로이\s*모드", "DESTROY MODE"),
+    (r"UNICORN\s*MODE|유니콘\s*모드", "UNICORN MODE"),
+    (r"REAL\s*TYPE|리얼\s*타입", "REAL TYPE"),
+    (r"CLEAR\s*COLOR|클리어\s*컬러|클리어", "CLEAR"),
+    (r"TITANIUM\s*FINISH|티타늄\s*피니쉬|티타늄\s*피니시", "TITANIUM FINISH"),
+
+    # 대표 기체명
+    (r"RX[-\s]?78[-\s]?2|퍼스트\s*건담", "RX78 2 GUNDAM"),
+    (r"NU\s*GUNDAM|뉴\s*건담|뉴건담|ν\s*건담", "NU GUNDAM"),
+    (r"HI[-\s]?NU\s*GUNDAM|하이\s*뉴\s*건담|하이뉴건담|HI[-\s]?ν\s*건담", "HI NU GUNDAM"),
+    (r"SAZABI|사자비", "SAZABI"),
+    (r"SINANJU|시난주", "SINANJU"),
+    (r"UNICORN\s*GUNDAM|유니콘\s*건담", "UNICORN GUNDAM"),
+    (r"BANSHEE\s*NORN|밴시\s*노른|밴시노른", "BANSHEE NORN"),
+    (r"BANSHEE|밴시", "BANSHEE"),
+    (r"ZETA\s*GUNDAM|제타\s*건담|제타건담", "ZETA GUNDAM"),
+    (r"ZZ\s*GUNDAM|더블제타\s*건담", "ZZ GUNDAM"),
+    (r"HYAKU\s*SHIKI|백식", "HYAKU SHIKI"),
+    (r"GOUF|구프", "GOUF"),
+    (r"Z['\s-]*GOK|즈고크", "ZGOK"),
+    (r"DOM|돔", "DOM"),
+    (r"RICK\s*DOM|릭돔", "RICK DOM"),
+    (r"ZAKU\s*II|자쿠\s*2|자쿠II|자쿠2", "ZAKU II"),
+    (r"CHAR['\s]*S|샤아\s*전용", "CHAR CUSTOM"),
+
+    # SEED 계열
+    (r"AILE\s*STRIKE\s*GUNDAM|에일\s*스트라이크\s*건담", "AILE STRIKE GUNDAM"),
+    (r"STRIKE\s*GUNDAM|스트라이크\s*건담", "STRIKE GUNDAM"),
+    (r"STRIKE\s*FREEDOM\s*GUNDAM|스트라이크\s*프리덤\s*건담", "STRIKE FREEDOM GUNDAM"),
+    (r"RISING\s*FREEDOM\s*GUNDAM|라이징\s*프리덤\s*건담", "RISING FREEDOM GUNDAM"),
+    (r"FREEDOM\s*GUNDAM|프리덤\s*건담", "FREEDOM GUNDAM"),
+    (r"INFINITE\s*JUSTICE\s*GUNDAM|인피니트\s*저스티스\s*건담", "INFINITE JUSTICE GUNDAM"),
+    (r"JUSTICE\s*GUNDAM|저스티스\s*건담", "JUSTICE GUNDAM"),
+    (r"DESTINY\s*GUNDAM|데스티니\s*건담", "DESTINY GUNDAM"),
+    (r"BLITZ\s*GUNDAM|블릿츠\s*건담", "BLITZ GUNDAM"),
+    (r"BUSTER\s*GUNDAM|버스터\s*건담", "BUSTER GUNDAM"),
+    (r"DUEL\s*GUNDAM|듀얼\s*건담", "DUEL GUNDAM"),
+    (r"ASTRAY\s*RED\s*FRAME|아스트레이\s*레드\s*프레임|아스트레이\s*레드프레임", "ASTRAY RED FRAME"),
+
+    # 00/W/철혈/수마
+    (r"GUNDAM\s*EXIA|건담\s*엑시아|엑시아", "GUNDAM EXIA"),
+    (r"DOUBLE\s*O\s*GUNDAM|00\s*GUNDAM|더블오\s*건담|더블오", "00 GUNDAM"),
+    (r"WING\s*GUNDAM\s*ZERO|윙\s*건담\s*제로|윙건담\s*제로", "WING GUNDAM ZERO"),
+    (r"WING\s*GUNDAM|윙\s*건담|윙건담", "WING GUNDAM"),
+    (r"GUNDAM\s*HEAVYARMS|헤비암즈", "GUNDAM HEAVYARMS"),
+    (r"GUNDAM\s*DEATHSCYTHE|데스사이즈", "GUNDAM DEATHSCYTHE"),
+    (r"GUNDAM\s*BARBATOS\s*LUPUS|발바토스\s*루프스|바르바토스\s*루프스", "GUNDAM BARBATOS LUPUS"),
+    (r"GUNDAM\s*BARBATOS|발바토스|바르바토스", "GUNDAM BARBATOS"),
+    (r"GUNDAM\s*AERIAL\s*REBUILD|에어리얼\s*개수형", "GUNDAM AERIAL REBUILD"),
+    (r"GUNDAM\s*AERIAL|건담\s*에어리얼|에어리얼", "GUNDAM AERIAL"),
+    (r"GUNDAM\s*CALIBARN|건담\s*캘리번|캘리번", "GUNDAM CALIBARN"),
+    (r"GUNDAM\s*SCHWARZETTE|건담\s*슈바르제테|슈바르제테", "GUNDAM SCHWARZETTE"),
+]
+
+
+DISPLAY_ALIAS_RULES = [
+    (r"RX78\s*2\s*GUNDAM", "RX-78-2 퍼스트 건담"),
+    (r"HI\s*NU\s*GUNDAM", "하이 뉴건담"),
+    (r"NU\s*GUNDAM", "뉴건담"),
+    (r"SAZABI", "사자비"),
+    (r"SINANJU", "시난주"),
+    (r"UNICORN\s*GUNDAM", "유니콘 건담"),
+    (r"BANSHEE\s*NORN", "밴시 노른"),
+    (r"ZETA\s*GUNDAM", "제타 건담"),
+    (r"AILE\s*STRIKE\s*GUNDAM", "에일 스트라이크 건담"),
+    (r"STRIKE\s*FREEDOM\s*GUNDAM", "스트라이크 프리덤 건담"),
+    (r"RISING\s*FREEDOM\s*GUNDAM", "라이징 프리덤 건담"),
+    (r"FREEDOM\s*GUNDAM", "프리덤 건담"),
+    (r"INFINITE\s*JUSTICE\s*GUNDAM", "인피니트 저스티스 건담"),
+    (r"JUSTICE\s*GUNDAM", "저스티스 건담"),
+    (r"DESTINY\s*GUNDAM", "데스티니 건담"),
+    (r"GUNDAM\s*EXIA", "건담 엑시아"),
+    (r"00\s*GUNDAM", "더블오 건담"),
+    (r"WING\s*GUNDAM\s*ZERO", "윙 건담 제로"),
+    (r"GUNDAM\s*BARBATOS\s*LUPUS", "건담 발바토스 루프스"),
+    (r"GUNDAM\s*BARBATOS", "건담 발바토스"),
+    (r"GUNDAM\s*AERIAL\s*REBUILD", "건담 에어리얼 개수형"),
+    (r"GUNDAM\s*AERIAL", "건담 에어리얼"),
+    (r"GUNDAM\s*CALIBARN", "건담 캘리번"),
+    (r"GUNDAM\s*SCHWARZETTE", "건담 슈바르제테"),
+]
+
+
+def apply_product_aliases(text: str) -> str:
+    t = normalize_space(text).upper()
+    t = t.replace("ν", "NU")
+    t = t.replace("RX-O", "RX-0")
+    for pattern, repl in PRODUCT_ALIAS_RULES:
+        t = re.sub(pattern, repl, t, flags=re.IGNORECASE)
+    return normalize_space(t)
+
+
+def standardize_product_name(name: str) -> str:
+    """앱에 표시할 상품명을 최대한 통일한다. 원본의 핵심 정보는 유지하되 쇼핑몰 잡태그를 줄인다."""
+    original = clean_product_name(name)
+    if not original:
+        return ""
+
+    grade = extract_grade(original)
+    scale = extract_scale(original)
+
+    text = original
+    text = re.sub(r"\[[A-Z]{2,4}\d{3,}\]\s*", " ", text, flags=re.IGNORECASE)  # [BAN123456]
+    text = re.sub(r"\bBAN\d{4,}\b", " ", text, flags=re.IGNORECASE)
+    text = re.sub(r"\bBD\d{4,}\b", " ", text, flags=re.IGNORECASE)
+    text = re.sub(r"\s+-\s+MD추천\s*$", "", text, flags=re.IGNORECASE)
+    text = re.sub(r"\b(MD추천|강력추천|추천|재입고|판매중|품절|예약중|입고예정)\b", " ", text, flags=re.IGNORECASE)
+    text = re.sub(r"\[\s*\d{1,3}\s*\]", " ", text)
+    text = re.sub(r"\s+", " ", text).strip(" -_/|[]")
+
+    aliased = apply_product_aliases(text)
+
+    # 대표명으로 표시할 수 있는 경우 한글 대표명 사용
+    display_core = ""
+    for pattern, repl in DISPLAY_ALIAS_RULES:
+        if re.search(pattern, aliased, flags=re.IGNORECASE):
+            display_core = repl
+            break
+
+    if not display_core:
+        display_core = text
+        # 본문 앞에 중복된 등급/스케일이 있으면 제거
+        display_core = re.sub(r"^\s*\[?\s*(MGEX|MGSD|PG|MG|RG|HGUC|HGCE|HGBF|HGAC|HG|EG|SD)\s*\]?\s*", "", display_core, flags=re.IGNORECASE)
+        if scale:
+            display_core = re.sub(r"^\s*" + re.escape(scale).replace("/", r"\s*/\s*") + r"\s*", "", display_core, flags=re.IGNORECASE)
+        display_core = normalize_space(display_core)
+
+    prefix_parts = []
+    if grade and grade != "UNKNOWN":
+        prefix_parts.append(f"[{grade}]")
+    if scale:
+        prefix_parts.append(scale)
+
+    result = " ".join(prefix_parts + [display_core]).strip()
+    result = re.sub(r"\s+", " ", result)
+    return result
+
+
 def normalize_product_key(name: str) -> str:
     """
-    판매처별로 제각각인 상품명을 최대한 같은 키로 맞추는 함수.
-    예:
-    [MG]1/100 MSN-04 SAZABI Ver.KA 사자비 Ver.Ka(버카)
-    -> MG|MSN04 SAZABI VERKA 사자비 VERKA
+    최저가 비교용 productKey 생성.
+    사이트별 다른 표기를 같은 상품으로 묶되, 등급/스케일/버전/기체명은 보존한다.
     """
-    text = normalize_space(name)
-    text = text.upper()
+    grade = extract_grade(name)
+    scale = extract_scale(name)
 
-    replace_rules = {
-        "버카": "VER.KA",
-        "브이카": "VER.KA",
-        "VER KA": "VER.KA",
-        "VER. KA": "VER.KA",
-        "VER.KA": "VERKA",
-        "ν": "뉴",
-        "NU GUNDAM": "뉴건담",
-        "RX-O": "RX-0",
-        "O2": "02",
-        "MODE": "모드",
-        "REVIVE": "리바이브",
-    }
-
-    for old, new in replace_rules.items():
-        text = text.replace(old.upper(), new.upper())
+    text = apply_product_aliases(name)
 
     # 쇼핑몰 홍보/상태/분류 태그 제거
     remove_words = [
-        "재입고",
-        "예약",
-        "입고예정",
-        "판매중",
-        "품절",
-        "일시품절",
-        "강력추천",
-        "MD추천",
-        "추천",
-        "한정판",
-        "한정",
-        "프라모델",
-        "건프라",
-        "기동전사",
-        "수성의마녀",
-        "섬광의 하사웨이",
+        "재입고", "예약", "입고예정", "판매중", "품절", "일시품절",
+        "강력추천", "MD추천", "추천", "프라모델", "건프라", "기동전사",
+        "MOBILE SUIT", "BANDAI", "반다이", "선택조립식",
     ]
-
     for word in remove_words:
-        text = text.replace(word.upper(), " ")
+        text = re.sub(re.escape(word.upper()), " ", text, flags=re.IGNORECASE)
 
-    # [MG], [HGUC 229], (버카), 번호 태그 등 제거
+    # 상품코드/쇼핑몰 코드 제거
+    text = re.sub(r"\b(BAN|BD)\d{4,}\b", " ", text, flags=re.IGNORECASE)
+
+    # [] 안의 시리즈 번호/등급 태그 제거. Ver.Ka 같은 중요 단어는 별칭에서 이미 VERKA로 살림.
     text = re.sub(r"\[[^\]]*\]", " ", text)
     text = re.sub(r"\([^)]*\)", " ", text)
 
-    # 스케일 제거
-    text = re.sub(r"\b1\s*/\s*\d+\b", " ", text)
-
-    # 끝의 제품 번호 제거: [003] 제거 이후에도 남는 단독 숫자 처리
-    text = re.sub(r"\b\d{1,3}\b$", " ", text)
-
-    # 불필요한 기호 제거. 단, 모델명 구분용 영문/숫자/한글은 남김
-    text = re.sub(r"[^0-9A-Z가-힣]+", " ", text)
+    # 스케일 제거: key 앞에 따로 붙임
+    text = re.sub(r"\b1\s*/\s*(60|72|100|144|220|400|550)\b", " ", text)
 
     # 등급 계열 단어는 key 앞에 따로 붙일 거라 본문에서는 제거
     grade_words = [
-        "MGEX", "MGSD", "FULL MECHANICS", "RE 100",
-        "HGUC", "HGCE", "HGBF", "HGAC",
-        "PG", "MG", "RG", "HG", "EG", "SD",
+        "MGEX", "MGSD", "FULL MECHANICS", "RE 100", "RE/100",
+        "HGUC", "HGCE", "HGBF", "HGAC", "HGGW", "PG", "MG", "RG", "HG", "EG", "SD",
     ]
     for g in grade_words:
-        text = re.sub(rf"\b{re.escape(g)}\b", " ", text)
+        text = re.sub(rf"\b{re.escape(g)}\b", " ", text, flags=re.IGNORECASE)
 
+    # 단독 번호/시리즈 번호 제거
+    text = re.sub(r"\b\d{1,3}\b", " ", text)
+
+    # 영문/숫자/한글만 남김
+    text = re.sub(r"[^0-9A-Z가-힣]+", " ", text.upper())
     text = normalize_space(text)
 
-    grade = extract_grade(name)
-    return f"{grade}|{text}"
+    parts = []
+    if grade and grade != "UNKNOWN":
+        parts.append(grade)
+    if scale:
+        parts.append(scale)
+    if text:
+        parts.append(text)
+
+    return "|".join(parts)
 
 
 def is_bad_record(item: ItemRecord) -> bool:
@@ -2188,9 +2318,10 @@ def filter_bad_records(records: List[ItemRecord]) -> List[ItemRecord]:
         item.status = normalize_status(item.status or item.stock_text)
         item.stock_text = item.status
 
-        # 이름 공백 정리
-        item.name = clean_product_name(item.name)
-        item.title = clean_product_name(item.title or item.name)
+        # 이름 표준화: 사이트마다 다른 표기/잡태그를 줄여 앱 카드 표시 통일
+        standardized = standardize_product_name(item.name or item.title)
+        item.name = standardized or clean_product_name(item.name)
+        item.title = item.name
 
         clean.append(item)
 
@@ -2261,6 +2392,8 @@ def to_firestore_doc(item: ItemRecord) -> Dict:
     return {
         "name": item.name,
         "title": item.title,
+        "displayName": item.name,
+        "normalizedName": product_key,
         "price": item.price,
         "priceInt": price_int,
         "grade": grade,
