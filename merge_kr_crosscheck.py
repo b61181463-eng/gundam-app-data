@@ -17,14 +17,6 @@ from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.by import By
 import time
 
-# ===== 기본 설정값: GitHub Actions/로컬 공통 =====
-DEBUG = False
-FAST_TEST_MODE = False
-MAX_LINKS_PER_SITE = 9999
-SERVICE_ACCOUNT_PATH = "serviceAccountKey.json"
-COLLECTION_NAME = os.getenv("FIRESTORE_COLLECTION", "aggregated_items")
-
-
 @dataclass
 class ItemRecord:
     item_id: str
@@ -175,6 +167,11 @@ def crawl_bnkrmall_selenium() -> List[ItemRecord]:
     print(f"[BNKR 최종] {len(results)}")
     return results
 
+DEBUG = False
+FAST_TEST_MODE = True
+MAX_LINKS_PER_SITE = 30
+SERVICE_ACCOUNT_PATH = "serviceAccountKey.json"
+COLLECTION_NAME = os.getenv("FIRESTORE_COLLECTION", "aggregated_items")
 
 HEADERS = {
     "User-Agent": (
@@ -446,7 +443,6 @@ def parse_title_from_soup(soup: BeautifulSoup) -> str:
         "상품명",
         "상품상세",
         "상품상세 | 반다이남코코리아몰",
-        "상품상세|반다이남코코리아몰",
     }
 
     # 1순위: 화면 본문 selector
@@ -502,7 +498,6 @@ def is_bad_title(title: str) -> bool:
         "상품명",
         "상품상세",
         "상품상세 | 반다이남코코리아몰",
-        "상품상세|반다이남코코리아몰",
         "건담시티",
         "gundamcity",
     }
@@ -2048,27 +2043,16 @@ def extract_grade(name: str) -> str:
 
     # 긴 등급을 먼저 봐야 MGSD가 MG로 잘못 잡히지 않음
     grade_patterns = [
-        ("MGEX", r"(?<![A-Z])MGEX(?![A-Z])|\[MGEX\]"),
-        ("MGSD", r"(?<![A-Z])MGSD(?![A-Z])|\[MGSD\]"),
-
+        ("MGEX", r"\bMGEX\b|\[MGEX\]"),
+        ("MGSD", r"\bMGSD\b|\[MGSD\]"),
         ("FULL MECHANICS", r"FULL\s*MECHANICS|풀\s*메카닉스"),
         ("RE/100", r"RE\s*/\s*100"),
-
-        ("PG", r"(?<![A-Z])PG(?![A-Z])|\[PG\]"),
-        ("RG", r"(?<![A-Z])RG(?![A-Z])|\[RG\]"),
-        ("MG", r"(?<![A-Z])MG(?![A-Z])|\[MG\]"),
-
-        (
-            "HG",
-            r"(?<![A-Z])HG(?![A-Z])|\[HG\]|\bHGUC\b|\bHGCE\b|\bHGBF\b|\bHGAC\b|\bHGGW\b",
-        ),
-
-        ("EG", r"(?<![A-Z])EG(?![A-Z])|\[EG\]"),
-
-        (
-            "SD",
-            r"(?<!MG)SD(?![A-Z])|\[SD\]|SD\s*[- ]?\s*EX|SD\s*EX[- ]?STANDARD|SD삼국|SD건담",
-        ),
+        ("PG", r"\bPG\b|\[PG\]"),
+        ("RG", r"\bRG\b|\[RG\]"),
+        ("MG", r"\bMG\b|\[MG\]"),
+        ("HG", r"\bHG\b|\[HG\]|\bHGUC\b|\bHGCE\b|\bHGBF\b|\bHGAC\b"),
+        ("EG", r"\bEG\b|\[EG\]"),
+        ("SD", r"\bSD\b|\[SD\]|SD삼국|SD건담"),
     ]
 
     for grade, pattern in grade_patterns:
@@ -2078,235 +2062,82 @@ def extract_grade(name: str) -> str:
     return "UNKNOWN"
 
 
-def extract_scale(name: str) -> str:
-    """상품명에서 1/144, 1/100 같은 스케일을 뽑는다."""
-    t = (name or "").upper()
-    m = re.search(r"1\s*/\s*(60|72|100|144|220|400|550)", t)
-    if not m:
-        return ""
-    return f"1/{m.group(1)}"
+def normalize_product_key(name: str) -> str:
+    """
+    판매처별로 제각각인 상품명을 최대한 같은 키로 맞추는 함수.
+    예:
+    [MG]1/100 MSN-04 SAZABI Ver.KA 사자비 Ver.Ka(버카)
+    -> MG|MSN04 SAZABI VERKA 사자비 VERKA
+    """
+    text = normalize_space(name)
+    text = text.upper()
 
+    replace_rules = {
+        "버카": "VER.KA",
+        "브이카": "VER.KA",
+        "VER KA": "VER.KA",
+        "VER. KA": "VER.KA",
+        "VER.KA": "VERKA",
+        "ν": "뉴",
+        "NU GUNDAM": "뉴건담",
+        "RX-O": "RX-0",
+        "O2": "02",
+        "MODE": "모드",
+        "REVIVE": "리바이브",
+    }
 
-# 같은 기체/상품명이 사이트마다 영어/한글/약칭으로 달라지는 문제를 줄이기 위한 별칭 사전.
-# 너무 공격적으로 합치면 다른 상품이 섞이므로, 확실한 대표명 위주로만 넣는다.
-PRODUCT_ALIAS_RULES = [
-    # 표기/기호 정리
-    (r"VER\.?\s*KA|버카", "VERKA"),
-    (r"REVIVE|리바이브", "REVIVE"),
-    (r"DESTROY\s*MODE|디스트로이\s*모드", "DESTROY MODE"),
-    (r"UNICORN\s*MODE|유니콘\s*모드", "UNICORN MODE"),
-    (r"REAL\s*TYPE|리얼\s*타입", "REAL TYPE"),
-    (r"CLEAR\s*COLOR|클리어\s*컬러|클리어", "CLEAR"),
-    (r"TITANIUM\s*FINISH|티타늄\s*피니쉬|티타늄\s*피니시", "TITANIUM FINISH"),
+    for old, new in replace_rules.items():
+        text = text.replace(old.upper(), new.upper())
 
-    # 대표 기체명
-    (r"RX[-\s]?78[-\s]?2|퍼스트\s*건담", "RX78 2 GUNDAM"),
-    (r"NU\s*GUNDAM|뉴\s*건담|뉴건담|ν\s*건담", "NU GUNDAM"),
-    (r"HI[-\s]?NU\s*GUNDAM|하이\s*뉴\s*건담|하이뉴건담|HI[-\s]?ν\s*건담", "HI NU GUNDAM"),
-    (r"SAZABI|사자비", "SAZABI"),
-    (r"SINANJU|시난주", "SINANJU"),
-    (r"UNICORN\s*GUNDAM|유니콘\s*건담", "UNICORN GUNDAM"),
-    (r"BANSHEE\s*NORN|밴시\s*노른|밴시노른", "BANSHEE NORN"),
-    (r"BANSHEE|밴시", "BANSHEE"),
-    (r"ZETA\s*GUNDAM|제타\s*건담|제타건담", "ZETA GUNDAM"),
-    (r"ZZ\s*GUNDAM|더블제타\s*건담", "ZZ GUNDAM"),
-    (r"HYAKU\s*SHIKI|백식", "HYAKU SHIKI"),
-    (r"GOUF|구프", "GOUF"),
-    (r"Z['\s-]*GOK|즈고크", "ZGOK"),
-    (r"DOM|돔", "DOM"),
-    (r"RICK\s*DOM|릭돔", "RICK DOM"),
-    (r"ZAKU\s*II|자쿠\s*2|자쿠II|자쿠2", "ZAKU II"),
-    (r"CHAR['\s]*S|샤아\s*전용", "CHAR CUSTOM"),
-
-    # SEED 계열
-    (r"AILE\s*STRIKE\s*GUNDAM|에일\s*스트라이크\s*건담", "AILE STRIKE GUNDAM"),
-    (r"STRIKE\s*GUNDAM|스트라이크\s*건담", "STRIKE GUNDAM"),
-    (r"STRIKE\s*FREEDOM\s*GUNDAM|스트라이크\s*프리덤\s*건담", "STRIKE FREEDOM GUNDAM"),
-    (r"RISING\s*FREEDOM\s*GUNDAM|라이징\s*프리덤\s*건담", "RISING FREEDOM GUNDAM"),
-    (r"FREEDOM\s*GUNDAM|프리덤\s*건담", "FREEDOM GUNDAM"),
-    (r"INFINITE\s*JUSTICE\s*GUNDAM|인피니트\s*저스티스\s*건담", "INFINITE JUSTICE GUNDAM"),
-    (r"JUSTICE\s*GUNDAM|저스티스\s*건담", "JUSTICE GUNDAM"),
-    (r"DESTINY\s*GUNDAM|데스티니\s*건담", "DESTINY GUNDAM"),
-    (r"BLITZ\s*GUNDAM|블릿츠\s*건담", "BLITZ GUNDAM"),
-    (r"BUSTER\s*GUNDAM|버스터\s*건담", "BUSTER GUNDAM"),
-    (r"DUEL\s*GUNDAM|듀얼\s*건담", "DUEL GUNDAM"),
-    (r"ASTRAY\s*RED\s*FRAME|아스트레이\s*레드\s*프레임|아스트레이\s*레드프레임", "ASTRAY RED FRAME"),
-
-    # 00/W/철혈/수마
-    (r"GUNDAM\s*EXIA|건담\s*엑시아|엑시아", "GUNDAM EXIA"),
-    (r"DOUBLE\s*O\s*GUNDAM|00\s*GUNDAM|더블오\s*건담|더블오", "00 GUNDAM"),
-    (r"WING\s*GUNDAM\s*ZERO|윙\s*건담\s*제로|윙건담\s*제로", "WING GUNDAM ZERO"),
-    (r"WING\s*GUNDAM|윙\s*건담|윙건담", "WING GUNDAM"),
-    (r"GUNDAM\s*HEAVYARMS|헤비암즈", "GUNDAM HEAVYARMS"),
-    (r"GUNDAM\s*DEATHSCYTHE|데스사이즈", "GUNDAM DEATHSCYTHE"),
-    (r"GUNDAM\s*BARBATOS\s*LUPUS|발바토스\s*루프스|바르바토스\s*루프스", "GUNDAM BARBATOS LUPUS"),
-    (r"GUNDAM\s*BARBATOS|발바토스|바르바토스", "GUNDAM BARBATOS"),
-    (r"GUNDAM\s*AERIAL\s*REBUILD|에어리얼\s*개수형", "GUNDAM AERIAL REBUILD"),
-    (r"GUNDAM\s*AERIAL|건담\s*에어리얼|에어리얼", "GUNDAM AERIAL"),
-    (r"GUNDAM\s*CALIBARN|건담\s*캘리번|캘리번", "GUNDAM CALIBARN"),
-    (r"GUNDAM\s*SCHWARZETTE|건담\s*슈바르제테|슈바르제테", "GUNDAM SCHWARZETTE"),
-]
-
-
-DISPLAY_ALIAS_RULES = [
-    (r"RX78\s*2\s*GUNDAM", "RX-78-2 퍼스트 건담"),
-    (r"HI\s*NU\s*GUNDAM", "하이 뉴건담"),
-    (r"NU\s*GUNDAM", "뉴건담"),
-    (r"SAZABI", "사자비"),
-    (r"SINANJU", "시난주"),
-    (r"UNICORN\s*GUNDAM", "유니콘 건담"),
-    (r"BANSHEE\s*NORN", "밴시 노른"),
-    (r"ZETA\s*GUNDAM", "제타 건담"),
-    (r"AILE\s*STRIKE\s*GUNDAM", "에일 스트라이크 건담"),
-    (r"STRIKE\s*FREEDOM\s*GUNDAM", "스트라이크 프리덤 건담"),
-    (r"RISING\s*FREEDOM\s*GUNDAM", "라이징 프리덤 건담"),
-    (r"FREEDOM\s*GUNDAM", "프리덤 건담"),
-    (r"INFINITE\s*JUSTICE\s*GUNDAM", "인피니트 저스티스 건담"),
-    (r"JUSTICE\s*GUNDAM", "저스티스 건담"),
-    (r"DESTINY\s*GUNDAM", "데스티니 건담"),
-    (r"GUNDAM\s*EXIA", "건담 엑시아"),
-    (r"00\s*GUNDAM", "더블오 건담"),
-    (r"WING\s*GUNDAM\s*ZERO", "윙 건담 제로"),
-    (r"GUNDAM\s*BARBATOS\s*LUPUS", "건담 발바토스 루프스"),
-    (r"GUNDAM\s*BARBATOS", "건담 발바토스"),
-    (r"GUNDAM\s*AERIAL\s*REBUILD", "건담 에어리얼 개수형"),
-    (r"GUNDAM\s*AERIAL", "건담 에어리얼"),
-    (r"GUNDAM\s*CALIBARN", "건담 캘리번"),
-    (r"GUNDAM\s*SCHWARZETTE", "건담 슈바르제테"),
-]
-
-
-def apply_product_aliases(text: str) -> str:
-    t = normalize_space(text).upper()
-    t = t.replace("ν", "NU")
-    t = t.replace("RX-O", "RX-0")
-    for pattern, repl in PRODUCT_ALIAS_RULES:
-        t = re.sub(pattern, repl, t, flags=re.IGNORECASE)
-    return normalize_space(t)
-
-
-def standardize_product_name(name: str) -> str:
-    original = clean_product_name(name)
-
-    if not original:
-        return ""
-
-    grade = extract_grade(original)
-
-    text = apply_product_aliases(original)
-
-    # 스케일 제거
-    text = re.sub(r"\b1\s*/\s*(60|72|100|144|220|400|550)\b", " ", text)
-
-    # 등급 제거
-    text = re.sub(
-        r"\b(MGEX|MGSD|FULL MECHANICS|RE/100|PG|MG|RG|HGUC|HGCE|HGBF|HGAC|HG|EG|SD)\b",
-        " ",
-        text,
-        flags=re.IGNORECASE,
-    )
-
-    # 상품 코드 제거
-    text = re.sub(r"\b(BAN|BD)\d{4,}\b", " ", text, flags=re.IGNORECASE)
-
-    # 괄호 제거
-    text = re.sub(r"\([^)]*\)", " ", text)
-    text = re.sub(r"\[[^\]]*\]", " ", text)
-
-    # 상태/홍보 제거
+    # 쇼핑몰 홍보/상태/분류 태그 제거
     remove_words = [
         "재입고",
         "예약",
         "입고예정",
         "판매중",
         "품절",
+        "일시품절",
         "강력추천",
         "MD추천",
         "추천",
+        "한정판",
+        "한정",
+        "프라모델",
+        "건프라",
+        "기동전사",
+        "수성의마녀",
+        "섬광의 하사웨이",
     ]
 
     for word in remove_words:
-        text = re.sub(word, " ", text, flags=re.IGNORECASE)
+        text = text.replace(word.upper(), " ")
 
-    text = normalize_space(text)
-
-    # 대표 한글명 변환
-    for pattern, repl in DISPLAY_ALIAS_RULES:
-        if re.search(pattern, text, flags=re.IGNORECASE):
-            text = repl
-            break
-
-    # Ver.Ka 유지
-    if re.search(r"VERKA|VER\.?KA", original, re.IGNORECASE):
-        if "Ver.Ka" not in text:
-            text += " Ver.Ka"
-
-    text = normalize_space(text)
-
-    # 최종 prefix
-    prefix = ""
-
-    if grade != "UNKNOWN":
-        prefix = f"[{grade}] "
-
-    return f"{prefix}{text}".strip()
-
-
-def normalize_product_key(name: str) -> str:
-    """
-    최저가 비교용 productKey 생성.
-    사이트별 다른 표기를 같은 상품으로 묶되, 등급/스케일/버전/기체명은 보존한다.
-    """
-    grade = extract_grade(name)
-    scale = extract_scale(name)
-
-    text = apply_product_aliases(name)
-
-    # 쇼핑몰 홍보/상태/분류 태그 제거
-    remove_words = [
-        "재입고", "예약", "입고예정", "판매중", "품절", "일시품절",
-        "강력추천", "MD추천", "추천", "프라모델", "건프라", "기동전사",
-        "MOBILE SUIT", "BANDAI", "반다이", "선택조립식",
-    ]
-    for word in remove_words:
-        text = re.sub(re.escape(word.upper()), " ", text, flags=re.IGNORECASE)
-
-    # 상품코드/쇼핑몰 코드 제거
-    text = re.sub(r"\b(BAN|BD)\d{4,}\b", " ", text, flags=re.IGNORECASE)
-
-    # [] 안의 시리즈 번호/등급 태그 제거. Ver.Ka 같은 중요 단어는 별칭에서 이미 VERKA로 살림.
+    # [MG], [HGUC 229], (버카), 번호 태그 등 제거
     text = re.sub(r"\[[^\]]*\]", " ", text)
     text = re.sub(r"\([^)]*\)", " ", text)
 
-    # 스케일 제거: key 앞에 따로 붙임
-    text = re.sub(r"\b1\s*/\s*(60|72|100|144|220|400|550)\b", " ", text)
+    # 스케일 제거
+    text = re.sub(r"\b1\s*/\s*\d+\b", " ", text)
+
+    # 끝의 제품 번호 제거: [003] 제거 이후에도 남는 단독 숫자 처리
+    text = re.sub(r"\b\d{1,3}\b$", " ", text)
+
+    # 불필요한 기호 제거. 단, 모델명 구분용 영문/숫자/한글은 남김
+    text = re.sub(r"[^0-9A-Z가-힣]+", " ", text)
 
     # 등급 계열 단어는 key 앞에 따로 붙일 거라 본문에서는 제거
     grade_words = [
-        "MGEX", "MGSD", "FULL MECHANICS", "RE 100", "RE/100",
-        "HGUC", "HGCE", "HGBF", "HGAC", "HGGW",
-        "SD EX STANDARD", "SD EX", "SDEX",
+        "MGEX", "MGSD", "FULL MECHANICS", "RE 100",
+        "HGUC", "HGCE", "HGBF", "HGAC",
         "PG", "MG", "RG", "HG", "EG", "SD",
     ]
     for g in grade_words:
-        text = re.sub(rf"\b{re.escape(g)}\b", " ", text, flags=re.IGNORECASE)
+        text = re.sub(rf"\b{re.escape(g)}\b", " ", text)
 
-    # 단독 번호/시리즈 번호 제거
-    text = re.sub(r"\b\d{1,3}\b", " ", text)
-
-    # 영문/숫자/한글만 남김
-    text = re.sub(r"[^0-9A-Z가-힣]+", " ", text.upper())
     text = normalize_space(text)
 
-    parts = []
-    if grade and grade != "UNKNOWN":
-        parts.append(grade)
-    if scale:
-        parts.append(scale)
-    if text:
-        parts.append(text)
-
-    return "|".join(parts)
+    grade = extract_grade(name)
+    return f"{grade}|{text}"
 
 
 def is_bad_record(item: ItemRecord) -> bool:
@@ -2352,10 +2183,9 @@ def filter_bad_records(records: List[ItemRecord]) -> List[ItemRecord]:
         item.status = normalize_status(item.status or item.stock_text)
         item.stock_text = item.status
 
-        # 이름 표준화: 사이트마다 다른 표기/잡태그를 줄여 앱 카드 표시 통일
-        standardized = standardize_product_name(item.name or item.title)
-        item.name = standardized or clean_product_name(item.name)
-        item.title = item.name
+        # 이름 공백 정리
+        item.name = clean_product_name(item.name)
+        item.title = clean_product_name(item.title or item.name)
 
         clean.append(item)
 
@@ -2365,16 +2195,15 @@ def filter_bad_records(records: List[ItemRecord]) -> List[ItemRecord]:
 
 def dedupe_records(records: List[ItemRecord]) -> List[ItemRecord]:
     """
-    안전한 중복 제거.
-    예전 방식은 normalize_product_key가 너무 강해서 조이하비 상품 188개가 1개로 합쳐지는 문제가 있었다.
-    이제는 같은 판매처 안에서 item_id가 같거나, URL이 완전히 같은 경우만 중복으로 본다.
-    상품명이 비슷해도 다른 링크면 별도 상품으로 유지한다.
+    같은 판매처 안에서 같은 상품이 여러 번 잡힌 경우 1개만 남김.
+    최저가 비교 구조를 위해 '판매처별 문서'는 유지한다.
+    즉, 같은 상품이어도 건담샵/하비팩토리/건담시티는 각각 남긴다.
     """
     by_key: Dict[str, ItemRecord] = {}
 
     for item in records:
-        stable = item.item_id or item.detail_url or item.product_url or item.url
-        key = f"{item.site}|{stable}"
+        product_key = normalize_product_key(item.name)
+        key = f"{item.site}|{product_key}"
 
         old = by_key.get(key)
         if old is None:
@@ -2384,19 +2213,22 @@ def dedupe_records(records: List[ItemRecord]) -> List[ItemRecord]:
         old_score = status_score(old.status)
         new_score = status_score(item.status)
 
+        # 판매중 > 예약중 > 입고예정 > 품절 > 확인중
         if new_score > old_score:
             by_key[key] = item
             continue
 
+        # 상태가 같으면 더 싼 가격 우선
         if new_score == old_score:
             old_price = price_to_int(old.price)
             new_price = price_to_int(item.price)
+
             if old_price is None and new_price is not None:
                 by_key[key] = item
             elif old_price is not None and new_price is not None and new_price < old_price:
                 by_key[key] = item
 
-    print(f"[중복 제거:안전모드] {len(records)}개 -> {len(by_key)}개")
+    print(f"[중복 제거] {len(records)}개 -> {len(by_key)}개")
     return list(by_key.values())
 
 def sort_records(records: List[ItemRecord]) -> List[ItemRecord]:
@@ -2418,20 +2250,73 @@ def sort_records(records: List[ItemRecord]) -> List[ItemRecord]:
     return sorted(records, key=key)
 
 
-def to_firestore_doc(item: ItemRecord) -> Dict:
+def _doc_get_int(data: Optional[Dict], keys: List[str]) -> Optional[int]:
+    if not data:
+        return None
+    for key in keys:
+        value = data.get(key)
+        if value is None:
+            continue
+        if isinstance(value, int):
+            return value
+        try:
+            digits = re.sub(r"[^0-9]", "", str(value))
+            if digits:
+                return int(digits)
+        except Exception:
+            pass
+    return None
+
+
+def _doc_get_str(data: Optional[Dict], keys: List[str]) -> str:
+    if not data:
+        return ""
+    for key in keys:
+        value = data.get(key)
+        if value is None:
+            continue
+        text = str(value).strip()
+        if text:
+            return text
+    return ""
+
+
+def _is_restock_transition(old_status: str, new_status: str) -> bool:
+    old = normalize_status(old_status)
+    new = normalize_status(new_status)
+    return new == "판매중" and old in {"품절", "입고예정", "상태 확인중"}
+
+
+def to_firestore_doc(item: ItemRecord, previous: Optional[Dict] = None) -> Dict:
     price_int = price_to_int(item.price)
     product_key = normalize_product_key(item.name)
     grade = extract_grade(item.name)
 
+    old_status = _doc_get_str(previous, ["status", "stockText", "stock_text"])
+    old_price_int = _doc_get_int(previous, ["priceInt", "price_int", "price"])
+
+    is_new = previous is None
+    is_restock = False if is_new else _is_restock_transition(old_status, item.status)
+    is_price_drop = (
+        old_price_int is not None
+        and price_int is not None
+        and price_int > 0
+        and old_price_int > price_int
+    )
+
     return {
         "name": item.name,
         "title": item.title,
-        "displayName": item.name,
-        "normalizedName": product_key,
         "price": item.price,
         "priceInt": price_int,
         "grade": grade,
         "productKey": product_key,
+        "isNew": is_new,
+        "isRestock": is_restock,
+        "isRestocked": is_restock,
+        "isPriceDrop": is_price_drop,
+        "previousPriceInt": old_price_int,
+        "previousStatus": old_status,
         "status": item.status,
         "stockText": item.stock_text,
         "mallName": item.mall_name,
@@ -2447,13 +2332,27 @@ def to_firestore_doc(item: ItemRecord) -> Dict:
 def upload_to_firestore(db, items: List[ItemRecord]):
     col = db.collection(COLLECTION_NAME)
 
-    existing_docs = col.stream()
+    # 기존 문서를 먼저 읽어서 NEW/재입고/가격하락 여부를 계산한다.
+    previous_by_id: Dict[str, Dict] = {}
+    previous_by_site_key: Dict[str, Dict] = {}
+    existing_refs = []
+
+    for doc in col.stream():
+        data = doc.to_dict() or {}
+        previous_by_id[doc.id] = data
+        existing_refs.append(doc.reference)
+
+        site = _doc_get_str(data, ["site", "source"])
+        product_key = _doc_get_str(data, ["productKey", "normalizedName"])
+        if site and product_key:
+            previous_by_site_key[f"{site}|{product_key}"] = data
+
     delete_count = 0
     batch = db.batch()
     batch_ops = 0
 
-    for doc in existing_docs:
-        batch.delete(doc.reference)
+    for ref in existing_refs:
+        batch.delete(ref)
         batch_ops += 1
         delete_count += 1
         if batch_ops >= 400:
@@ -2469,10 +2368,26 @@ def upload_to_firestore(db, items: List[ItemRecord]):
     batch = db.batch()
     batch_ops = 0
     write_count = 0
+    new_count = 0
+    restock_count = 0
+    price_drop_count = 0
 
     for item in items:
+        product_key = normalize_product_key(item.name)
+        previous = previous_by_id.get(item.item_id)
+        if previous is None:
+            previous = previous_by_site_key.get(f"{item.site}|{product_key}")
+
+        payload = to_firestore_doc(item, previous)
+        if payload.get("isNew"):
+            new_count += 1
+        if payload.get("isRestock"):
+            restock_count += 1
+        if payload.get("isPriceDrop"):
+            price_drop_count += 1
+
         doc_ref = col.document(item.item_id)
-        batch.set(doc_ref, to_firestore_doc(item))
+        batch.set(doc_ref, payload)
         batch_ops += 1
         write_count += 1
 
@@ -2485,6 +2400,7 @@ def upload_to_firestore(db, items: List[ItemRecord]):
         batch.commit()
 
     print(f"[Firestore] 업로드 완료: {write_count}개")
+    print(f"[변화 감지] NEW {new_count}개 / 재입고 {restock_count}개 / 가격하락 {price_drop_count}개")
 
 
 def save_local_backup(items: List[ItemRecord], path: str = "kr_aggregated_debug.json"):

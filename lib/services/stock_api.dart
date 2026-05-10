@@ -58,10 +58,10 @@ String _cleanDisplayNameRaw(String raw) {
 }
 
 String _cleanForFilter(String raw) {
-  return raw
-      .trim()
-      .toUpperCase()
-      .replaceAll(RegExp(r'[^A-Z0-9가-힣]'), '');
+  var text = raw.trim().toUpperCase();
+  text = text.replaceAll(RegExp(r'\s+'), ' ');
+  text = text.replaceAll(RegExp(r'\s+\d{6,}$'), '');
+  return text;
 }
 
 String _normalizeSiteKey(String raw) {
@@ -365,6 +365,10 @@ class StockItem {
   final String productUrl;
   final String resolvedUrl;
   final bool isRestocked;
+  final bool isNew;
+  final bool isPriceDrop;
+  final int? previousPriceInt;
+  final String previousStatus;
   final List<StockOffer> offers;
   final int sellerCount;
   final String minPrice;
@@ -384,6 +388,10 @@ class StockItem {
     required this.productUrl,
     required this.resolvedUrl,
     required this.isRestocked,
+    required this.isNew,
+    required this.isPriceDrop,
+    required this.previousPriceInt,
+    required this.previousStatus,
     required this.offers,
     required this.sellerCount,
     required this.minPrice,
@@ -404,6 +412,10 @@ class StockItem {
     String? productUrl,
     String? resolvedUrl,
     bool? isRestocked,
+    bool? isNew,
+    bool? isPriceDrop,
+    int? previousPriceInt,
+    String? previousStatus,
     List<StockOffer>? offers,
     int? sellerCount,
     String? minPrice,
@@ -423,6 +435,10 @@ class StockItem {
       productUrl: productUrl ?? this.productUrl,
       resolvedUrl: resolvedUrl ?? this.resolvedUrl,
       isRestocked: isRestocked ?? this.isRestocked,
+      isNew: isNew ?? this.isNew,
+      isPriceDrop: isPriceDrop ?? this.isPriceDrop,
+      previousPriceInt: previousPriceInt ?? this.previousPriceInt,
+      previousStatus: previousStatus ?? this.previousStatus,
       offers: offers ?? this.offers,
       sellerCount: sellerCount ?? this.sellerCount,
       minPrice: minPrice ?? this.minPrice,
@@ -454,6 +470,11 @@ class StockItem {
       'postedAt',
       'posted_at',
     ]);
+    final isNew = _readBool(data, ['isNew', 'new']);
+    final isRestocked = _readBool(data, ['isRestock', 'isRestocked', 'restocked']);
+    final isPriceDrop = _readBool(data, ['isPriceDrop', 'priceDrop']);
+    final previousPriceInt = _readInt(data, ['previousPriceInt', 'previous_price_int']);
+    final previousStatus = _readString(data, ['previousStatus', 'previous_status']);
 
     final cleanedName = _cleanDisplayNameRaw(rawName);
     final cleanedTitle = _cleanDisplayNameRaw(rawTitle);
@@ -495,7 +516,11 @@ class StockItem {
       url: url,
       productUrl: productUrl,
       resolvedUrl: resolvedUrl,
-      isRestocked: false,
+      isRestocked: isRestocked,
+      isNew: isNew,
+      isPriceDrop: isPriceDrop,
+      previousPriceInt: previousPriceInt,
+      previousStatus: previousStatus,
       offers: [
         StockOffer(
           seller: mallName.isNotEmpty ? mallName : site,
@@ -508,6 +533,30 @@ class StockItem {
       minPrice: price,
       noticeDate: noticeDate,
     );
+  }
+
+  static bool _readBool(Map<String, dynamic> data, List<String> keys) {
+    for (final key in keys) {
+      final value = data[key];
+      if (value == null) continue;
+      if (value is bool) return value;
+      final text = value.toString().trim().toLowerCase();
+      if (text == 'true' || text == '1' || text == 'yes') return true;
+      if (text == 'false' || text == '0' || text == 'no') return false;
+    }
+    return false;
+  }
+
+  static int? _readInt(Map<String, dynamic> data, List<String> keys) {
+    for (final key in keys) {
+      final value = data[key];
+      if (value == null) continue;
+      if (value is int) return value;
+      if (value is num) return value.toInt();
+      final digits = value.toString().replaceAll(RegExp(r'[^0-9]'), '');
+      if (digits.isNotEmpty) return int.tryParse(digits);
+    }
+    return null;
   }
 
   static String _readString(Map<String, dynamic> data, List<String> keys) {
@@ -856,46 +905,47 @@ class StockApi {
   }
 
   static bool _isSimilarItem(StockItem a, StockItem b) {
-    // 안전장치: 현재는 _groupDuplicateItems에서 퍼지 병합을 쓰지 않는다.
-    // 향후 다시 사용할 경우를 대비해 매우 보수적인 조건만 허용한다.
     if (StockApi._isNoticeForMerge(a) || StockApi._isNoticeForMerge(b)) {
       return false;
     }
 
-    final sellerA = _prettySellerName(a.mallName.isNotEmpty ? a.mallName : a.site);
-    final sellerB = _prettySellerName(b.mallName.isNotEmpty ? b.mallName : b.site);
-
-    // 같은 판매처 안의 상품은 서로 다른 상품일 가능성이 높으므로 퍼지 병합하지 않는다.
-    if (sellerA == sellerB) return false;
-
     final gradeA = _extractGrade('${a.name} ${a.title}');
     final gradeB = _extractGrade('${b.name} ${b.title}');
 
-    if (gradeA == 'UNKNOWN' || gradeB == 'UNKNOWN' || gradeA != gradeB) {
+    // 🔥 핵심: 하나라도 UNKNOWN이면 합치지 않음
+    if (gradeA != gradeB) {
       return false;
     }
-
     final priceA = _priceToInt(a.price);
     final priceB = _priceToInt(b.price);
 
     if (priceA != null && priceB != null) {
-      final ratio = priceA > priceB ? priceA / priceB : priceB / priceA;
-      if (ratio >= 1.7) return false;
-    }
+      final ratio = priceA > priceB
+          ? priceA / priceB
+          : priceB / priceA;
 
-    final tokensA = _matchTokens(a).toSet();
-    final tokensB = _matchTokens(b).toSet();
+      // ❗ 가격 2배 이상 차이나면 다른 상품
+      if (ratio >= 2.0) return false;
+    }
+    
+    final tokensA = _matchTokens(a);
+    final tokensB = _matchTokens(b);
 
     if (tokensA.isEmpty || tokensB.isEmpty) return false;
 
-    final intersection = tokensA.intersection(tokensB);
+    final intersection = tokensA.where(tokensB.contains).toList();
 
-    // 단어 하나만 겹친다고 같은 상품으로 보지 않는다.
-    // 모델명/기체명 토큰이 최소 2개 이상 겹쳐야 한다.
-    if (intersection.length < 2) return false;
+    // 한국어 핵심 토큰 (3글자 이상) 1개라도 겹치면 OK
+    final hasStrongKorean = intersection.any(
+      (t) => RegExp(r'[가-힣]').hasMatch(t) && t.length >= 3,
+    );
 
-    final strongOverlap = intersection.where((token) => token.length >= 3).length;
-    return strongOverlap >= 1;
+    if (hasStrongKorean) return true;
+
+    // 영어/숫자 토큰은 2개 이상 겹쳐야
+    if (intersection.length >= 2) return true;
+
+    return false;
   }
 
   static Stream<List<StockItem>> watchItems() {
@@ -1116,12 +1166,27 @@ class StockApi {
       exactGroups.putIfAbsent(key, () => []).add(item);
     }
 
-    // 2차 퍼지 병합은 과하게 합쳐지는 문제가 있어서 비활성화한다.
-    // 예: 조이하비 상품 188개가 1개 카드로 합쳐지는 문제 방지.
-    // 같은 상품 비교는 _groupKey가 완전히 같은 경우만 묶는다.
-    final List<List<StockItem>> mergedGroups = exactGroups.values
-        .map((group) => List<StockItem>.from(group))
-        .toList();
+    // 2차: 퍼지 병합
+    final List<List<StockItem>> mergedGroups = [];
+
+    for (final group in exactGroups.values) {
+      bool merged = false;
+
+      for (final existing in mergedGroups) {
+        final a = existing.first;
+        final b = group.first;
+
+        if (StockApi._isSimilarItem(a, b)) {
+          existing.addAll(group);
+          merged = true;
+          break;
+        }
+      }
+
+      if (!merged) {
+        mergedGroups.add(List<StockItem>.from(group));
+      }
+    }
 
     final List<StockItem> result = [];
 
@@ -1300,12 +1365,12 @@ class StockApi {
       final currentStatus = _normalizedStatus(item);
       final previousStatus = (previousMap[key] ?? '').toString();
 
-      final restocked = previousStatus.isNotEmpty &&
+      final locallyRestocked = previousStatus.isNotEmpty &&
           (previousStatus == 'soldout' || previousStatus == 'reserve') &&
           currentStatus == 'onsale';
 
       nextMap[key] = currentStatus;
-      result.add(item.copyWith(isRestocked: restocked));
+      result.add(item.copyWith(isRestocked: item.isRestocked || locallyRestocked));
     }
 
     await prefs.setString(_statusCacheKey, jsonEncode(nextMap));
