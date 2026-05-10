@@ -1,0 +1,474 @@
+{
+  "products": {
+    "MG|사자비 VERKA": {
+      "officialName": "[MG] 사자비 Ver.Ka",
+      "grade": "MG",
+      "series": "역습의 샤아",
+      "aliases": [
+        "MSN-04 SAZABI VER.KA",
+        "SAZABI VER.KA",
+        "사자비 버카",
+        "사자비 Ver Ka"
+      ]
+    },
+    "HG|사자비": {
+      "officialName": "[HG] 사자비",
+      "grade": "HG",
+      "series": "역습의 샤아",
+      "aliases": [
+        "HGUC MSN-04 SAZABI",
+        "HGUC 사자비",
+        "MSN-04 SAZABI"
+      ]
+    },
+    "SD|사자비": {
+      "officialName": "[SD] 사자비",
+      "grade": "SD",
+      "series": "SD EX-STANDARD",
+      "aliases": [
+        "SD EX-STANDARD 사자비",
+        "SD-EX 사자비",
+        "SD EX 사자비"
+      ]
+    },
+    "RG|뉴 건담": {
+      "officialName": "[RG] 뉴 건담",
+      "grade": "RG",
+      "series": "역습의 샤아",
+      "aliases": [
+        "RG NU GUNDAM",
+        "RX-93 NU GUNDAM",
+        "RG 뉴건담"
+      ]
+    },
+    "EG|뉴 건담": {
+      "officialName": "[EG] 뉴 건담",
+      "grade": "EG",
+      "series": "역습의 샤아",
+      "aliases": [
+        "EG NU GUNDAM",
+        "EG 뉴건담",
+        "ENTRY GRADE NU GUNDAM"
+      ]
+    },
+    "HG|하이 뉴 건담": {
+      "officialName": "[HG] 하이 뉴 건담",
+      "grade": "HG",
+      "series": "역습의 샤아",
+      "aliases": [
+        "HGUC HI-NU GUNDAM",
+        "HGUC RX-93-V2",
+        "하이뉴 건담",
+        "HI NU GUNDAM"
+      ]
+    },
+    "HG|건담 에어리얼": {
+      "officialName": "[HG] 건담 에어리얼",
+      "grade": "HG",
+      "series": "수성의 마녀",
+      "aliases": [
+        "GUNDAM AERIAL",
+        "건담 에어리얼 수성의마녀",
+        "HG-WM 03 건담 에어리얼"
+      ]
+    },
+    "HG|건담 에어리얼 개수형": {
+      "officialName": "[HG] 건담 에어리얼 개수형",
+      "grade": "HG",
+      "series": "수성의 마녀",
+      "aliases": [
+        "AERIAL REBUILD",
+        "GUNDAM AERIAL REBUILD",
+        "건담 에어리얼 개수형",
+        "건담 에어리얼(개수형)",
+        "HG-WM 19"
+      ]
+    },
+    "SD|건담 에어리얼": {
+      "officialName": "[SD] 건담 에어리얼",
+      "grade": "SD",
+      "series": "SD EX-STANDARD",
+      "aliases": [
+        "SD EX-STANDARD 건담 에어리얼",
+        "SD-EX 건담 에어리얼",
+        "SD EX 건담 에어리얼"
+      ]
+    },
+    "HG|건담 캘리번": {
+      "officialName": "[HG] 건담 캘리번",
+      "grade": "HG",
+      "series": "수성의 마녀",
+      "aliases": [
+        "GUNDAM CALIBARN",
+        "CALIBARN",
+        "건담 캘리번",
+        "HG-WM 26"
+      ]
+    },
+    "HG|건담 슈바르제테": {
+      "officialName": "[HG] 건담 슈바르제테",
+      "grade": "HG",
+      "series": "수성의 마녀",
+      "aliases": [
+        "GUNDAM SCHWARZETTE",
+        "SCHWARZETTE",
+        "슈바르제테",
+        "HG-WM 25"
+      ]
+    },
+    "HG|건담 르브리스": {
+      "officialName": "[HG] 건담 르브리스",
+      "grade": "HG",
+      "series": "수성의 마녀",
+      "aliases": [
+        "GUNDAM LFRITH",
+        "LFRITH",
+        "르브리스"
+      ]
+    },
+    "HG|건담 르브리스 울": {
+      "officialName": "[HG] 건담 르브리스 울",
+      "grade": "HG",
+      "series": "수성의 마녀",
+      "aliases": [
+        "LFRITH UR",
+        "르브리스 울"
+      ]
+    },
+    "HG|건담 르브리스 손": {
+      "officialName": "[HG] 건담 르브리스 손",
+      "grade": "HG",
+      "series": "수성의 마녀",
+      "aliases": [
+        "LFRITH THORN",
+        "르브리스 손",
+        "르브리스 쏜"
+      ]
+    },
+    "HG|마이티 스트라이크 프리덤 건담": {
+      "officialName": "[HG] 마이티 스트라이크 프리덤 건담",
+      "grade": "HG",
+      "series": "SEED FREEDOM",
+      "aliases": [
+        "MIGHTY STRIKE FREEDOM",
+        "마이티 스트라이크 프리덤",
+        "HGCE 250"
+      ]
+    },
+    "SD|마이티 스트라이크 프리덤 건담": {
+      "officialName": "[SD] 마이티 스트라이크 프리덤 건담",
+      "grade": "SD",
+      "series": "SD EX-STANDARD",
+      "aliases": [
+        "SD EX MIGHTY STRIKE FREEDOM",
+        "SD 마이티 스트라이크 프리덤"
+      ]
+    },
+    "HG|라이징 프리덤 건담": {
+      "officialName": "[HG] 라이징 프리덤 건담",
+      "grade": "HG",
+      "series": "SEED FREEDOM",
+      "aliases": [
+        "RISING FREEDOM GUNDAM",
+        "라이징 프리덤",
+        "HGCE 243"
+      ]
+    },
+    "SD|라이징 프리덤 건담": {
+      "officialName": "[SD] 라이징 프리덤 건담",
+      "grade": "SD",
+      "series": "SD EX-STANDARD",
+      "aliases": [
+        "SD EX-STANDARD 라이징 프리덤",
+        "SD EX 라이징 프리덤"
+      ]
+    },
+    "HG|임모탈 저스티스 건담": {
+      "officialName": "[HG] 임모탈 저스티스 건담",
+      "grade": "HG",
+      "series": "SEED FREEDOM",
+      "aliases": [
+        "IMMORTAL JUSTICE GUNDAM",
+        "임모탈 저스티스",
+        "HGCE 244"
+      ]
+    },
+    "RG|프리덤 건담": {
+      "officialName": "[RG] 프리덤 건담",
+      "grade": "RG",
+      "series": "SEED",
+      "aliases": [
+        "RG FREEDOM GUNDAM",
+        "ZGMF-X10A FREEDOM",
+        "프리덤 건담 005"
+      ]
+    },
+    "HG|프리덤 건담": {
+      "officialName": "[HG] 프리덤 건담",
+      "grade": "HG",
+      "series": "SEED",
+      "aliases": [
+        "HGCE FREEDOM GUNDAM",
+        "HGCE 192",
+        "ZGMF-X10A FREEDOM"
+      ]
+    },
+    "MG|프리덤 건담": {
+      "officialName": "[MG] 프리덤 건담",
+      "grade": "MG",
+      "series": "SEED",
+      "aliases": [
+        "1/100 FREEDOM GUNDAM",
+        "MG FREEDOM GUNDAM"
+      ]
+    },
+    "RG|스트라이크 프리덤 건담": {
+      "officialName": "[RG] 스트라이크 프리덤 건담",
+      "grade": "RG",
+      "series": "SEED DESTINY",
+      "aliases": [
+        "RG STRIKE FREEDOM",
+        "ZGMF-X20A STRIKE FREEDOM"
+      ]
+    },
+    "SD|스트라이크 프리덤 건담": {
+      "officialName": "[SD] 스트라이크 프리덤 건담",
+      "grade": "SD",
+      "series": "SD EX-STANDARD",
+      "aliases": [
+        "SD EX-STANDARD 건담 스트라이크 프리덤",
+        "SD 스트라이크 프리덤"
+      ]
+    },
+    "RG|에일 스트라이크 건담": {
+      "officialName": "[RG] 에일 스트라이크 건담",
+      "grade": "RG",
+      "series": "SEED",
+      "aliases": [
+        "AILE STRIKE GUNDAM",
+        "GAT-X105 AILE STRIKE",
+        "에일 스트라이크"
+      ]
+    },
+    "MG|에일 스트라이크 건담": {
+      "officialName": "[MG] 에일 스트라이크 건담",
+      "grade": "MG",
+      "series": "SEED",
+      "aliases": [
+        "1/100 AILE STRIKE GUNDAM",
+        "MG AILE STRIKE"
+      ]
+    },
+    "EG|퍼스트 건담": {
+      "officialName": "[EG] 퍼스트 건담",
+      "grade": "EG",
+      "series": "기동전사 건담",
+      "aliases": [
+        "EG RX-78-2",
+        "ENTRY GRADE RX-78-2",
+        "RX-78-2 퍼스트"
+      ]
+    },
+    "HG|퍼스트 건담": {
+      "officialName": "[HG] 퍼스트 건담",
+      "grade": "HG",
+      "series": "기동전사 건담",
+      "aliases": [
+        "HGUC RX-78-2",
+        "RX-78-2 GUNDAM REVIVE",
+        "퍼스트 건담 REVIVE"
+      ]
+    },
+    "HG|유니콘 건담 디스트로이 모드": {
+      "officialName": "[HG] 유니콘 건담 디스트로이 모드",
+      "grade": "HG",
+      "series": "UC",
+      "aliases": [
+        "UNICORN GUNDAM DESTROY MODE",
+        "RX-0 UNICORN DESTROY",
+        "HGUC 100"
+      ]
+    },
+    "SD|유니콘 건담 디스트로이 모드": {
+      "officialName": "[SD] 유니콘 건담 디스트로이 모드",
+      "grade": "SD",
+      "series": "SD EX-STANDARD",
+      "aliases": [
+        "SD EX-STANDARD 유니콘 건담 디스트로이",
+        "SD 유니콘 건담 디스트로이"
+      ]
+    },
+    "HG|유니콘 건담 2호기 밴시 노른": {
+      "officialName": "[HG] 유니콘 건담 2호기 밴시 노른",
+      "grade": "HG",
+      "series": "UC",
+      "aliases": [
+        "BANSHEE NORN",
+        "UNICORN GUNDAM 02 BANSHEE NORN",
+        "밴시노른",
+        "밴시 노른"
+      ]
+    },
+    "SD|유니콘 건담 2호기 밴시 노른": {
+      "officialName": "[SD] 유니콘 건담 2호기 밴시 노른",
+      "grade": "SD",
+      "series": "SD EX-STANDARD",
+      "aliases": [
+        "SD EX-STANDARD 유니콘 건담 2호기 밴시노른",
+        "SD 밴시 노른"
+      ]
+    },
+    "HG|건담 발바토스": {
+      "officialName": "[HG] 건담 발바토스",
+      "grade": "HG",
+      "series": "철혈의 오펀스",
+      "aliases": [
+        "GUNDAM BARBATOS",
+        "발바토스 001"
+      ]
+    },
+    "HG|건담 발바토스 루프스": {
+      "officialName": "[HG] 건담 발바토스 루프스",
+      "grade": "HG",
+      "series": "철혈의 오펀스",
+      "aliases": [
+        "BARBATOS LUPUS",
+        "발바토스 루프스"
+      ]
+    },
+    "RG|건담 엑시아": {
+      "officialName": "[RG] 건담 엑시아",
+      "grade": "RG",
+      "series": "00",
+      "aliases": [
+        "RG GUNDAM EXIA",
+        "GN-001 GUNDAM EXIA"
+      ]
+    },
+    "HG|건담 엑시아": {
+      "officialName": "[HG] 건담 엑시아",
+      "grade": "HG",
+      "series": "00",
+      "aliases": [
+        "HG GUNDAM EXIA",
+        "GN-001 GUNDAM EXIA"
+      ]
+    },
+    "HG|건담 엑시아 리페어 II": {
+      "officialName": "[HG] 건담 엑시아 리페어 II",
+      "grade": "HG",
+      "series": "00",
+      "aliases": [
+        "GUNDAM EXIA R2",
+        "EXIA REPAIR II",
+        "엑시아 리페어Ⅱ"
+      ]
+    },
+    "RG|윙 건담 제로 EW": {
+      "officialName": "[RG] 윙 건담 제로 EW",
+      "grade": "RG",
+      "series": "W EW",
+      "aliases": [
+        "WING GUNDAM ZERO EW",
+        "윙건담 제로 EW"
+      ]
+    },
+    "HG|윙 건담 제로": {
+      "officialName": "[HG] 윙 건담 제로",
+      "grade": "HG",
+      "series": "W",
+      "aliases": [
+        "HGAC WING GUNDAM ZERO",
+        "XXXG-00W0 WING GUNDAM ZERO"
+      ]
+    },
+    "SD|윙 건담 제로": {
+      "officialName": "[SD] 윙 건담 제로",
+      "grade": "SD",
+      "series": "SD EX-STANDARD",
+      "aliases": [
+        "SD EX-STANDARD 윙 건담 제로",
+        "SD 윙 건담 제로"
+      ]
+    },
+    "RG|제타 건담": {
+      "officialName": "[RG] 제타 건담",
+      "grade": "RG",
+      "series": "Z",
+      "aliases": [
+        "RG ZETA GUNDAM",
+        "MSZ-006 ZETA"
+      ]
+    },
+    "HG|제타 건담": {
+      "officialName": "[HG] 제타 건담",
+      "grade": "HG",
+      "series": "Z",
+      "aliases": [
+        "HGUC ZETA GUNDAM",
+        "MSZ-006 제타"
+      ]
+    },
+    "RG|데스티니 건담": {
+      "officialName": "[RG] 데스티니 건담",
+      "grade": "RG",
+      "series": "SEED DESTINY",
+      "aliases": [
+        "RG DESTINY GUNDAM",
+        "ZGMF-X42S DESTINY"
+      ]
+    },
+    "SD|데스티니 건담": {
+      "officialName": "[SD] 데스티니 건담",
+      "grade": "SD",
+      "series": "SD EX-STANDARD",
+      "aliases": [
+        "SD EX-STANDARD 건담 데스티니",
+        "SD 데스티니 건담"
+      ]
+    },
+    "HG|시난주": {
+      "officialName": "[HG] 시난주",
+      "grade": "HG",
+      "series": "UC",
+      "aliases": [
+        "HGUC SINANJU",
+        "MSN-06S 시난주"
+      ]
+    },
+    "HG|시난주 스타인": {
+      "officialName": "[HG] 시난주 스타인",
+      "grade": "HG",
+      "series": "NT",
+      "aliases": [
+        "SINANJU STEIN",
+        "시난주 스타인"
+      ]
+    },
+    "RG|즈고크 샤아 전용기": {
+      "officialName": "[RG] 즈고크 샤아 전용기",
+      "grade": "RG",
+      "series": "기동전사 건담",
+      "aliases": [
+        "MSM-07S ZGOK",
+        "즈고크 샤아전용",
+        "CHAR ZGOK"
+      ]
+    },
+    "MG|자쿠 II Ver.2.0": {
+      "officialName": "[MG] 자쿠 II Ver.2.0",
+      "grade": "MG",
+      "series": "기동전사 건담",
+      "aliases": [
+        "MS-06J ZAKU2 VER.2.0",
+        "자크2 버전2.0",
+        "자쿠2 Ver.2.0"
+      ]
+    }
+  },
+  "notes": [
+    "공식명 마스터 DB입니다. 왼쪽 key는 내부 기준이고 officialName이 앱 표시명으로 우선 적용됩니다.",
+    "aliases에 쇼핑몰별 표기를 추가하면 다음 크롤링부터 공식명으로 통일됩니다.",
+    "처음부터 완벽한 공식 카탈로그가 아니라, 실제 크롤링 데이터 기반으로 계속 키우는 운영형 DB입니다."
+  ]
+}

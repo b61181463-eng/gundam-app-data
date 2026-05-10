@@ -1,11 +1,5 @@
 import 'dart:convert';
 
-double _doubleFromAny(dynamic value, {double fallback = 0.0}) {
-  if (value == null) return fallback;
-  if (value is num) return value.toDouble();
-  return double.tryParse(value.toString()) ?? fallback;
-}
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -39,9 +33,6 @@ bool _containsAny(String text, List<String> keywords) {
 String _cleanDisplayNameRaw(String raw) {
   var text = raw.trim();
   if (text.isEmpty) return '';
-  final lowered = text.toLowerCase();
-  if (lowered == '상품상세 | 반다이남코리아몰' || lowered == '상품상세 | 반다이남코코리아몰') return '';
-  if (lowered.contains('상품상세') && lowered.contains('반다이남코')) return '';
 
   text = text
       .replaceAll('&nbsp;', ' ')
@@ -317,16 +308,15 @@ bool _isBadPlaceholderName(String raw) {
 
 String _extractGrade(String text) {
   final upper = text.toUpperCase();
-  if (RegExp(r'(^|[^A-Z0-9])MG\s*EX([^A-Z0-9]|$)').hasMatch(upper)) return 'MGEX';
-  if (RegExp(r'(^|[^A-Z0-9])MG\s*SD([^A-Z0-9]|$)').hasMatch(upper)) return 'MGSD';
-  if (upper.contains('FULL MECHANICS')) return 'FULL MECHANICS';
-  if (upper.contains('RE/100')) return 'RE/100';
+  if (upper.contains('MGEX')) return 'MGEX';
+  if (upper.contains('MGSD')) return 'MGSD';
   if (RegExp(r'(^|[^A-Z0-9])PG([^A-Z0-9]|$)').hasMatch(upper)) return 'PG';
   if (RegExp(r'(^|[^A-Z0-9])RG[A-Z]*([^A-Z0-9]|$)').hasMatch(upper)) return 'RG';
-  if (RegExp(r'(^|[^A-Z0-9])MG([^A-Z0-9]|$)').hasMatch(upper)) return 'MG';
+  if (RegExp(r'(^|[^A-Z0-9])MG[A-Z]*([^A-Z0-9]|$)').hasMatch(upper)) return 'MG';
   if (RegExp(r'(^|[^A-Z0-9])HG[A-Z]*([^A-Z0-9]|$)').hasMatch(upper)) return 'HG';
-  if (RegExp(r'(^|[^A-Z0-9])EG([^A-Z0-9]|$)').hasMatch(upper)) return 'EG';
-  if (RegExp(r'(^|[^A-Z0-9])SD(?:[- ]?EX(?:[- ]?STANDARD)?)?([^A-Z0-9]|$)').hasMatch(upper)) return 'SD';
+  if (RegExp(r'(^|[^A-Z0-9])SD[A-Z]*([^A-Z0-9]|$)').hasMatch(upper)) return 'SD';
+  if (upper.contains('FULL MECHANICS')) return 'FULL MECHANICS';
+  if (upper.contains('RE/100')) return 'RE/100';
   return 'UNKNOWN';
 }
 int _offerStatusRank(String status) {
@@ -377,8 +367,6 @@ class StockItem {
   final bool isRestocked;
   final bool isNew;
   final bool isPriceDrop;
-  final double matchConfidence;
-  final bool needsReview;
   final int? previousPriceInt;
   final String previousStatus;
   final List<StockOffer> offers;
@@ -402,8 +390,6 @@ class StockItem {
     required this.isRestocked,
     required this.isNew,
     required this.isPriceDrop,
-    this.matchConfidence = 0.80,
-    this.needsReview = false,
     required this.previousPriceInt,
     required this.previousStatus,
     required this.offers,
@@ -428,8 +414,6 @@ class StockItem {
     bool? isRestocked,
     bool? isNew,
     bool? isPriceDrop,
-    double? matchConfidence,
-    bool? needsReview,
     int? previousPriceInt,
     String? previousStatus,
     List<StockOffer>? offers,
@@ -453,8 +437,6 @@ class StockItem {
       isRestocked: isRestocked ?? this.isRestocked,
       isNew: isNew ?? this.isNew,
       isPriceDrop: isPriceDrop ?? this.isPriceDrop,
-      matchConfidence: matchConfidence ?? this.matchConfidence,
-      needsReview: needsReview ?? this.needsReview,
       previousPriceInt: previousPriceInt ?? this.previousPriceInt,
       previousStatus: previousStatus ?? this.previousStatus,
       offers: offers ?? this.offers,
@@ -470,8 +452,8 @@ class StockItem {
     final data = doc.data();
 
     final sourcePage = _readString(data, ['sourcePage', 'source_page']);
-    final rawName = _readString(data, ['displayName', 'name', 'item_name']);
-    final rawTitle = _readString(data, ['displayName', 'title']);
+    final rawName = _readString(data, ['officialName', 'displayName', 'name', 'item_name']);
+    final rawTitle = _readString(data, ['officialName', 'displayName', 'title']);
     final price = _normalizePriceText(_readString(data, ['price']));
     final site = _readString(data, ['site', 'source']);
     final rawStatus = _readString(data, ['status']);
@@ -493,8 +475,6 @@ class StockItem {
     final isPriceDrop = _readBool(data, ['isPriceDrop', 'priceDrop']);
     final previousPriceInt = _readInt(data, ['previousPriceInt', 'previous_price_int']);
     final previousStatus = _readString(data, ['previousStatus', 'previous_status']);
-    final matchConfidence = _doubleFromAny(data['matchConfidence'], fallback: 0.80);
-    final needsReview = data['needsReview'] == true || matchConfidence < 0.72;
 
     final cleanedName = _cleanDisplayNameRaw(rawName);
     final cleanedTitle = _cleanDisplayNameRaw(rawTitle);
@@ -539,8 +519,6 @@ class StockItem {
       isRestocked: isRestocked,
       isNew: isNew,
       isPriceDrop: isPriceDrop,
-      matchConfidence: matchConfidence,
-      needsReview: needsReview,
       previousPriceInt: previousPriceInt,
       previousStatus: previousStatus,
       offers: [
