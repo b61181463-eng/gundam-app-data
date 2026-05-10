@@ -1,5 +1,6 @@
 import json
 import os
+SERVICE_ACCOUNT_PATH = "serviceAccountKey.json"
 import re
 import time
 import hashlib
@@ -17,7 +18,6 @@ from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.by import By
 import time
 
-SERVICE_ACCOUNT_PATH = "serviceAccountKey.json"
 
 @dataclass
 class ItemRecord:
