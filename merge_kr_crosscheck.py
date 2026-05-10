@@ -185,7 +185,8 @@ FORCE_UPLOAD_LOW_COUNT = os.getenv("FORCE_UPLOAD_LOW_COUNT", "0").strip().lower(
 CRITICAL_SITE_MIN_COUNTS = {
     "건담샵": 120,
     "모델세일": 80,
-    "하비팩토리": 120,
+    # 하비팩토리는 원격 연결 끊김이 자주 있어 100개 이상이면 운영 가능으로 본다.
+    "하비팩토리": 100,
     "조이하비": 80,
 }
 
@@ -193,7 +194,7 @@ CRITICAL_SITE_MIN_COUNTS = {
 WARNING_SITE_MIN_COUNTS = {
     "건담시티": 5,
     "지온샵": 20,
-    "프라모델매니아": 10,
+    "프라모델매니아": 5,
     "반다이남코코리아몰": 10,
     "건담붐": 1,
     "건담몰": 1,
@@ -389,12 +390,6 @@ def is_non_gundam_figure_like(text: str) -> bool:
         "드래곤볼",
         "POKEMON",
         "포켓몬",
-        "하츠네",
-        "미쿠",
-        "파이널 판타지",
-        "FINAL FANTASY",
-        "소프비",
-        "데스크탑 페어리",
         "30MS",
         "30MM",
         "30MF",
@@ -2288,6 +2283,14 @@ def is_bad_record(item: ItemRecord) -> bool:
     if is_non_gundam_figure_like(name):
         return True
 
+    # 조이하비는 상품명이 짧거나 코드형으로 잡히는 경우가 있어 기존 검증을 너무 세게 걸면
+    # 정상 상품까지 전부 제거될 수 있다. 기본 차단 조건만 통과하면 우선 살리고
+    # 이후 match_report.json에서 낮은 신뢰도 항목으로 검토한다.
+    if item.mall_name == "조이하비" or item.site == "joyhobby":
+        if not looks_like_gundam(joined):
+            return True
+        return False
+
     if not is_valid_gundam_plamodel(name, joined):
         return True
 
@@ -2299,12 +2302,16 @@ def is_bad_record(item: ItemRecord) -> bool:
 
 
 def filter_bad_records(records: List[ItemRecord]) -> List[ItemRecord]:
+    from collections import Counter
+
     clean: List[ItemRecord] = []
     removed = 0
+    removed_by_mall = Counter()
 
     for item in records:
         if is_bad_record(item):
             removed += 1
+            removed_by_mall[item.mall_name] += 1
             if DEBUG:
                 print(f"[필터 제거] {item.mall_name} / {item.name} / {item.price} / {item.url}")
             continue
@@ -2315,8 +2322,15 @@ def filter_bad_records(records: List[ItemRecord]) -> List[ItemRecord]:
 
         # 앱 표시용 이름과 내부 비교용 이름을 통일한다.
         display_name = standardize_product_name(item.name or item.title)
+
+        # 조이하비는 공식명 매칭이 실패해도 원본명을 살려둔다.
+        # 완전 제거보다 needsReview/match_report에서 검토하는 편이 데이터 손실을 막는다.
+        if (not display_name or is_bad_title(display_name)) and (item.mall_name == "조이하비" or item.site == "joyhobby"):
+            display_name = clean_product_name(item.name or item.title)
+
         if not display_name or is_bad_title(display_name):
             removed += 1
+            removed_by_mall[item.mall_name] += 1
             if DEBUG:
                 print(f"[필터 제거:표시명 실패] {item.mall_name} / {item.name} / {item.url}")
             continue
@@ -2327,6 +2341,10 @@ def filter_bad_records(records: List[ItemRecord]) -> List[ItemRecord]:
         clean.append(item)
 
     print(f"[품질 필터] 제거 {removed}개 / 유지 {len(clean)}개")
+    if removed_by_mall:
+        print("[품질 필터 제거 내역]")
+        for mall, count in sorted(removed_by_mall.items()):
+            print(f"  {mall}: {count}개 제거")
     return clean
 
 
@@ -3189,361 +3207,11 @@ def build_match_report(items: List[ItemRecord], path: str = MATCH_REPORT_PATH) -
     return report
 
 
-
-# ===== 공식명 마스터 시스템 =====
-OFFICIAL_PRODUCTS_PATH = os.getenv("OFFICIAL_PRODUCTS_PATH", "official_products.json")
-_OFFICIAL_PRODUCTS_CACHE = None
-_OFFICIAL_ALIAS_INDEX_CACHE = None
-
-DEFAULT_OFFICIAL_PRODUCTS = {
-    "products": {},
-    "notes": [
-        "official_products.json이 없을 때 자동 생성되는 빈 템플릿입니다.",
-        "실제 운영에서는 별도 official_products.json 파일을 같이 커밋하세요."
-    ]
-}
-
-
-def load_official_products() -> Dict:
-    global _OFFICIAL_PRODUCTS_CACHE
-    if _OFFICIAL_PRODUCTS_CACHE is not None:
-        return _OFFICIAL_PRODUCTS_CACHE
-    data = _read_json_with_default(OFFICIAL_PRODUCTS_PATH, DEFAULT_OFFICIAL_PRODUCTS)
-    products = data.get("products", data)
-    if not isinstance(products, dict):
-        products = {}
-    _OFFICIAL_PRODUCTS_CACHE = products
-    print(f"[공식명 마스터] {len(products)}개 로드")
-    return products
-
-
-def _official_probe(text: str) -> str:
-    t = normalize_space(text or "")
-    t = t.replace("ν", "NU")
-    t = re.sub(r"VER\s*\.?\s*KA|버카|브이카", "VERKA", t, flags=re.IGNORECASE)
-    t = re.sub(r"\b1\s*/\s*(60|72|100|144|220|400|550)\b", " ", t, flags=re.IGNORECASE)
-    t = re.sub(r"\b(MGEX|MGSD|FULL\s*MECHANICS|RE\s*/\s*100|HGUC|HGCE|HGBF|HGAC|HGFC|HGGW|HGWM|PG|MG|RG|HG|EG|SD)\b", " ", t, flags=re.IGNORECASE)
-    t = re.sub(r"\b(BAN|BD)\s*\d{4,}\b", " ", t, flags=re.IGNORECASE)
-    t = re.sub(r"\b\d{5,}\b", " ", t)
-    t = re.sub(r"[^0-9A-Z가-힣]+", " ", t.upper())
-    return normalize_space(t)
-
-
-def build_official_alias_index() -> List[Dict]:
-    global _OFFICIAL_ALIAS_INDEX_CACHE
-    if _OFFICIAL_ALIAS_INDEX_CACHE is not None:
-        return _OFFICIAL_ALIAS_INDEX_CACHE
-
-    index: List[Dict] = []
-    for key, info in load_official_products().items():
-        if not isinstance(info, dict):
-            continue
-        official_name = normalize_space(str(info.get("officialName", "")))
-        if not official_name:
-            continue
-        grade = normalize_space(str(info.get("grade", ""))) or extract_grade(official_name)
-        aliases = list(info.get("aliases", []) or [])
-        aliases.extend([official_name, _strip_grade_prefix(official_name), key])
-
-        for alias in aliases:
-            probe = _official_probe(str(alias))
-            if not probe or len(probe) < 2:
-                continue
-            index.append({
-                "probe": probe,
-                "officialName": official_name,
-                "grade": grade,
-                "key": key,
-                "series": info.get("series", ""),
-            })
-
-    # 긴 별칭 우선: STRIKE FREEDOM이 FREEDOM보다 먼저 매칭되어야 한다.
-    index.sort(key=lambda x: len(x["probe"]), reverse=True)
-    _OFFICIAL_ALIAS_INDEX_CACHE = index
-    print(f"[공식명 alias index] {len(index)}개 생성")
-    return index
-
-
-def lookup_official_product_name(name: str, *, grade_hint: Optional[str] = None) -> Optional[Dict]:
-    raw = normalize_space(name or "")
-    if not raw:
-        return None
-    grade = grade_hint or extract_grade(raw)
-    raw_probe = _official_probe(raw)
-    core_probe = _official_probe(_base_canonical_core_name_before_manual_alias(raw))
-    manual_probe = _official_probe(apply_manual_alias(raw))
-    probes = [p for p in [raw_probe, core_probe, manual_probe] if p]
-
-    for entry in build_official_alias_index():
-        entry_grade = entry.get("grade") or extract_grade(entry.get("officialName", ""))
-        # 등급이 확실히 다르면 섞지 않는다. UNKNOWN은 예외적으로 허용.
-        if grade != "UNKNOWN" and entry_grade and entry_grade != "UNKNOWN" and grade != entry_grade:
-            continue
-        alias_probe = entry["probe"]
-        for p in probes:
-            if p == alias_probe or alias_probe in p or p in alias_probe:
-                return entry
-    return None
-
-
-def apply_official_product_name(name: str) -> str:
-    original = clean_product_name(name)
-    if not original:
-        return ""
-    hit = lookup_official_product_name(original)
-    if hit:
-        return normalize_space(hit["officialName"])
-    return standardize_product_name(original)
-
-
-# 공식명 마스터 적용 버전으로 최종 함수 재정의
-_PRE_OFFICIAL_STANDARDIZE_PRODUCT_NAME = standardize_product_name
-_PRE_OFFICIAL_NORMALIZE_PRODUCT_KEY = normalize_product_key
-
-
-def standardize_product_name(name: str) -> str:
-    original = clean_product_name(name)
-    if not original:
-        return ""
-    hit = lookup_official_product_name(original)
-    if hit:
-        return normalize_space(hit["officialName"])
-    return _PRE_OFFICIAL_STANDARDIZE_PRODUCT_NAME(original)
-
-
-def normalize_product_key(name: str) -> str:
-    display = standardize_product_name(name)
-    grade = extract_grade(display or name)
-    core = _strip_grade_prefix(display or canonical_core_name(name))
-    core = re.sub(r"VER\s*\.\s*KA", "VERKA", core, flags=re.IGNORECASE)
-    key = _official_probe(core)
-    if not key:
-        return f"{grade}|"
-    return f"{grade}|{key}"
-
-
-def calculate_match_confidence_for_name(name: str, price: Optional[str] = None, status: Optional[str] = None) -> Dict:
-    grade = extract_grade(name)
-    official_hit = lookup_official_product_name(name)
-    core = _strip_grade_prefix(official_hit["officialName"]) if official_hit else canonical_core_name(name)
-    product_key = normalize_product_key(name)
-    score = 0.50
-    reasons: List[str] = []
-
-    if official_hit:
-        score += 0.28
-        reasons.append("official_master")
-    if grade != "UNKNOWN":
-        score += 0.16
-        reasons.append("grade_detected")
-    else:
-        score -= 0.12
-        reasons.append("grade_unknown")
-    if apply_manual_alias(name) or apply_manual_alias(core):
-        score += 0.08
-        reasons.append("manual_alias")
-    tokens = _core_token_set(core)
-    if len(tokens) >= 2:
-        score += 0.06
-        reasons.append("specific_core")
-    elif len(tokens) <= 0:
-        score -= 0.22
-        reasons.append("empty_core")
-    if price_to_int(price or "") is not None:
-        score += 0.03
-        reasons.append("price_ok")
-    if normalize_status(status or "") != "상태 확인중":
-        score += 0.02
-        reasons.append("status_ok")
-    if is_bad_title(name):
-        score = min(score, 0.15)
-        reasons.append("bad_placeholder")
-    if product_key.endswith("|"):
-        score = min(score, 0.25)
-        reasons.append("empty_product_key")
-    score = max(0.05, min(0.99, score))
-    return {"score": round(score, 2), "reasons": reasons, "core": core, "productKey": product_key}
-
-
-def to_firestore_doc(item: ItemRecord, previous: Optional[Dict] = None) -> Dict:
-    price_int = price_to_int(item.price)
-    display_name = apply_official_product_name(item.name or item.title) or item.name
-    official_hit = lookup_official_product_name(item.name or item.title) or lookup_official_product_name(display_name)
-    product_key = normalize_product_key(display_name)
-    grade = extract_grade(display_name)
-    confidence = calculate_match_confidence_for_name(display_name, item.price, item.status)
-
-    old_status = _doc_get_str(previous, ["status", "stockText", "stock_text"])
-    old_price_int = _doc_get_int(previous, ["priceInt", "price_int", "price"])
-
-    is_new = previous is None
-    is_restock = False if is_new else _is_restock_transition(old_status, item.status)
-    is_price_drop = (
-        old_price_int is not None
-        and price_int is not None
-        and price_int > 0
-        and old_price_int > price_int
-    )
-
-    return {
-        "name": display_name,
-        "title": display_name,
-        "displayName": display_name,
-        "officialName": official_hit.get("officialName", display_name) if official_hit else display_name,
-        "officialMatched": official_hit is not None,
-        "officialProductKey": official_hit.get("key", "") if official_hit else "",
-        "officialSeries": official_hit.get("series", "") if official_hit else "",
-        "normalizedName": product_key,
-        "rawName": item.name,
-        "rawTitle": item.title,
-        "price": item.price,
-        "priceInt": price_int,
-        "grade": grade,
-        "productKey": product_key,
-        "matchConfidence": confidence["score"],
-        "matchConfidenceReasons": confidence["reasons"],
-        "canonicalCore": confidence["core"],
-        "needsReview": confidence["score"] < 0.72,
-        "isNew": is_new,
-        "isRestock": is_restock,
-        "isRestocked": is_restock,
-        "isPriceDrop": is_price_drop,
-        "previousPriceInt": old_price_int,
-        "previousStatus": old_status,
-        "status": item.status,
-        "stockText": item.stock_text,
-        "mallName": item.mall_name,
-        "site": item.site,
-        "sourcePage": item.source_page,
-        "url": item.url,
-        "productUrl": item.product_url,
-        "detailUrl": item.detail_url,
-        "updatedAt": firestore.SERVER_TIMESTAMP,
-    }
-
-
-def build_match_report(items: List[ItemRecord], path: str = MATCH_REPORT_PATH) -> Dict:
-    groups: Dict[str, List[ItemRecord]] = {}
-    for item in items:
-        key = normalize_product_key(item.name or item.title)
-        groups.setdefault(key, []).append(item)
-
-    suspicious_groups: List[Dict] = []
-    low_confidence_items: List[Dict] = []
-    official_unmatched_items: List[Dict] = []
-    alias_candidates: List[Dict] = []
-    blocked_warnings: List[Dict] = []
-
-    for key, group in groups.items():
-        names = sorted({standardize_product_name(i.name or i.title) or i.name for i in group})
-        sellers = sorted({i.mall_name for i in group})
-        prices = [price_to_int(i.price) for i in group if price_to_int(i.price) is not None]
-        confidences = [calculate_match_confidence_for_name(i.name or i.title, i.price, i.status)["score"] for i in group]
-        min_conf = min(confidences) if confidences else 0
-        max_price = max(prices) if prices else None
-        min_price = min(prices) if prices else None
-        price_spread_ratio = round(max_price / min_price, 2) if min_price and max_price and min_price > 0 else None
-
-        blocked_pairs = []
-        for idx, left in enumerate(names):
-            for right in names[idx + 1:]:
-                if is_blocked_match(left, right):
-                    blocked_pairs.append([left, right])
-                    blocked_warnings.append({"productKey": key, "left": left, "right": right, "sellers": sellers})
-
-        reasons = []
-        if key.endswith("|"):
-            reasons.append("empty_product_key")
-        if min_conf < 0.72:
-            reasons.append("low_confidence")
-        if blocked_pairs:
-            reasons.append("blocked_match_violation")
-        if price_spread_ratio is not None and price_spread_ratio >= 3.0 and len(group) >= 2:
-            reasons.append("price_spread_large")
-
-        if reasons:
-            suspicious_groups.append({
-                "productKey": key,
-                "count": len(group),
-                "sellers": sellers,
-                "names": names[:12],
-                "minConfidence": min_conf,
-                "priceRange": [min_price, max_price],
-                "priceSpreadRatio": price_spread_ratio,
-                "blockedPairs": blocked_pairs,
-                "reasons": reasons,
-            })
-
-        for item in group:
-            original_name = item.name or item.title
-            c = calculate_match_confidence_for_name(original_name, item.price, item.status)
-            if c["score"] < 0.72:
-                low_confidence_items.append({
-                    "name": item.name,
-                    "mallName": item.mall_name,
-                    "price": item.price,
-                    "status": item.status,
-                    "productKey": c["productKey"],
-                    "confidence": c["score"],
-                    "reasons": c["reasons"],
-                    "url": item.url,
-                })
-            if not lookup_official_product_name(original_name):
-                official_unmatched_items.append({
-                    "name": item.name,
-                    "standardizedName": standardize_product_name(original_name),
-                    "mallName": item.mall_name,
-                    "grade": extract_grade(original_name),
-                    "price": item.price,
-                    "url": item.url,
-                    "suggestedOfficialKey": normalize_product_key(original_name),
-                })
-
-    by_core: Dict[str, List[str]] = {}
-    for key in groups.keys():
-        parts = key.split("|", 1)
-        core = parts[1] if len(parts) > 1 else key
-        if core:
-            by_core.setdefault(core, []).append(key)
-    for core, keys in by_core.items():
-        unique_keys = sorted(set(keys))
-        if len(unique_keys) >= 2:
-            alias_candidates.append({"canonicalCore": core, "productKeys": unique_keys, "reason": "same_core_different_grade_or_key"})
-
-    report = {
-        "generatedAt": datetime.now(timezone.utc).isoformat(),
-        "totalItems": len(items),
-        "totalGroups": len(groups),
-        "suspiciousGroupCount": len(suspicious_groups),
-        "lowConfidenceItemCount": len(low_confidence_items),
-        "officialUnmatchedItemCount": len(official_unmatched_items),
-        "aliasCandidateCount": len(alias_candidates),
-        "blockedWarningCount": len(blocked_warnings),
-        "suspiciousGroups": suspicious_groups[:200],
-        "lowConfidenceItems": low_confidence_items[:300],
-        "officialUnmatchedItems": official_unmatched_items[:300],
-        "aliasCandidates": alias_candidates[:200],
-        "blockedWarnings": blocked_warnings[:200],
-        "howToUse": {
-            "official_products.json": "공식명으로 확정하고 싶은 상품을 추가하세요. officialName이 앱 표시명으로 우선 적용됩니다.",
-            "aliases.json": "같은 상품으로 강제 통일하고 싶은 이름을 추가하세요.",
-            "blocked_matches.json": "절대 같은 상품으로 묶으면 안 되는 조합을 추가하세요.",
-            "matchConfidence": "0.72 미만이면 검토 권장, official_master reason이 있으면 공식명 DB로 매칭된 것입니다."
-        }
-    }
-    try:
-        Path(path).write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
-        print(f"[매칭 리포트 저장] {path} / 의심 그룹 {len(suspicious_groups)}개 / 공식명 미매칭 {len(official_unmatched_items)}개")
-    except Exception as e:
-        print(f"[매칭 리포트 저장 실패] {path} / {type(e).__name__}: {e}")
-    return report
-
 def main():
     print("=== KR 통합 크롤링 시작 ===")
     print(f"[실행 모드] FAST_TEST_MODE={FAST_TEST_MODE} / MAX_LINKS_PER_SITE={MAX_LINKS_PER_SITE}")
     load_manual_aliases()
     load_blocked_matches()
-    load_official_products()
 
     try:
         db = init_firestore()
