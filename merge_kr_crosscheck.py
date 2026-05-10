@@ -2048,16 +2048,27 @@ def extract_grade(name: str) -> str:
 
     # 긴 등급을 먼저 봐야 MGSD가 MG로 잘못 잡히지 않음
     grade_patterns = [
-        ("MGEX", r"\bMGEX\b|\[MGEX\]"),
-        ("MGSD", r"\bMGSD\b|\[MGSD\]"),
+        ("MGEX", r"(?<![A-Z])MGEX(?![A-Z])|\[MGEX\]"),
+        ("MGSD", r"(?<![A-Z])MGSD(?![A-Z])|\[MGSD\]"),
+
         ("FULL MECHANICS", r"FULL\s*MECHANICS|풀\s*메카닉스"),
         ("RE/100", r"RE\s*/\s*100"),
-        ("PG", r"\bPG\b|\[PG\]"),
-        ("RG", r"\bRG\b|\[RG\]"),
-        ("MG", r"\bMG\b|\[MG\]"),
-        ("HG", r"\bHG\b|\[HG\]|\bHGUC\b|\bHGCE\b|\bHGBF\b|\bHGAC\b"),
-        ("EG", r"\bEG\b|\[EG\]"),
-        ("SD", r"\bSD\b|\[SD\]|SD삼국|SD건담"),
+
+        ("PG", r"(?<![A-Z])PG(?![A-Z])|\[PG\]"),
+        ("RG", r"(?<![A-Z])RG(?![A-Z])|\[RG\]"),
+        ("MG", r"(?<![A-Z])MG(?![A-Z])|\[MG\]"),
+
+        (
+            "HG",
+            r"(?<![A-Z])HG(?![A-Z])|\[HG\]|\bHGUC\b|\bHGCE\b|\bHGBF\b|\bHGAC\b|\bHGGW\b",
+        ),
+
+        ("EG", r"(?<![A-Z])EG(?![A-Z])|\[EG\]"),
+
+        (
+            "SD",
+            r"(?<!MG)SD(?![A-Z])|\[SD\]|SD\s*[- ]?\s*EX|SD\s*EX[- ]?STANDARD|SD삼국|SD건담",
+        ),
     ]
 
     for grade, pattern in grade_patterns:
@@ -2175,49 +2186,70 @@ def apply_product_aliases(text: str) -> str:
 
 
 def standardize_product_name(name: str) -> str:
-    """앱에 표시할 상품명을 최대한 통일한다. 원본의 핵심 정보는 유지하되 쇼핑몰 잡태그를 줄인다."""
     original = clean_product_name(name)
+
     if not original:
         return ""
 
     grade = extract_grade(original)
-    scale = extract_scale(original)
 
-    text = original
-    text = re.sub(r"\[[A-Z]{2,4}\d{3,}\]\s*", " ", text, flags=re.IGNORECASE)  # [BAN123456]
-    text = re.sub(r"\bBAN\d{4,}\b", " ", text, flags=re.IGNORECASE)
-    text = re.sub(r"\bBD\d{4,}\b", " ", text, flags=re.IGNORECASE)
-    text = re.sub(r"\s+-\s+MD추천\s*$", "", text, flags=re.IGNORECASE)
-    text = re.sub(r"\b(MD추천|강력추천|추천|재입고|판매중|품절|예약중|입고예정)\b", " ", text, flags=re.IGNORECASE)
-    text = re.sub(r"\[\s*\d{1,3}\s*\]", " ", text)
-    text = re.sub(r"\s+", " ", text).strip(" -_/|[]")
+    text = apply_product_aliases(original)
 
-    aliased = apply_product_aliases(text)
+    # 스케일 제거
+    text = re.sub(r"\b1\s*/\s*(60|72|100|144|220|400|550)\b", " ", text)
 
-    # 대표명으로 표시할 수 있는 경우 한글 대표명 사용
-    display_core = ""
+    # 등급 제거
+    text = re.sub(
+        r"\b(MGEX|MGSD|FULL MECHANICS|RE/100|PG|MG|RG|HGUC|HGCE|HGBF|HGAC|HG|EG|SD)\b",
+        " ",
+        text,
+        flags=re.IGNORECASE,
+    )
+
+    # 상품 코드 제거
+    text = re.sub(r"\b(BAN|BD)\d{4,}\b", " ", text, flags=re.IGNORECASE)
+
+    # 괄호 제거
+    text = re.sub(r"\([^)]*\)", " ", text)
+    text = re.sub(r"\[[^\]]*\]", " ", text)
+
+    # 상태/홍보 제거
+    remove_words = [
+        "재입고",
+        "예약",
+        "입고예정",
+        "판매중",
+        "품절",
+        "강력추천",
+        "MD추천",
+        "추천",
+    ]
+
+    for word in remove_words:
+        text = re.sub(word, " ", text, flags=re.IGNORECASE)
+
+    text = normalize_space(text)
+
+    # 대표 한글명 변환
     for pattern, repl in DISPLAY_ALIAS_RULES:
-        if re.search(pattern, aliased, flags=re.IGNORECASE):
-            display_core = repl
+        if re.search(pattern, text, flags=re.IGNORECASE):
+            text = repl
             break
 
-    if not display_core:
-        display_core = text
-        # 본문 앞에 중복된 등급/스케일이 있으면 제거
-        display_core = re.sub(r"^\s*\[?\s*(MGEX|MGSD|PG|MG|RG|HGUC|HGCE|HGBF|HGAC|HG|EG|SD)\s*\]?\s*", "", display_core, flags=re.IGNORECASE)
-        if scale:
-            display_core = re.sub(r"^\s*" + re.escape(scale).replace("/", r"\s*/\s*") + r"\s*", "", display_core, flags=re.IGNORECASE)
-        display_core = normalize_space(display_core)
+    # Ver.Ka 유지
+    if re.search(r"VERKA|VER\.?KA", original, re.IGNORECASE):
+        if "Ver.Ka" not in text:
+            text += " Ver.Ka"
 
-    prefix_parts = []
-    if grade and grade != "UNKNOWN":
-        prefix_parts.append(f"[{grade}]")
-    if scale:
-        prefix_parts.append(scale)
+    text = normalize_space(text)
 
-    result = " ".join(prefix_parts + [display_core]).strip()
-    result = re.sub(r"\s+", " ", result)
-    return result
+    # 최종 prefix
+    prefix = ""
+
+    if grade != "UNKNOWN":
+        prefix = f"[{grade}] "
+
+    return f"{prefix}{text}".strip()
 
 
 def normalize_product_key(name: str) -> str:
@@ -2252,7 +2284,9 @@ def normalize_product_key(name: str) -> str:
     # 등급 계열 단어는 key 앞에 따로 붙일 거라 본문에서는 제거
     grade_words = [
         "MGEX", "MGSD", "FULL MECHANICS", "RE 100", "RE/100",
-        "HGUC", "HGCE", "HGBF", "HGAC", "HGGW", "PG", "MG", "RG", "HG", "EG", "SD",
+        "HGUC", "HGCE", "HGBF", "HGAC", "HGGW",
+        "SD EX STANDARD", "SD EX", "SDEX",
+        "PG", "MG", "RG", "HG", "EG", "SD",
     ]
     for g in grade_words:
         text = re.sub(rf"\b{re.escape(g)}\b", " ", text, flags=re.IGNORECASE)
