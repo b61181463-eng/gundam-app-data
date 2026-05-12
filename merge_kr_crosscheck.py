@@ -3,6 +3,8 @@ import os
 import re
 import time
 import hashlib
+from datetime import datetime, timezone
+from pathlib import Path
 from dataclasses import dataclass, asdict
 from typing import Dict, List, Optional, Set
 from urllib.parse import urljoin, urlparse, parse_qs
@@ -168,10 +170,98 @@ def crawl_bnkrmall_selenium() -> List[ItemRecord]:
     return results
 
 DEBUG = False
-FAST_TEST_MODE = True
-MAX_LINKS_PER_SITE = 30
+FAST_TEST_MODE = os.getenv("FAST_TEST_MODE", "0").strip().lower() in {"1", "true", "yes", "y"}
+MAX_LINKS_PER_SITE = int(os.getenv("MAX_LINKS_PER_SITE", "9999"))
 SERVICE_ACCOUNT_PATH = "serviceAccountKey.json"
 COLLECTION_NAME = os.getenv("FIRESTORE_COLLECTION", "aggregated_items")
+
+# ===== 크롤링 안전장치 / 건강검진 기준 =====
+# 아래 기준보다 너무 적게 수집되면 Firestore 기존 데이터를 지우지 않고 업로드를 중단한다.
+MIN_TOTAL_UPLOAD = int(os.getenv("MIN_TOTAL_UPLOAD", "250"))
+MIN_EXISTING_RATIO = float(os.getenv("MIN_EXISTING_RATIO", "0.60"))
+FORCE_UPLOAD_LOW_COUNT = os.getenv("FORCE_UPLOAD_LOW_COUNT", "0").strip().lower() in {"1", "true", "yes", "y"}
+# 최후 안전장치: 테스트/저수량 업로드는 명시적으로 허용하지 않으면 절대 Firestore를 덮어쓰지 않는다.
+ALLOW_TEST_UPLOAD = os.getenv("ALLOW_TEST_UPLOAD", "0").strip().lower() in {"1", "true", "yes", "y"}
+ABSOLUTE_MIN_UPLOAD = int(os.getenv("ABSOLUTE_MIN_UPLOAD", "250"))
+
+# 핵심 사이트: 이 사이트들이 크게 무너지면 데이터 품질에 직접 영향이 크다.
+CRITICAL_SITE_MIN_COUNTS = {
+    # 정말 핵심인 두 사이트만 업로드 차단 기준으로 둔다.
+    # 나머지 사이트는 순간적인 차단/인코딩/구조 변경이 잦아서 경고로만 관리한다.
+    "건담샵": 120,
+    "모델세일": 80,
+}
+
+# 보조 사이트: 0개 또는 급감 시 경고는 남기지만 전체 업로드를 막지는 않는다.
+# 조이하비/하비팩토리는 수집은 되는데 필터/접속 상태에 따라 흔들릴 수 있어 차단 조건에서 제외한다.
+WARNING_SITE_MIN_COUNTS = {
+    "하비팩토리": 70,
+    "건담시티": 5,
+    "조이하비": 0,
+    "지온샵": 20,
+    "프라모델매니아": 5,
+    "반다이남코코리아몰": 0,
+    "건담붐": 0,
+    "건담몰": 0,
+}
+
+BAD_TITLE_EXACT = {
+    "",
+    "상품명",
+    "상품상세",
+    "상품상세 | 반다이남코코리아몰",
+    "상품상세|반다이남코코리아몰",
+    "반다이남코코리아몰",
+    "bnkrmall",
+    "건담시티",
+    "gundamcity",
+    "건담샵",
+    "하비팩토리",
+    "모델세일",
+    "조이하비",
+    "회원게시글검색",
+    "회원게시글검색 재고 문의드립니다",
+    "재고 문의드립니다",
+    "문의드립니다",
+}
+
+BAD_BOARD_PATTERNS = [
+    r"회원\s*게시글\s*검색",
+    r"게시글\s*검색",
+    r"재고\s*문의",
+    r"문의\s*드립니다",
+    r"문의\s*드려요",
+    r"질문\s*드립니다",
+    r"재고\s*있나요",
+    r"재고\s*문의드립니다",
+    r"입고\s*문의",
+    r"예약\s*문의",
+]
+
+def is_board_or_qna_noise(text: str) -> bool:
+    t = normalize_space(text or "")
+    if not t:
+        return False
+    for pat in BAD_BOARD_PATTERNS:
+        if re.search(pat, t, flags=re.IGNORECASE):
+            return True
+    # 날짜가 붙은 게시판/문의성 제목도 제거
+    if re.search(r"\b20\d{2}[./-]?(0?[1-9]|1[0-2])[./-]?(0?[1-9]|[12]\d|3[01])", t) and re.search(r"문의|게시글|검색|재고", t):
+        return True
+    return False
+
+# ===== 운영 관측/실패 리포트 =====
+FAILED_EVENTS: List[Dict[str, str]] = []
+
+
+def record_failure(site: str, url: str, error: Exception | str):
+    message = str(error)
+    FAILED_EVENTS.append({
+        "site": site,
+        "url": url or "",
+        "error": message[:500],
+    })
+
 
 HEADERS = {
     "User-Agent": (
@@ -179,17 +269,13 @@ HEADERS = {
         "AppleWebKit/537.36 (KHTML, like Gecko) "
         "Chrome/146.0.0.0 Safari/537.36"
     ),
-    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
     "Accept-Language": "ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7",
-    "Referer": "https://www.google.com/",
     "Cache-Control": "no-cache",
     "Pragma": "no-cache",
 }
 
-TIMEOUT = int(os.getenv("REQUEST_TIMEOUT", "12"))
-REQUEST_SLEEP = float(os.getenv("REQUEST_SLEEP", "0.08"))
-GUNDAMBOOM_MAX_SECONDS = int(os.getenv("GUNDAMBOOM_MAX_SECONDS", "180"))
-GUNDAMBOOM_MAX_LINKS = int(os.getenv("GUNDAMBOOM_MAX_LINKS", "80"))
+TIMEOUT = 20
+REQUEST_SLEEP = 0.3
 
 
 def is_notice_like(title: str, text: str) -> bool:
@@ -329,6 +415,30 @@ def is_non_gundam_figure_like(text: str) -> bool:
         "S.H.FIGUARTS",
         "SHFIGUARTS",
         "피규아츠",
+        "울트라맨",
+        "ULTRAMAN",
+        "스타워즈",
+        "STAR WARS",
+        "타이파이터",
+        "TIE FIGHTER",
+        "드래곤볼",
+        "POKEMON",
+        "포켓몬",
+        "하츠네",
+        "미쿠",
+        "파이널 판타지",
+        "FINAL FANTASY",
+        "소프비",
+        "데스크탑 페어리",
+        "30MS",
+        "30MM",
+        "30MF",
+        "옵션파츠",
+        "OPTION PARTS",
+        "데칼",
+        "스티커",
+        "마커",
+        "도료",
     ]
 
     return any(k in t for k in exclude_keywords)
@@ -347,6 +457,8 @@ def is_valid_gundam_plamodel(title: str, joined_text: str) -> bool:
     return True
 
 def is_excluded(text: str) -> bool:
+    if is_board_or_qna_noise(text):
+        return True
     t = normalize_space(text).upper()
 
     exclude_keywords = [
@@ -422,7 +534,7 @@ def parse_title_from_soup(soup: BeautifulSoup) -> str:
         el = soup.select_one(selector)
         if el and el.get(attr):
             title = normalize_space(el.get(attr))
-            if title:
+            if title and not is_bad_title(title):
                 return title
 
     selectors = [
@@ -494,18 +606,10 @@ def parse_bnkr_title_from_soup(soup: BeautifulSoup) -> str:
 
 
 def is_bad_title(title: str) -> bool:
+    if is_board_or_qna_noise(title):
+        return True
     t = normalize_space(title).lower()
-    bad_exact = {
-        "",
-        "반다이남코코리아몰",
-        "bnkrmall",
-        "상품명",
-        "상품상세",
-        "상품상세 | 반다이남코코리아몰",
-        "건담시티",
-        "gundamcity",
-    }
-    if t in bad_exact:
+    if t in {x.lower() for x in BAD_TITLE_EXACT}:
         return True
 
     bad_contains = [
@@ -689,6 +793,14 @@ def extract_gundamcity_candidate_links(soup: BeautifulSoup, base_url: str) -> Se
         lower = full.lower()
 
         if "gundamcity.co.kr" not in lower:
+            continue
+
+        # 게시판/메인/커뮤니티 링크가 상품처럼 들어오면 앱에 잡문이 노출될 수 있어 제외
+        if any(x in lower for x in [
+            "/community", "/board", "/notice", "/member", "/login", "/join",
+            "/basket", "/cart", "/order", "/mypage", "/main.html",
+            "search_board", "board_no", "article",
+        ]):
             continue
 
         strong_patterns = [
@@ -1074,10 +1186,12 @@ def parse_generic_shop_detail(
             detail_url=url,
         )
     except requests.exceptions.HTTPError as e:
+        record_failure(mall_name, url, e)
         if DEBUG:
             print(f"[{mall_name} HTTP 탈락] {url} / {e}")
         return None
     except Exception as e:
+        record_failure(mall_name, url, e)
         print(f"[{mall_name} 상세 파싱 실패] {url} / {type(e).__name__}: {e}")
         return None
 
@@ -1142,147 +1256,8 @@ def crawl_generic_shop(
     return results
 
 
-def _parse_gundamboom_soup_detail(url: str, soup: BeautifulSoup) -> Optional[ItemRecord]:
-    """Selenium fallback에서 이미 받아온 HTML로 건담붐 상품을 파싱한다."""
-    try:
-        page_text = soup.get_text(" ", strip=True) if soup else ""
-        raw_title = parse_generic_shop_title(soup, page_text, "건담붐")
-        title_only = clean_product_name(raw_title)
-        joined = f"{title_only} {page_text}".strip()
-
-        if not title_only:
-            return None
-        if is_excluded(title_only):
-            return None
-        if is_non_gundam_figure_like(title_only):
-            return None
-        if not looks_like_gundam(joined):
-            return None
-
-        price = parse_price_from_soup(soup) or ""
-        status = parse_status_from_soup(soup) or "상태 확인중"
-        parsed_price = price_to_int(price)
-        if parsed_price is not None and parsed_price < 3000:
-            return None
-
-        parsed = urlparse(url)
-        qs = parse_qs(parsed.query)
-        stable_key = qs.get("product_no", [""])[0] or qs.get("goodsno", [""])[0]
-        if not stable_key:
-            m = re.search(r"/product/[^/]+/(\d+)", parsed.path)
-            if m:
-                stable_key = m.group(1)
-        stable_key = stable_key or url
-        item_id = f"gundamboom_{sha_id(stable_key)}"
-
-        clean_title = clean_product_name(title_only)
-        if not clean_title:
-            return None
-
-        return ItemRecord(
-            item_id=item_id,
-            name=clean_title,
-            title=clean_title,
-            price=price,
-            status=status,
-            stock_text=status,
-            mall_name="건담붐",
-            site="gundamboom",
-            source_page="kr_gundamboom",
-            url=url,
-            product_url=url,
-            detail_url=url,
-        )
-    except Exception as e:
-        record_failure("건담붐", url, e)
-        return None
-
-
-def crawl_gundamboom_selenium_fallback(session: requests.Session) -> List[ItemRecord]:
-    """403이 걸리는 건담붐을 브라우저 렌더링으로 보조 수집한다.
-
-    무한 대기 방지를 위해 GUNDAMBOOM_MAX_SECONDS/GUNDAMBOOM_MAX_LINKS 제한을 둔다.
-    """
-    print("[건담붐 Selenium fallback 시작]")
-    started = time.time()
-    results: List[ItemRecord] = []
-    seen_ids: Set[str] = set()
-    links: Set[str] = set()
-
-    options = webdriver.ChromeOptions()
-    options.add_argument("--headless=new")
-    options.add_argument("--no-sandbox")
-    options.add_argument("--disable-dev-shm-usage")
-    options.add_argument("--disable-gpu")
-    options.add_argument("--window-size=1400,2200")
-    options.add_argument("--lang=ko-KR")
-    options.add_argument(f"--user-agent={HEADERS['User-Agent']}")
-
-    driver = None
-    try:
-        driver = webdriver.Chrome(
-            service=Service(ChromeDriverManager().install()),
-            options=options,
-        )
-        driver.set_page_load_timeout(25)
-
-        for seed in GUNDAMBOOM_SEEDS:
-            if time.time() - started > GUNDAMBOOM_MAX_SECONDS:
-                print("[건담붐 Selenium] 시간 제한 도달: 목록 수집 중단")
-                break
-            try:
-                print(f"[건담붐 Selenium 목록] {seed}")
-                driver.get(seed)
-                time.sleep(2.0)
-                soup = BeautifulSoup(driver.page_source, "html.parser")
-                found = extract_cafe24_candidate_links(soup, seed, "gundamboom.com", "건담붐")
-                links.update(found)
-                print(f"  Selenium 후보 링크 누적 {len(links)}개")
-                if len(links) >= GUNDAMBOOM_MAX_LINKS:
-                    break
-            except Exception as e:
-                record_failure("건담붐 Selenium 목록", seed, e)
-                print(f"[건담붐 Selenium 목록 실패] {seed} / {type(e).__name__}: {e}")
-
-        links_to_crawl = sorted(links)[:GUNDAMBOOM_MAX_LINKS]
-        print(f"[건담붐 Selenium] 상세 후보 총 {len(links_to_crawl)}개")
-
-        for idx, link in enumerate(links_to_crawl, start=1):
-            if time.time() - started > GUNDAMBOOM_MAX_SECONDS:
-                print("[건담붐 Selenium] 시간 제한 도달: 상세 수집 중단")
-                break
-            try:
-                driver.get(link)
-                time.sleep(1.0)
-                soup = BeautifulSoup(driver.page_source, "html.parser")
-                item = _parse_gundamboom_soup_detail(link, soup)
-                if item and item.item_id not in seen_ids:
-                    results.append(item)
-                    seen_ids.add(item.item_id)
-            except Exception as e:
-                record_failure("건담붐 Selenium 상세", link, e)
-                print(f"[건담붐 Selenium 상세 실패] {link} / {type(e).__name__}: {e}")
-
-            if idx % 10 == 0:
-                print(f"[건담붐 Selenium] 상세 진행 {idx}/{len(links_to_crawl)}")
-
-    except Exception as e:
-        record_failure("건담붐 Selenium", "SITE_LEVEL", e)
-        print(f"[건담붐 Selenium fallback 실패] {type(e).__name__}: {e}")
-    finally:
-        if driver is not None:
-            try:
-                driver.quit()
-            except Exception:
-                pass
-
-    print(f"[건담붐 Selenium 최종] {len(results)}개")
-    return results
-
-
 def crawl_gundamboom(session: requests.Session) -> List[ItemRecord]:
-    """건담붐은 requests가 403을 받을 수 있어 requests → Selenium fallback 순서로 시도한다."""
-    items = crawl_generic_shop(
+    return crawl_generic_shop(
         session,
         seeds=GUNDAMBOOM_SEEDS,
         domain='gundamboom.com',
@@ -1291,10 +1266,6 @@ def crawl_gundamboom(session: requests.Session) -> List[ItemRecord]:
         source_page='kr_gundamboom',
         id_prefix='gundamboom',
     )
-    if items:
-        return items
-
-    return crawl_gundamboom_selenium_fallback(session)
 
 
 def crawl_plamodelmania(session: requests.Session) -> List[ItemRecord]:
@@ -1420,6 +1391,7 @@ def parse_modelsale_detail(session: requests.Session, url: str) -> Optional[Item
             detail_url=url,
         )
     except Exception as e:
+        record_failure("모델세일", url, e)
         print(f"[모델세일 상세 파싱 실패] {url} / {type(e).__name__}: {e}")
         return None
 
@@ -1465,6 +1437,7 @@ def parse_gundambase_detail(session: requests.Session, url: str) -> Optional[Ite
             detail_url=url,
         )
     except Exception as e:
+        record_failure("건담베이스", url, e)
         print(f"[건담베이스 상세 파싱 실패] {url} / {type(e).__name__}: {e}")
         return None
 
@@ -1475,7 +1448,8 @@ def parse_hobbyfactory_detail(session: requests.Session, url: str) -> Optional[I
         title = parse_title_from_soup(soup)
         title_only = clean_product_name(title)
         joined = f"{title_only} {page_text}"
-        print(f"[하비팩토리 상세 진입] {url}")
+        if DEBUG:
+            print(f"[하비팩토리 상세 진입] {url}")
 
         if not title_only:
             print(f"[하비팩토리 탈락:title없음] {url}")
@@ -1516,6 +1490,7 @@ def parse_hobbyfactory_detail(session: requests.Session, url: str) -> Optional[I
             detail_url=url,
         )
     except Exception as e:
+        record_failure("하비팩토리", url, e)
         print(f"[하비팩토리 상세 파싱 실패] {url} / {type(e).__name__}: {e}")
         return None
 
@@ -1586,6 +1561,7 @@ def parse_gundamcity_detail(session: requests.Session, url: str) -> Optional[Ite
             detail_url=url,
         )
     except Exception as e:
+        record_failure("건담시티", url, e)
         print(f"[건담시티 상세 파싱 실패] {url} / {type(e).__name__}: {e}")
         return None
 
@@ -1727,10 +1703,12 @@ def parse_joyhobby_detail(session: requests.Session, url: str) -> Optional[ItemR
             detail_url=url,
         )
     except requests.exceptions.HTTPError as e:
+        record_failure("조이하비", url, e)
         if DEBUG:
             print(f"[조이하비 HTTP 탈락] {url} / {e}")
         return None
     except Exception as e:
+        record_failure("조이하비", url, e)
         print(f"[조이하비 상세 파싱 실패] {url} / {type(e).__name__}: {e}")
         return None
 
@@ -1791,6 +1769,7 @@ def parse_gundamshop_detail(session: requests.Session, url: str) -> Optional[Ite
             detail_url=url,
         )
     except Exception as e:
+        record_failure("건담샵", url, e)
         print(f"[건담샵 상세 파싱 실패] {url} / {type(e).__name__}: {e}")
         return None
 
@@ -1875,6 +1854,7 @@ def parse_bnkr_detail(session: requests.Session, url: str) -> Optional[ItemRecor
             detail_url=url,
         )
     except Exception as e:
+        record_failure("반다이남코코리아몰", url, e)
         print(f"[BNKR 상세 파싱 실패] {url} / {type(e).__name__}: {e}")
         return None
 
@@ -2185,21 +2165,22 @@ def price_to_int(price: str) -> Optional[int]:
         return None
 
 
+
 def extract_grade(name: str) -> str:
     t = (name or "").upper()
 
-    # 긴 등급을 먼저 봐야 MGSD가 MG로 잘못 잡히지 않음
+    # 긴 등급을 반드시 먼저 검사한다. MGSD 안의 SD, MGEX 안의 MG가 잡히면 안 된다.
     grade_patterns = [
-        ("MGEX", r"\bMGEX\b|\[MGEX\]"),
-        ("MGSD", r"\bMGSD\b|\[MGSD\]"),
+        ("MGEX", r"(?<![A-Z0-9])MG\s*EX(?![A-Z0-9])|\[\s*MG\s*EX\s*\]"),
+        ("MGSD", r"(?<![A-Z0-9])MG\s*SD(?![A-Z0-9])|\[\s*MG\s*SD\s*\]"),
         ("FULL MECHANICS", r"FULL\s*MECHANICS|풀\s*메카닉스"),
         ("RE/100", r"RE\s*/\s*100"),
-        ("PG", r"\bPG\b|\[PG\]"),
-        ("RG", r"\bRG\b|\[RG\]"),
-        ("MG", r"\bMG\b|\[MG\]"),
-        ("HG", r"\bHG\b|\[HG\]|\bHGUC\b|\bHGCE\b|\bHGBF\b|\bHGAC\b"),
-        ("EG", r"\bEG\b|\[EG\]"),
-        ("SD", r"\bSD\b|\[SD\]|SD삼국|SD건담"),
+        ("PG", r"(?<![A-Z0-9])PG(?![A-Z0-9])|\[\s*PG\s*\]"),
+        ("RG", r"(?<![A-Z0-9])RG(?:\s*\d+)?(?![A-Z0-9])|\[\s*RG[^\]]*\]"),
+        ("MG", r"(?<![A-Z0-9])MG(?:\s*\d+)?(?![A-Z0-9])|\[\s*MG[^\]]*\]"),
+        ("HG", r"(?<![A-Z0-9])HG(?:UC|CE|BF|AC|FC|GW|WM)?(?:\s*\d+)?(?![A-Z0-9])|\[\s*HG[^\]]*\]"),
+        ("EG", r"(?<![A-Z0-9])EG(?![A-Z0-9])|\[\s*EG\s*\]"),
+        ("SD", r"(?<!MG)(?<![A-Z0-9])SD(?:\s*[- ]?\s*EX(?:\s*[- ]?\s*STANDARD)?)?(?![A-Z0-9])|\[\s*SD[^\]]*\]|SD삼국|SD건담|SD건담월드"),
     ]
 
     for grade, pattern in grade_patterns:
@@ -2209,87 +2190,141 @@ def extract_grade(name: str) -> str:
     return "UNKNOWN"
 
 
-def normalize_product_key(name: str) -> str:
-    """
-    판매처별로 제각각인 상품명을 최대한 같은 키로 맞추는 함수.
-    예:
-    [MG]1/100 MSN-04 SAZABI Ver.KA 사자비 Ver.Ka(버카)
-    -> MG|MSN04 SAZABI VERKA 사자비 VERKA
-    """
-    text = normalize_space(name)
-    text = text.upper()
+CANONICAL_ALIAS_RULES = [
+    (r"AERIAL\s*REBUILD|에어리얼\s*개수형", "건담 에어리얼 개수형"),
+    (r"GUNDAM\s*AERIAL|건담\s*에어리얼|에어리얼", "건담 에어리얼"),
+    (r"CALIBARN|캘리번", "건담 캘리번"),
+    (r"SCHWARZETTE|슈바르제테", "건담 슈바르제테"),
+    (r"LFRITH\s*UR|르브리스\s*울", "건담 르브리스 울"),
+    (r"LFRITH\s*THORN|르브리스\s*손", "건담 르브리스 손"),
+    (r"LFRITH|르브리스", "건담 르브리스"),
+    (r"MIGHTY\s*STRIKE\s*FREEDOM|마이티\s*스트라이크\s*프리덤", "마이티 스트라이크 프리덤 건담"),
+    (r"RISING\s*FREEDOM|라이징\s*프리덤", "라이징 프리덤 건담"),
+    (r"IMMORTAL\s*JUSTICE|임모탈\s*저스티스", "임모탈 저스티스 건담"),
+    (r"STRIKE\s*FREEDOM|스트라이크\s*프리덤", "스트라이크 프리덤 건담"),
+    (r"FREEDOM\s*GUNDAM|프리덤\s*건담", "프리덤 건담"),
+    (r"AILE\s*STRIKE|에일\s*스트라이크", "에일 스트라이크 건담"),
+    (r"BUILD\s*STRIKE|빌드\s*스트라이크", "빌드 스트라이크 건담"),
+    (r"STRIKE\s*GUNDAM|스트라이크\s*건담", "스트라이크 건담"),
+    (r"NU\s*GUNDAM|ν\s*GUNDAM|뉴\s*건담", "뉴 건담"),
+    (r"HI[-\s]*NU|하이\s*뉴|HI\s*ν", "하이 뉴 건담"),
+    (r"SAZABI|사자비", "사자비"),
+    (r"SINANJU\s*STEIN|시난주\s*스타인", "시난주 스타인"),
+    (r"SINANJU|시난주", "시난주"),
+    (r"UNICORN.*BANSHEE\s*NORN|밴시\s*노른|밴시노른", "유니콘 건담 2호기 밴시 노른"),
+    (r"UNICORN.*DESTROY|유니콘.*디스트로이", "유니콘 건담 디스트로이 모드"),
+    (r"UNICORN\s*GUNDAM|유니콘\s*건담", "유니콘 건담"),
+    (r"BARBATOS\s*LUPUS\s*REX|발바토스\s*루프스\s*렉스", "건담 발바토스 루프스 렉스"),
+    (r"BARBATOS\s*LUPUS|발바토스\s*루프스", "건담 발바토스 루프스"),
+    (r"BARBATOS|발바토스", "건담 발바토스"),
+    (r"EXIA\s*REPAIR\s*II|엑시아\s*리페어", "건담 엑시아 리페어 II"),
+    (r"EXIA|엑시아", "건담 엑시아"),
+    (r"RX[-\s]*78[-\s]*2|퍼스트\s*건담", "퍼스트 건담"),
+    (r"ZETA\s*GUNDAM|제타\s*건담", "제타 건담"),
+    (r"ZZ\s*GUNDAM|더블제타", "ZZ 건담"),
+    (r"GOD\s*GUNDAM|갓\s*건담", "갓 건담"),
+    (r"WING\s*GUNDAM\s*ZERO|윙\s*건담\s*제로", "윙 건담 제로"),
+    (r"WING\s*GUNDAM|윙\s*건담", "윙 건담"),
+    (r"DEATHSCYTHE|데스사이즈", "건담 데스사이즈"),
+    (r"HEAVY\s*ARMS|헤비암즈", "건담 헤비암즈"),
+    (r"GUNTANK|건탱크", "건탱크"),
+    (r"GUNCANNON|건캐논", "건캐논"),
+    (r"CHAR.*ZAKU|샤아.*자쿠", "샤아 전용 자쿠 II"),
+    (r"ZAKU\s*II|자쿠\s*2|자쿠\s*II", "자쿠 II"),
+]
 
-    replace_rules = {
-        "버카": "VER.KA",
-        "브이카": "VER.KA",
-        "VER KA": "VER.KA",
-        "VER. KA": "VER.KA",
-        "VER.KA": "VERKA",
-        "ν": "뉴",
-        "NU GUNDAM": "뉴건담",
-        "RX-O": "RX-0",
-        "O2": "02",
-        "MODE": "모드",
-        "REVIVE": "리바이브",
-    }
 
-    for old, new in replace_rules.items():
-        text = text.replace(old.upper(), new.upper())
+def _normalize_alias_source(text: str) -> str:
+    t = normalize_space(text)
+    t = t.replace("ν", "NU")
+    t = re.sub(r"VER\s*\.?\s*KA|버카|브이카", "Ver.Ka", t, flags=re.IGNORECASE)
+    t = re.sub(r"\bRX[-\s]*O\b", "RX-0", t, flags=re.IGNORECASE)
+    t = re.sub(r"\bO2\b", "02", t, flags=re.IGNORECASE)
+    return t
 
-    # 쇼핑몰 홍보/상태/분류 태그 제거
+
+def canonical_core_name(name: str) -> str:
+    source = _normalize_alias_source(name)
+    probe = source.upper()
+
+    for pattern, replacement in CANONICAL_ALIAS_RULES:
+        if re.search(pattern, probe, flags=re.IGNORECASE):
+            core = replacement
+            break
+    else:
+        core = source
+
+    # 등급, 스케일, 상품번호, 쇼핑몰 홍보 문구 제거
+    core = re.sub(r"\[[^\]]*\]", " ", core)
+    core = re.sub(r"\([^)]*\)", " ", core)
+    core = re.sub(r"\b1\s*/\s*(60|72|100|144|220|400|550)\b", " ", core)
+    core = re.sub(r"\b(BAN|BD)\s*\d{4,}\b", " ", core, flags=re.IGNORECASE)
+    core = re.sub(r"\b\d{6,}\b", " ", core)
+    core = re.sub(r"\[[0-9]{1,4}\]", " ", core)
+    core = re.sub(r"\b(MGEX|MGSD|FULL\s*MECHANICS|RE\s*/\s*100|HGUC|HGCE|HGBF|HGAC|HGFC|HGGW|HGWM|PG|MG|RG|HG|EG|SD)\b", " ", core, flags=re.IGNORECASE)
+
     remove_words = [
-        "재입고",
-        "예약",
-        "입고예정",
-        "판매중",
-        "품절",
-        "일시품절",
-        "강력추천",
-        "MD추천",
-        "추천",
-        "한정판",
-        "한정",
-        "프라모델",
-        "건프라",
-        "기동전사",
-        "수성의마녀",
-        "섬광의 하사웨이",
+        "재입고", "예약판매", "예약", "입고예정", "판매중", "품절", "일시품절", "강력추천", "MD추천", "추천",
+        "한정판", "한정", "프라모델", "건프라", "기동전사", "수성의 마녀", "수성의마녀", "섬광의 하사웨이",
+        "GUNDAM", "건담 건담",
     ]
-
     for word in remove_words:
-        text = text.replace(word.upper(), " ")
+        core = re.sub(re.escape(word), " ", core, flags=re.IGNORECASE)
 
-    # [MG], [HGUC 229], (버카), 번호 태그 등 제거
-    text = re.sub(r"\[[^\]]*\]", " ", text)
-    text = re.sub(r"\([^)]*\)", " ", text)
+    # 대표명에 이미 건담이 포함된 경우는 살리고, 중복만 줄인다.
+    core = normalize_space(core)
+    core = re.sub(r"건담\s+건담", "건담", core)
+    core = re.sub(r"\s+", " ", core).strip(" -_/[]()")
+    return normalize_space(core)
 
-    # 스케일 제거
-    text = re.sub(r"\b1\s*/\s*\d+\b", " ", text)
 
-    # 끝의 제품 번호 제거: [003] 제거 이후에도 남는 단독 숫자 처리
-    text = re.sub(r"\b\d{1,3}\b$", " ", text)
+def standardize_product_name(name: str) -> str:
+    original = clean_product_name(name)
+    if not original:
+        return ""
+    grade = extract_grade(original)
+    core = canonical_core_name(original)
 
-    # 불필요한 기호 제거. 단, 모델명 구분용 영문/숫자/한글은 남김
-    text = re.sub(r"[^0-9A-Z가-힣]+", " ", text)
+    if not core:
+        return ""
 
-    # 등급 계열 단어는 key 앞에 따로 붙일 거라 본문에서는 제거
-    grade_words = [
-        "MGEX", "MGSD", "FULL MECHANICS", "RE 100",
-        "HGUC", "HGCE", "HGBF", "HGAC",
-        "PG", "MG", "RG", "HG", "EG", "SD",
-    ]
-    for g in grade_words:
-        text = re.sub(rf"\b{re.escape(g)}\b", " ", text)
+    # Ver.Ka 표기는 대표명 뒤에 통일해서 붙인다.
+    if re.search(r"VER\s*\.?\s*KA|버카|브이카", original, re.IGNORECASE) and "Ver.Ka" not in core:
+        core = f"{core} Ver.Ka"
 
-    text = normalize_space(text)
+    # 너무 일반적인 결과는 원본 정리값을 사용하되 prefix는 붙인다.
+    if core.upper() in {"GUNDAM", "건담", "MODEL", "KIT"}:
+        core = clean_product_name(original)
 
+    prefix = f"[{grade}] " if grade != "UNKNOWN" else ""
+    return normalize_space(f"{prefix}{core}")
+
+
+def normalize_product_key(name: str) -> str:
+    """동일 상품 묶기/최저가 비교용 내부 키. displayName과 분리해서 더 공격적으로 정규화한다."""
     grade = extract_grade(name)
-    return f"{grade}|{text}"
+    core = canonical_core_name(name)
+    if re.search(r"VER\s*\.?\s*KA|버카|브이카", name or "", re.IGNORECASE) and "Ver.Ka" not in core:
+        core = f"{core} Ver.Ka"
 
+    key = core.upper()
+    key = key.replace("VER.KA", "VERKA")
+    key = re.sub(r"[^0-9A-Z가-힣]+", " ", key)
+    key = normalize_space(key)
+
+    # 혼동 방지: 프리덤/스트라이크 프리덤/마이티 스트라이크 프리덤은 core가 다르게 남아야 한다.
+    if not key:
+        return f"{grade}|"
+    return f"{grade}|{key}"
 
 def is_bad_record(item: ItemRecord) -> bool:
     name = normalize_space(item.name or item.title)
     joined = f"{item.name} {item.title} {item.stock_text} {item.url}"
+    is_joyhobby = item.mall_name == "조이하비" or item.site == "joyhobby"
+
+    # 게시판/문의글/검색 결과가 상품명으로 잘못 들어온 케이스 제거
+    if is_board_or_qna_noise(joined):
+        return True
 
     if is_bad_title(name):
         return True
@@ -2301,6 +2336,24 @@ def is_bad_record(item: ItemRecord) -> bool:
 
     if is_excluded(name):
         return True
+
+    # 조이하비는 상품명이 짧거나 코드형으로 잡히는 경우가 있어 기존 검증을 너무 세게 걸면
+    # 정상 상품까지 전부 제거될 수 있다. 명백한 비건담/옵션류만 제거하고 나머지는 리포트에서 검토한다.
+    if is_joyhobby:
+        joy_block_words = [
+            "데칼", "습식데칼", "스티커", "마커", "도료", "스프레이", "서페이서", "신너",
+            "니퍼", "공구", "툴", "베이스", "스탠드", "옵션파츠", "OPTION PARTS",
+            "DISPLAY BASE", "메탈빌드", "METAL BUILD", "로봇혼", "초합금",
+            "울트라맨", "ULTRAMAN", "스타워즈", "STAR WARS", "포켓몬", "POKEMON",
+            "하츠네", "미쿠", "파이널 판타지", "FINAL FANTASY",
+        ]
+        up = name.upper()
+        if any(w.upper() in up for w in joy_block_words):
+            return True
+        # 조이하비는 상세명 파싱이 사이트 특성상 짧게 잡히는 경우가 많다.
+        # 여기서 looks_like_gundam으로 다시 걸면 정상 상품 188개가 전부 제거될 수 있으므로
+        # 명백한 옵션/비건담류만 제거하고 나머지는 match_report/needsReview에서 검토한다.
+        return False
 
     if is_non_gundam_figure_like(name):
         return True
@@ -2316,12 +2369,16 @@ def is_bad_record(item: ItemRecord) -> bool:
 
 
 def filter_bad_records(records: List[ItemRecord]) -> List[ItemRecord]:
+    from collections import Counter
+
     clean: List[ItemRecord] = []
     removed = 0
+    removed_by_mall = Counter()
 
     for item in records:
         if is_bad_record(item):
             removed += 1
+            removed_by_mall[item.mall_name] += 1
             if DEBUG:
                 print(f"[필터 제거] {item.mall_name} / {item.name} / {item.price} / {item.url}")
             continue
@@ -2330,27 +2387,45 @@ def filter_bad_records(records: List[ItemRecord]) -> List[ItemRecord]:
         item.status = normalize_status(item.status or item.stock_text)
         item.stock_text = item.status
 
-        # 이름 공백 정리
-        item.name = clean_product_name(item.name)
-        item.title = clean_product_name(item.title or item.name)
+        # 앱 표시용 이름과 내부 비교용 이름을 통일한다.
+        display_name = standardize_product_name(item.name or item.title)
+
+        # 조이하비는 공식명 매칭이 실패해도 원본명을 살려둔다.
+        # 완전 제거보다 needsReview/match_report에서 검토하는 편이 데이터 손실을 막는다.
+        if (not display_name or is_bad_title(display_name)) and (item.mall_name == "조이하비" or item.site == "joyhobby"):
+            display_name = clean_product_name(item.name or item.title)
+
+        if not display_name or is_bad_title(display_name):
+            removed += 1
+            removed_by_mall[item.mall_name] += 1
+            if DEBUG:
+                print(f"[필터 제거:표시명 실패] {item.mall_name} / {item.name} / {item.url}")
+            continue
+
+        item.name = display_name
+        item.title = display_name
 
         clean.append(item)
 
     print(f"[품질 필터] 제거 {removed}개 / 유지 {len(clean)}개")
+    if removed_by_mall:
+        print("[품질 필터 제거 내역]")
+        for mall, count in sorted(removed_by_mall.items()):
+            print(f"{mall}: {count}개 제거")
     return clean
 
 
 def dedupe_records(records: List[ItemRecord]) -> List[ItemRecord]:
     """
-    같은 판매처 안에서 같은 상품이 여러 번 잡힌 경우 1개만 남김.
-    최저가 비교 구조를 위해 '판매처별 문서'는 유지한다.
-    즉, 같은 상품이어도 건담샵/하비팩토리/건담시티는 각각 남긴다.
+    안전한 중복 제거.
+    같은 판매처 안에서 item_id 또는 상세 URL이 같은 경우만 중복으로 본다.
+    productKey만으로 합치면 조이하비/SD/HG 계열이 과하게 합쳐질 수 있어서 업로드 전 데이터 손실을 막는다.
     """
     by_key: Dict[str, ItemRecord] = {}
 
     for item in records:
-        product_key = normalize_product_key(item.name)
-        key = f"{item.site}|{product_key}"
+        stable = item.item_id or item.detail_url or item.product_url or item.url
+        key = f"{item.site}|{stable}"
 
         old = by_key.get(key)
         if old is None:
@@ -2360,22 +2435,19 @@ def dedupe_records(records: List[ItemRecord]) -> List[ItemRecord]:
         old_score = status_score(old.status)
         new_score = status_score(item.status)
 
-        # 판매중 > 예약중 > 입고예정 > 품절 > 확인중
         if new_score > old_score:
             by_key[key] = item
             continue
 
-        # 상태가 같으면 더 싼 가격 우선
         if new_score == old_score:
             old_price = price_to_int(old.price)
             new_price = price_to_int(item.price)
-
             if old_price is None and new_price is not None:
                 by_key[key] = item
             elif old_price is not None and new_price is not None and new_price < old_price:
                 by_key[key] = item
 
-    print(f"[중복 제거] {len(records)}개 -> {len(by_key)}개")
+    print(f"[중복 제거:안전모드] {len(records)}개 -> {len(by_key)}개")
     return list(by_key.values())
 
 def sort_records(records: List[ItemRecord]) -> List[ItemRecord]:
@@ -2451,9 +2523,15 @@ def to_firestore_doc(item: ItemRecord, previous: Optional[Dict] = None) -> Dict:
         and old_price_int > price_int
     )
 
+    display_name = standardize_product_name(item.name or item.title) or item.name
+
     return {
-        "name": item.name,
-        "title": item.title,
+        "name": display_name,
+        "title": display_name,
+        "displayName": display_name,
+        "normalizedName": product_key,
+        "rawName": item.name,
+        "rawTitle": item.title,
         "price": item.price,
         "priceInt": price_int,
         "grade": grade,
@@ -2477,9 +2555,27 @@ def to_firestore_doc(item: ItemRecord, previous: Optional[Dict] = None) -> Dict:
 
 
 def upload_to_firestore(db, items: List[ItemRecord]):
+    # 절대 안전장치: 테스트 모드/저수량 결과가 기존 Firestore를 삭제하지 못하게 막는다.
+    if FAST_TEST_MODE and not ALLOW_TEST_UPLOAD:
+        raise RuntimeError(
+            '[업로드 중단] FAST_TEST_MODE=True 상태입니다. 테스트 결과는 Firestore에 업로드하지 않습니다. '
+            'GitHub Actions env에서 FAST_TEST_MODE, MAX_LINKS_PER_SITE를 확인하세요.'
+        )
+    if len(items) < ABSOLUTE_MIN_UPLOAD and not FORCE_UPLOAD_LOW_COUNT:
+        raise RuntimeError(
+            f'[업로드 중단] 최종 수집 {len(items)}개가 절대 최소 기준 ABSOLUTE_MIN_UPLOAD={ABSOLUTE_MIN_UPLOAD}보다 적습니다. '
+            '기존 Firestore 데이터를 보호하기 위해 삭제/업로드를 중단합니다.'
+        )
+
     col = db.collection(COLLECTION_NAME)
 
-    # 기존 문서를 먼저 읽어서 NEW/재입고/가격하락 여부를 계산한다.
+    if len(items) < MIN_TOTAL_UPLOAD and not FORCE_UPLOAD_LOW_COUNT:
+        raise RuntimeError(
+            f"[업로드 중단] 최종 수집 {len(items)}개가 MIN_TOTAL_UPLOAD={MIN_TOTAL_UPLOAD}보다 적습니다. "
+            "기존 Firestore 데이터를 보호하기 위해 삭제/업로드를 중단합니다."
+        )
+
+    # 기존 문서를 먼저 읽어서 NEW/재입고/가격하락 여부를 계산하고, 급감 안전장치를 적용한다.
     previous_by_id: Dict[str, Dict] = {}
     previous_by_site_key: Dict[str, Dict] = {}
     existing_refs = []
@@ -2493,6 +2589,17 @@ def upload_to_firestore(db, items: List[ItemRecord]):
         product_key = _doc_get_str(data, ["productKey", "normalizedName"])
         if site and product_key:
             previous_by_site_key[f"{site}|{product_key}"] = data
+
+    existing_count = len(existing_refs)
+    if (
+        existing_count >= MIN_TOTAL_UPLOAD
+        and len(items) < int(existing_count * MIN_EXISTING_RATIO)
+        and not FORCE_UPLOAD_LOW_COUNT
+    ):
+        raise RuntimeError(
+            f"[업로드 중단] 기존 {existing_count}개 대비 새 수집 {len(items)}개로 급감했습니다. "
+            f"허용 비율 MIN_EXISTING_RATIO={MIN_EXISTING_RATIO}. 기존 Firestore 데이터를 유지합니다."
+        )
 
     delete_count = 0
     batch = db.batch()
@@ -2549,16 +2656,999 @@ def upload_to_firestore(db, items: List[ItemRecord]):
     print(f"[Firestore] 업로드 완료: {write_count}개")
     print(f"[변화 감지] NEW {new_count}개 / 재입고 {restock_count}개 / 가격하락 {price_drop_count}개")
 
-
 def save_local_backup(items: List[ItemRecord], path: str = "kr_aggregated_debug.json"):
     payload = [asdict(x) for x in items]
     with open(path, "w", encoding="utf-8") as f:
         json.dump(payload, f, ensure_ascii=False, indent=2)
     print(f"[로컬 백업 저장] {path} / {len(items)}개")
 
+    backup_dir = Path("backups")
+    backup_dir.mkdir(exist_ok=True)
+    ts = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+    latest_path = backup_dir / "kr_aggregated_latest.json"
+    ts_path = backup_dir / f"kr_aggregated_backup_{ts}.json"
+    for out in [latest_path, ts_path]:
+        with open(out, "w", encoding="utf-8") as f:
+            json.dump(payload, f, ensure_ascii=False, indent=2)
+    print(f"[백업 저장] {latest_path} / {ts_path}")
+
+
+def run_crawler_safely(label: str, func, *args) -> List[ItemRecord]:
+    started = time.time()
+    try:
+        items = func(*args)
+        elapsed = time.time() - started
+        print(f"[사이트 완료] {label}: {len(items)}개 / {elapsed:.1f}s")
+        return items
+    except Exception as e:
+        elapsed = time.time() - started
+        record_failure(label, "SITE_LEVEL", e)
+        print(f"[사이트 실패] {label}: {type(e).__name__}: {e} / {elapsed:.1f}s")
+        return []
+
+
+def crawl_bnkrmall_resilient(session: requests.Session) -> List[ItemRecord]:
+    # Selenium이 실패하거나 제목이 전부 상품상세로 잡히면 API 방식으로 한 번 더 시도한다.
+    selenium_items = run_crawler_safely("BNKR Selenium", crawl_bnkrmall_selenium)
+    good = [x for x in selenium_items if not is_bad_title(x.name or x.title)]
+    if len(good) >= 10:
+        return good
+
+    if selenium_items and len(good) < len(selenium_items):
+        print(f"[BNKR 경고] 잘못된 제목 제거: {len(selenium_items)}개 -> {len(good)}개")
+
+    api_items = run_crawler_safely("BNKR API fallback", crawl_bnkrmall, session)
+    api_good = [x for x in api_items if not is_bad_title(x.name or x.title)]
+    if len(api_good) >= len(good):
+        return api_good
+    return good
+
+
+def count_by_mall(items: List[ItemRecord]):
+    from collections import Counter
+    return Counter(item.mall_name for item in items)
+
+
+def print_site_counts(title: str, items: List[ItemRecord]):
+    counter = count_by_mall(items)
+    print(title)
+    for mall, count in sorted(counter.items()):
+        print(f"{mall}: {count}")
+    print("==================================")
+    return counter
+
+
+
+def save_failed_events_report(path: str = "failed_links_report.json"):
+    backup_dir = Path("backups")
+    backup_dir.mkdir(exist_ok=True)
+    ts = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+
+    grouped: Dict[str, List[Dict[str, str]]] = {}
+    for event in FAILED_EVENTS:
+        grouped.setdefault(event.get("site", "unknown"), []).append(event)
+
+    report = {
+        "generatedAtUtc": datetime.now(timezone.utc).isoformat(),
+        "totalFailures": len(FAILED_EVENTS),
+        "failuresBySite": {site: len(events) for site, events in sorted(grouped.items())},
+        "events": FAILED_EVENTS,
+    }
+
+    targets = [Path(path), backup_dir / "failed_links_latest.json", backup_dir / f"failed_links_{ts}.json"]
+    for out in targets:
+        with open(out, "w", encoding="utf-8") as f:
+            json.dump(report, f, ensure_ascii=False, indent=2)
+
+    print(f"[실패 URL 저장] {path} / 실패 {len(FAILED_EVENTS)}건")
+
+
+def save_health_history(items: List[ItemRecord], upload_allowed: bool, path: str = "crawler_health_history.json"):
+    backup_dir = Path("backups")
+    backup_dir.mkdir(exist_ok=True)
+    counter = count_by_mall(items)
+    now = datetime.now(timezone.utc).isoformat()
+    entry = {
+        "generatedAtUtc": now,
+        "total": len(items),
+        "uploadAllowed": upload_allowed,
+        "fastTestMode": FAST_TEST_MODE,
+        "countsByMall": dict(sorted(counter.items())),
+        "failureCount": len(FAILED_EVENTS),
+        "criticalThresholds": CRITICAL_SITE_MIN_COUNTS,
+        "warningThresholds": WARNING_SITE_MIN_COUNTS,
+    }
+
+    history: List[Dict] = []
+    latest = backup_dir / path
+    if latest.exists():
+        try:
+            history = json.loads(latest.read_text(encoding="utf-8"))
+            if not isinstance(history, list):
+                history = []
+        except Exception:
+            history = []
+    history.append(entry)
+    history = history[-100:]
+
+    for out in [Path(path), latest]:
+        with open(out, "w", encoding="utf-8") as f:
+            json.dump(history, f, ensure_ascii=False, indent=2)
+
+    ts = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+    snapshot = backup_dir / f"crawler_health_{ts}.json"
+    with open(snapshot, "w", encoding="utf-8") as f:
+        json.dump(entry, f, ensure_ascii=False, indent=2)
+
+    print(f"[건강 기록 저장] {path} / {snapshot}")
+
+
+def validate_crawl_health(items: List[ItemRecord]) -> bool:
+    counter = count_by_mall(items)
+    total = len(items)
+    errors: List[str] = []
+    warnings: List[str] = []
+
+    if FAST_TEST_MODE and not ALLOW_TEST_UPLOAD:
+        errors.append('FAST_TEST_MODE=True 상태입니다. 테스트 결과 업로드를 차단합니다.')
+    if total < ABSOLUTE_MIN_UPLOAD:
+        errors.append(f"총 수집량 {total}개 < 절대 최소 기준 {ABSOLUTE_MIN_UPLOAD}개")
+    elif total < MIN_TOTAL_UPLOAD:
+        errors.append(f"총 수집량 {total}개 < 최소 기준 {MIN_TOTAL_UPLOAD}개")
+
+    for mall, minimum in CRITICAL_SITE_MIN_COUNTS.items():
+        count = counter.get(mall, 0)
+        if count < minimum:
+            errors.append(f"{mall} {count}개 < 핵심 기준 {minimum}개")
+
+    for mall, minimum in WARNING_SITE_MIN_COUNTS.items():
+        count = counter.get(mall, 0)
+        if count < minimum:
+            warnings.append(f"{mall} {count}개 < 권장 기준 {minimum}개")
+
+    print("===== 크롤링 건강 상태 =====")
+    print(f"총 수집량: {total}개")
+    for mall in sorted(set(CRITICAL_SITE_MIN_COUNTS) | set(WARNING_SITE_MIN_COUNTS) | set(counter.keys())):
+        count = counter.get(mall, 0)
+        if mall in CRITICAL_SITE_MIN_COUNTS:
+            minimum = CRITICAL_SITE_MIN_COUNTS[mall]
+            mark = "OK" if count >= minimum else "DANGER"
+            print(f"{mall}: {count}개 / 기준 {minimum}개 / {mark}")
+        elif mall in WARNING_SITE_MIN_COUNTS:
+            minimum = WARNING_SITE_MIN_COUNTS[mall]
+            mark = "OK" if count >= minimum else "WARN"
+            print(f"{mall}: {count}개 / 권장 {minimum}개 / {mark}")
+        else:
+            print(f"{mall}: {count}개")
+
+    if warnings:
+        print("----- 경고 -----")
+        for w in warnings:
+            print(f"[경고] {w}")
+
+    if errors:
+        print("----- 위험 -----")
+        for e in errors:
+            print(f"[위험] {e}")
+        if not FORCE_UPLOAD_LOW_COUNT:
+            print("[업로드 판단] 중단: 기존 Firestore 데이터를 보호합니다.")
+            return False
+        print("[업로드 판단] FORCE_UPLOAD_LOW_COUNT=1 이므로 강제 진행합니다.")
+
+    print("[업로드 판단] 진행 가능")
+    print("============================")
+    return True
+
+
+# ===== 데이터 정규화 운영 보정: 수동 alias / blocked match / 신뢰도 / 자동 리포트 =====
+ALIAS_PATH = os.getenv("ALIAS_PATH", "aliases.json")
+BLOCKED_MATCHES_PATH = os.getenv("BLOCKED_MATCHES_PATH", "blocked_matches.json")
+MATCH_REPORT_PATH = os.getenv("MATCH_REPORT_PATH", "match_report.json")
+
+DEFAULT_ALIASES = {
+    "aliases": {
+        "AERIAL REBUILD": "건담 에어리얼 개수형",
+        "GUNDAM AERIAL REBUILD": "건담 에어리얼 개수형",
+        "SAZABI VER.KA": "사자비 Ver.Ka",
+        "MSN-04 SAZABI VER.KA": "사자비 Ver.Ka",
+        "MSN-04 SAZABI": "사자비",
+        "NU GUNDAM": "뉴 건담",
+        "RX-93 NU GUNDAM": "뉴 건담",
+        "HI-NU GUNDAM": "하이 뉴 건담",
+        "UNICORN GUNDAM DESTROY MODE": "유니콘 건담 디스트로이 모드",
+        "AILE STRIKE GUNDAM": "에일 스트라이크 건담",
+        "STRIKE FREEDOM GUNDAM": "스트라이크 프리덤 건담",
+        "MIGHTY STRIKE FREEDOM GUNDAM": "마이티 스트라이크 프리덤 건담",
+        "RISING FREEDOM GUNDAM": "라이징 프리덤 건담",
+        "IMMORTAL JUSTICE GUNDAM": "임모탈 저스티스 건담",
+        "GUNDAM EXIA": "건담 엑시아",
+        "RX-78-2 GUNDAM": "퍼스트 건담",
+        "ZETA GUNDAM": "제타 건담",
+        "WING GUNDAM ZERO": "윙 건담 제로",
+        "GUNDAM BARBATOS": "건담 발바토스"
+    },
+    "notes": [
+        "왼쪽에는 사이트에서 들어올 수 있는 별칭, 오른쪽에는 앱에서 쓰고 싶은 대표 이름을 넣으면 됩니다.",
+        "예: \"MSN-04 SAZABI\": \"사자비\"",
+        "이 파일은 없으면 자동 생성되고, 직접 수정해도 다음 크롤링 때 반영됩니다."
+    ]
+}
+
+DEFAULT_BLOCKED_MATCHES = {
+    "blocked": {
+        "프리덤 건담": ["스트라이크 프리덤 건담", "마이티 스트라이크 프리덤 건담", "라이징 프리덤 건담"],
+        "스트라이크 프리덤 건담": ["마이티 스트라이크 프리덤 건담"],
+        "유니콘 건담": ["유니콘 건담 2호기 밴시", "밴시 노른"],
+        "뉴 건담": ["하이 뉴 건담"],
+        "사자비": ["나이팅게일"],
+        "건담 에어리얼": ["건담 에어리얼 개수형", "건담 캘리번"]
+    },
+    "notes": [
+        "서로 이름이 비슷하지만 절대 같은 상품으로 묶으면 안 되는 조합입니다.",
+        "왼쪽 이름과 오른쪽 목록 중 하나가 같은 productKey 그룹에 들어오면 match_report.json에 위험으로 표시합니다."
+    ]
+}
+
+_MANUAL_ALIAS_CACHE = None
+_BLOCKED_MATCH_CACHE = None
+
+
+def _read_json_with_default(path: str, default: Dict) -> Dict:
+    p = Path(path)
+    if not p.exists():
+        try:
+            p.write_text(json.dumps(default, ensure_ascii=False, indent=2), encoding="utf-8")
+            print(f"[정규화 관리 파일 생성] {path}")
+        except Exception as e:
+            print(f"[정규화 관리 파일 생성 실패] {path} / {type(e).__name__}: {e}")
+        return default
+    try:
+        data = json.loads(p.read_text(encoding="utf-8"))
+        return data if isinstance(data, dict) else default
+    except Exception as e:
+        print(f"[정규화 관리 파일 읽기 실패] {path} / {type(e).__name__}: {e}")
+        return default
+
+
+def load_manual_aliases() -> Dict[str, str]:
+    global _MANUAL_ALIAS_CACHE
+    if _MANUAL_ALIAS_CACHE is not None:
+        return _MANUAL_ALIAS_CACHE
+    data = _read_json_with_default(ALIAS_PATH, DEFAULT_ALIASES)
+    aliases = data.get("aliases", data)
+    if not isinstance(aliases, dict):
+        aliases = {}
+    normalized: Dict[str, str] = {}
+    for k, v in aliases.items():
+        if isinstance(v, str) and str(k).strip() and v.strip():
+            normalized[_alias_probe(str(k))] = normalize_space(v)
+    _MANUAL_ALIAS_CACHE = normalized
+    print(f"[수동 alias] {len(normalized)}개 로드")
+    return normalized
+
+
+def load_blocked_matches() -> List[tuple[str, str]]:
+    global _BLOCKED_MATCH_CACHE
+    if _BLOCKED_MATCH_CACHE is not None:
+        return _BLOCKED_MATCH_CACHE
+    data = _read_json_with_default(BLOCKED_MATCHES_PATH, DEFAULT_BLOCKED_MATCHES)
+    raw = data.get("blocked", data)
+    pairs: List[tuple[str, str]] = []
+    if isinstance(raw, dict):
+        for left, rights in raw.items():
+            if isinstance(rights, str):
+                rights = [rights]
+            if not isinstance(rights, list):
+                continue
+            for right in rights:
+                if str(left).strip() and str(right).strip():
+                    pairs.append((_alias_probe(str(left)), _alias_probe(str(right))))
+    elif isinstance(raw, list):
+        for entry in raw:
+            if isinstance(entry, list) and len(entry) >= 2:
+                pairs.append((_alias_probe(str(entry[0])), _alias_probe(str(entry[1]))))
+            elif isinstance(entry, dict):
+                left = entry.get("left") or entry.get("a")
+                right = entry.get("right") or entry.get("b")
+                if left and right:
+                    pairs.append((_alias_probe(str(left)), _alias_probe(str(right))))
+    _BLOCKED_MATCH_CACHE = pairs
+    print(f"[금지 매칭] {len(pairs)}쌍 로드")
+    return pairs
+
+
+def _alias_probe(text: str) -> str:
+    t = normalize_space(text or "")
+    t = t.replace("ν", "NU")
+    t = re.sub(r"VER\s*\.?\s*KA|버카|브이카", "VERKA", t, flags=re.IGNORECASE)
+    t = re.sub(r"[^0-9A-Z가-힣]+", " ", t.upper())
+    return normalize_space(t)
+
+
+def _strip_grade_prefix(text: str) -> str:
+    t = normalize_space(text)
+    t = re.sub(r"^\[(MGEX|MGSD|FULL MECHANICS|RE/100|PG|MG|RG|HG|EG|SD|UNKNOWN)\]\s*", "", t, flags=re.IGNORECASE)
+    return normalize_space(t)
+
+
+def apply_manual_alias(text: str) -> str:
+    aliases = load_manual_aliases()
+    if not aliases:
+        return ""
+    probe = _alias_probe(text)
+    if not probe:
+        return ""
+    # 긴 alias를 먼저 검사해야 STRIKE FREEDOM이 FREEDOM보다 먼저 잡힌다.
+    for alias_probe, canonical in sorted(aliases.items(), key=lambda kv: len(kv[0]), reverse=True):
+        if alias_probe and (probe == alias_probe or alias_probe in probe):
+            return _strip_grade_prefix(canonical)
+    return ""
+
+
+def _base_canonical_core_name_before_manual_alias(name: str) -> str:
+    source = _normalize_alias_source(name)
+    probe = source.upper()
+
+    for pattern, replacement in CANONICAL_ALIAS_RULES:
+        if re.search(pattern, probe, flags=re.IGNORECASE):
+            core = replacement
+            break
+    else:
+        core = source
+
+    core = re.sub(r"\[[^\]]*\]", " ", core)
+    core = re.sub(r"\([^)]*\)", " ", core)
+    core = re.sub(r"\b1\s*/\s*(60|72|100|144|220|400|550)\b", " ", core)
+    core = re.sub(r"\b(BAN|BD)\s*\d{4,}\b", " ", core, flags=re.IGNORECASE)
+    core = re.sub(r"\b\d{6,}\b", " ", core)
+    core = re.sub(r"\[[0-9]{1,4}\]", " ", core)
+    core = re.sub(r"\b(MGEX|MGSD|FULL\s*MECHANICS|RE\s*/\s*100|HGUC|HGCE|HGBF|HGAC|HGFC|HGGW|HGWM|PG|MG|RG|HG|EG|SD)\b", " ", core, flags=re.IGNORECASE)
+
+    remove_words = [
+        "재입고", "예약판매", "예약", "입고예정", "판매중", "품절", "일시품절", "강력추천", "MD추천", "추천",
+        "한정판", "한정", "프라모델", "건프라", "기동전사", "수성의 마녀", "수성의마녀", "섬광의 하사웨이",
+        "GUNDAM", "건담 건담",
+    ]
+    for word in remove_words:
+        core = re.sub(re.escape(word), " ", core, flags=re.IGNORECASE)
+
+    core = normalize_space(core)
+    core = re.sub(r"건담\s+건담", "건담", core)
+    core = re.sub(r"\s+", " ", core).strip(" -_/[]()")
+    return normalize_space(core)
+
+
+# 기존 canonical_core_name/standardize_product_name/normalize_product_key를 운영형 alias 규칙으로 덮어쓴다.
+def canonical_core_name(name: str) -> str:
+    manual = apply_manual_alias(name)
+    if manual:
+        return manual
+    core = _base_canonical_core_name_before_manual_alias(name)
+    manual_core = apply_manual_alias(core)
+    return manual_core or core
+
+
+def standardize_product_name(name: str) -> str:
+    original = clean_product_name(name)
+    if not original:
+        return ""
+    grade = extract_grade(original)
+    core = canonical_core_name(original)
+    if not core:
+        return ""
+
+    if re.search(r"VER\s*\.?\s*KA|버카|브이카", original, re.IGNORECASE) and "Ver.Ka" not in core:
+        core = f"{core} Ver.Ka"
+
+    if core.upper() in {"GUNDAM", "건담", "MODEL", "KIT"}:
+        core = clean_product_name(original)
+
+    prefix = f"[{grade}] " if grade != "UNKNOWN" else ""
+    return normalize_space(f"{prefix}{core}")
+
+
+def normalize_product_key(name: str) -> str:
+    grade = extract_grade(name)
+    core = canonical_core_name(name)
+    if re.search(r"VER\s*\.?\s*KA|버카|브이카", name or "", re.IGNORECASE) and "Ver.Ka" not in core:
+        core = f"{core} Ver.Ka"
+    key = core.upper().replace("VER.KA", "VERKA")
+    key = re.sub(r"[^0-9A-Z가-힣]+", " ", key)
+    key = normalize_space(key)
+    if not key:
+        return f"{grade}|"
+    return f"{grade}|{key}"
+
+
+def _core_token_set(text: str) -> Set[str]:
+    probe = _alias_probe(text)
+    tokens = {t for t in probe.split() if len(t) >= 2}
+    noise = {"GUNDAM", "건담", "VERKA", "MODEL", "KIT", "HG", "MG", "RG", "PG", "SD", "EG"}
+    return {t for t in tokens if t not in noise}
+
+
+def is_blocked_match(a: str, b: str) -> bool:
+    pa = _alias_probe(a)
+    pb = _alias_probe(b)
+    if not pa or not pb:
+        return False
+    for left, right in load_blocked_matches():
+        if (left in pa and right in pb) or (left in pb and right in pa):
+            return True
+    return False
+
+
+def calculate_match_confidence_for_name(name: str, price: Optional[str] = None, status: Optional[str] = None) -> Dict:
+    grade = extract_grade(name)
+    core = canonical_core_name(name)
+    product_key = normalize_product_key(name)
+    score = 0.48
+    reasons: List[str] = []
+
+    if grade != "UNKNOWN":
+        score += 0.18
+        reasons.append("grade_detected")
+    else:
+        reasons.append("grade_unknown")
+
+    if apply_manual_alias(name) or apply_manual_alias(core):
+        score += 0.18
+        reasons.append("manual_alias")
+
+    tokens = _core_token_set(core)
+    if len(tokens) >= 2:
+        score += 0.10
+        reasons.append("specific_core")
+    elif len(tokens) == 1:
+        score -= 0.08
+        reasons.append("short_core")
+    else:
+        score -= 0.22
+        reasons.append("empty_core")
+
+    if price_to_int(price or "") is not None:
+        score += 0.04
+        reasons.append("price_ok")
+
+    if normalize_status(status or "") != "상태 확인중":
+        score += 0.03
+        reasons.append("status_ok")
+
+    if is_bad_title(name):
+        score = min(score, 0.20)
+        reasons.append("bad_placeholder")
+
+    if product_key.endswith("|"):
+        score = min(score, 0.25)
+        reasons.append("empty_product_key")
+
+    score = max(0.05, min(0.99, score))
+    return {
+        "score": round(score, 2),
+        "reasons": reasons,
+        "core": core,
+        "productKey": product_key,
+    }
+
+
+def to_firestore_doc(item: ItemRecord, previous: Optional[Dict] = None) -> Dict:
+    price_int = price_to_int(item.price)
+    display_name = standardize_product_name(item.name or item.title) or item.name
+    product_key = normalize_product_key(display_name)
+    grade = extract_grade(display_name)
+    confidence = calculate_match_confidence_for_name(display_name, item.price, item.status)
+
+    old_status = _doc_get_str(previous, ["status", "stockText", "stock_text"])
+    old_price_int = _doc_get_int(previous, ["priceInt", "price_int", "price"])
+
+    is_new = previous is None
+    is_restock = False if is_new else _is_restock_transition(old_status, item.status)
+    is_price_drop = (
+        old_price_int is not None
+        and price_int is not None
+        and price_int > 0
+        and old_price_int > price_int
+    )
+
+    return {
+        "name": display_name,
+        "title": display_name,
+        "displayName": display_name,
+        "normalizedName": product_key,
+        "rawName": item.name,
+        "rawTitle": item.title,
+        "price": item.price,
+        "priceInt": price_int,
+        "grade": grade,
+        "productKey": product_key,
+        "matchConfidence": confidence["score"],
+        "matchConfidenceReasons": confidence["reasons"],
+        "canonicalCore": confidence["core"],
+        "needsReview": confidence["score"] < 0.72,
+        "isNew": is_new,
+        "isRestock": is_restock,
+        "isRestocked": is_restock,
+        "isPriceDrop": is_price_drop,
+        "previousPriceInt": old_price_int,
+        "previousStatus": old_status,
+        "status": item.status,
+        "stockText": item.stock_text,
+        "mallName": item.mall_name,
+        "site": item.site,
+        "sourcePage": item.source_page,
+        "url": item.url,
+        "productUrl": item.product_url,
+        "detailUrl": item.detail_url,
+        "updatedAt": firestore.SERVER_TIMESTAMP,
+    }
+
+
+def build_match_report(items: List[ItemRecord], path: str = MATCH_REPORT_PATH) -> Dict:
+    groups: Dict[str, List[ItemRecord]] = {}
+    for item in items:
+        key = normalize_product_key(item.name or item.title)
+        groups.setdefault(key, []).append(item)
+
+    suspicious_groups: List[Dict] = []
+    low_confidence_items: List[Dict] = []
+    alias_candidates: List[Dict] = []
+    blocked_warnings: List[Dict] = []
+
+    for key, group in groups.items():
+        names = sorted({standardize_product_name(i.name or i.title) or i.name for i in group})
+        sellers = sorted({i.mall_name for i in group})
+        prices = [price_to_int(i.price) for i in group if price_to_int(i.price) is not None]
+        confidences = [calculate_match_confidence_for_name(i.name or i.title, i.price, i.status)["score"] for i in group]
+        min_conf = min(confidences) if confidences else 0
+        max_price = max(prices) if prices else None
+        min_price = min(prices) if prices else None
+        price_spread_ratio = round(max_price / min_price, 2) if min_price and max_price and min_price > 0 else None
+
+        blocked_pairs = []
+        for idx, left in enumerate(names):
+            for right in names[idx + 1:]:
+                if is_blocked_match(left, right):
+                    blocked_pairs.append([left, right])
+                    blocked_warnings.append({"productKey": key, "left": left, "right": right, "sellers": sellers})
+
+        reasons = []
+        if key.endswith("|"):
+            reasons.append("empty_product_key")
+        if min_conf < 0.72:
+            reasons.append("low_confidence")
+        if blocked_pairs:
+            reasons.append("blocked_match_violation")
+        if price_spread_ratio is not None and price_spread_ratio >= 3.0 and len(group) >= 2:
+            reasons.append("price_spread_large")
+
+        if reasons:
+            suspicious_groups.append({
+                "productKey": key,
+                "count": len(group),
+                "sellers": sellers,
+                "names": names[:12],
+                "minConfidence": min_conf,
+                "priceRange": [min_price, max_price],
+                "priceSpreadRatio": price_spread_ratio,
+                "blockedPairs": blocked_pairs,
+                "reasons": reasons,
+            })
+
+        for item in group:
+            c = calculate_match_confidence_for_name(item.name or item.title, item.price, item.status)
+            if c["score"] < 0.72:
+                low_confidence_items.append({
+                    "name": item.name,
+                    "mallName": item.mall_name,
+                    "price": item.price,
+                    "status": item.status,
+                    "productKey": c["productKey"],
+                    "confidence": c["score"],
+                    "reasons": c["reasons"],
+                    "url": item.url,
+                })
+
+    # 같은 core인데 grade만 다르거나 key가 갈라진 후보를 잡는다.
+    by_core: Dict[str, List[str]] = {}
+    for key in groups.keys():
+        parts = key.split("|", 1)
+        core = parts[1] if len(parts) > 1 else key
+        if core:
+            by_core.setdefault(core, []).append(key)
+    for core, keys in by_core.items():
+        unique_keys = sorted(set(keys))
+        if len(unique_keys) >= 2:
+            alias_candidates.append({
+                "canonicalCore": core,
+                "productKeys": unique_keys,
+                "reason": "same_core_different_grade_or_key",
+            })
+
+    report = {
+        "generatedAt": datetime.now(timezone.utc).isoformat(),
+        "totalItems": len(items),
+        "totalGroups": len(groups),
+        "suspiciousGroupCount": len(suspicious_groups),
+        "lowConfidenceItemCount": len(low_confidence_items),
+        "aliasCandidateCount": len(alias_candidates),
+        "blockedWarningCount": len(blocked_warnings),
+        "suspiciousGroups": suspicious_groups[:200],
+        "lowConfidenceItems": low_confidence_items[:300],
+        "aliasCandidates": alias_candidates[:200],
+        "blockedWarnings": blocked_warnings[:200],
+        "howToUse": {
+            "aliases.json": "같은 상품으로 강제 통일하고 싶은 이름을 추가하세요.",
+            "blocked_matches.json": "절대 같은 상품으로 묶으면 안 되는 조합을 추가하세요.",
+            "matchConfidence": "0.72 미만이면 검토 권장, 0.85 이상이면 비교적 안정적입니다."
+        }
+    }
+    try:
+        Path(path).write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
+        print(f"[매칭 리포트 저장] {path} / 의심 그룹 {len(suspicious_groups)}개 / 낮은 신뢰도 {len(low_confidence_items)}개")
+    except Exception as e:
+        print(f"[매칭 리포트 저장 실패] {path} / {type(e).__name__}: {e}")
+    return report
+
+
+
+# ===== 공식명 마스터 시스템 =====
+OFFICIAL_PRODUCTS_PATH = os.getenv("OFFICIAL_PRODUCTS_PATH", "official_products.json")
+_OFFICIAL_PRODUCTS_CACHE = None
+_OFFICIAL_ALIAS_INDEX_CACHE = None
+
+DEFAULT_OFFICIAL_PRODUCTS = {
+    "products": {},
+    "notes": [
+        "official_products.json이 없을 때 자동 생성되는 빈 템플릿입니다.",
+        "실제 운영에서는 별도 official_products.json 파일을 같이 커밋하세요."
+    ]
+}
+
+
+def load_official_products() -> Dict:
+    global _OFFICIAL_PRODUCTS_CACHE
+    if _OFFICIAL_PRODUCTS_CACHE is not None:
+        return _OFFICIAL_PRODUCTS_CACHE
+    data = _read_json_with_default(OFFICIAL_PRODUCTS_PATH, DEFAULT_OFFICIAL_PRODUCTS)
+    products = data.get("products", data)
+    if not isinstance(products, dict):
+        products = {}
+    _OFFICIAL_PRODUCTS_CACHE = products
+    print(f"[공식명 마스터] {len(products)}개 로드")
+    return products
+
+
+def _official_probe(text: str) -> str:
+    t = normalize_space(text or "")
+    t = t.replace("ν", "NU")
+    t = re.sub(r"VER\s*\.?\s*KA|버카|브이카", "VERKA", t, flags=re.IGNORECASE)
+    t = re.sub(r"\b1\s*/\s*(60|72|100|144|220|400|550)\b", " ", t, flags=re.IGNORECASE)
+    t = re.sub(r"\b(MGEX|MGSD|FULL\s*MECHANICS|RE\s*/\s*100|HGUC|HGCE|HGBF|HGAC|HGFC|HGGW|HGWM|PG|MG|RG|HG|EG|SD)\b", " ", t, flags=re.IGNORECASE)
+    t = re.sub(r"\b(BAN|BD)\s*\d{4,}\b", " ", t, flags=re.IGNORECASE)
+    t = re.sub(r"\b\d{5,}\b", " ", t)
+    t = re.sub(r"[^0-9A-Z가-힣]+", " ", t.upper())
+    return normalize_space(t)
+
+
+def build_official_alias_index() -> List[Dict]:
+    global _OFFICIAL_ALIAS_INDEX_CACHE
+    if _OFFICIAL_ALIAS_INDEX_CACHE is not None:
+        return _OFFICIAL_ALIAS_INDEX_CACHE
+
+    index: List[Dict] = []
+    for key, info in load_official_products().items():
+        if not isinstance(info, dict):
+            continue
+        official_name = normalize_space(str(info.get("officialName", "")))
+        if not official_name:
+            continue
+        grade = normalize_space(str(info.get("grade", ""))) or extract_grade(official_name)
+        aliases = list(info.get("aliases", []) or [])
+        aliases.extend([official_name, _strip_grade_prefix(official_name), key])
+
+        for alias in aliases:
+            probe = _official_probe(str(alias))
+            if not probe or len(probe) < 2:
+                continue
+            index.append({
+                "probe": probe,
+                "officialName": official_name,
+                "grade": grade,
+                "key": key,
+                "series": info.get("series", ""),
+            })
+
+    # 긴 별칭 우선: STRIKE FREEDOM이 FREEDOM보다 먼저 매칭되어야 한다.
+    index.sort(key=lambda x: len(x["probe"]), reverse=True)
+    _OFFICIAL_ALIAS_INDEX_CACHE = index
+    print(f"[공식명 alias index] {len(index)}개 생성")
+    return index
+
+
+def lookup_official_product_name(name: str, *, grade_hint: Optional[str] = None) -> Optional[Dict]:
+    raw = normalize_space(name or "")
+    if not raw:
+        return None
+    grade = grade_hint or extract_grade(raw)
+    raw_probe = _official_probe(raw)
+    core_probe = _official_probe(_base_canonical_core_name_before_manual_alias(raw))
+    manual_probe = _official_probe(apply_manual_alias(raw))
+    probes = [p for p in [raw_probe, core_probe, manual_probe] if p]
+
+    for entry in build_official_alias_index():
+        entry_grade = entry.get("grade") or extract_grade(entry.get("officialName", ""))
+        # 등급이 확실히 다르면 섞지 않는다. UNKNOWN은 예외적으로 허용.
+        if grade != "UNKNOWN" and entry_grade and entry_grade != "UNKNOWN" and grade != entry_grade:
+            continue
+        alias_probe = entry["probe"]
+        for p in probes:
+            if p == alias_probe or alias_probe in p or p in alias_probe:
+                return entry
+    return None
+
+
+def apply_official_product_name(name: str) -> str:
+    original = clean_product_name(name)
+    if not original:
+        return ""
+    hit = lookup_official_product_name(original)
+    if hit:
+        return normalize_space(hit["officialName"])
+    return standardize_product_name(original)
+
+
+# 공식명 마스터 적용 버전으로 최종 함수 재정의
+_PRE_OFFICIAL_STANDARDIZE_PRODUCT_NAME = standardize_product_name
+_PRE_OFFICIAL_NORMALIZE_PRODUCT_KEY = normalize_product_key
+
+
+def standardize_product_name(name: str) -> str:
+    original = clean_product_name(name)
+    if not original:
+        return ""
+    hit = lookup_official_product_name(original)
+    if hit:
+        return normalize_space(hit["officialName"])
+    return _PRE_OFFICIAL_STANDARDIZE_PRODUCT_NAME(original)
+
+
+def normalize_product_key(name: str) -> str:
+    display = standardize_product_name(name)
+    grade = extract_grade(display or name)
+    core = _strip_grade_prefix(display or canonical_core_name(name))
+    core = re.sub(r"VER\s*\.\s*KA", "VERKA", core, flags=re.IGNORECASE)
+    key = _official_probe(core)
+    if not key:
+        return f"{grade}|"
+    return f"{grade}|{key}"
+
+
+def calculate_match_confidence_for_name(name: str, price: Optional[str] = None, status: Optional[str] = None) -> Dict:
+    grade = extract_grade(name)
+    official_hit = lookup_official_product_name(name)
+    core = _strip_grade_prefix(official_hit["officialName"]) if official_hit else canonical_core_name(name)
+    product_key = normalize_product_key(name)
+    score = 0.50
+    reasons: List[str] = []
+
+    if official_hit:
+        score += 0.28
+        reasons.append("official_master")
+    if grade != "UNKNOWN":
+        score += 0.16
+        reasons.append("grade_detected")
+    else:
+        score -= 0.12
+        reasons.append("grade_unknown")
+    if apply_manual_alias(name) or apply_manual_alias(core):
+        score += 0.08
+        reasons.append("manual_alias")
+    tokens = _core_token_set(core)
+    if len(tokens) >= 2:
+        score += 0.06
+        reasons.append("specific_core")
+    elif len(tokens) <= 0:
+        score -= 0.22
+        reasons.append("empty_core")
+    if price_to_int(price or "") is not None:
+        score += 0.03
+        reasons.append("price_ok")
+    if normalize_status(status or "") != "상태 확인중":
+        score += 0.02
+        reasons.append("status_ok")
+    if is_bad_title(name):
+        score = min(score, 0.15)
+        reasons.append("bad_placeholder")
+    if product_key.endswith("|"):
+        score = min(score, 0.25)
+        reasons.append("empty_product_key")
+    score = max(0.05, min(0.99, score))
+    return {"score": round(score, 2), "reasons": reasons, "core": core, "productKey": product_key}
+
+
+def to_firestore_doc(item: ItemRecord, previous: Optional[Dict] = None) -> Dict:
+    price_int = price_to_int(item.price)
+    display_name = apply_official_product_name(item.name or item.title) or item.name
+    official_hit = lookup_official_product_name(item.name or item.title) or lookup_official_product_name(display_name)
+    product_key = normalize_product_key(display_name)
+    grade = extract_grade(display_name)
+    confidence = calculate_match_confidence_for_name(display_name, item.price, item.status)
+
+    old_status = _doc_get_str(previous, ["status", "stockText", "stock_text"])
+    old_price_int = _doc_get_int(previous, ["priceInt", "price_int", "price"])
+
+    is_new = previous is None
+    is_restock = False if is_new else _is_restock_transition(old_status, item.status)
+    is_price_drop = (
+        old_price_int is not None
+        and price_int is not None
+        and price_int > 0
+        and old_price_int > price_int
+    )
+
+    return {
+        "name": display_name,
+        "title": display_name,
+        "displayName": display_name,
+        "officialName": official_hit.get("officialName", display_name) if official_hit else display_name,
+        "officialMatched": official_hit is not None,
+        "officialProductKey": official_hit.get("key", "") if official_hit else "",
+        "officialSeries": official_hit.get("series", "") if official_hit else "",
+        "normalizedName": product_key,
+        "rawName": item.name,
+        "rawTitle": item.title,
+        "price": item.price,
+        "priceInt": price_int,
+        "grade": grade,
+        "productKey": product_key,
+        "matchConfidence": confidence["score"],
+        "matchConfidenceReasons": confidence["reasons"],
+        "canonicalCore": confidence["core"],
+        "needsReview": confidence["score"] < 0.72,
+        "isNew": is_new,
+        "isRestock": is_restock,
+        "isRestocked": is_restock,
+        "isPriceDrop": is_price_drop,
+        "previousPriceInt": old_price_int,
+        "previousStatus": old_status,
+        "status": item.status,
+        "stockText": item.stock_text,
+        "mallName": item.mall_name,
+        "site": item.site,
+        "sourcePage": item.source_page,
+        "url": item.url,
+        "productUrl": item.product_url,
+        "detailUrl": item.detail_url,
+        "updatedAt": firestore.SERVER_TIMESTAMP,
+    }
+
+
+def build_match_report(items: List[ItemRecord], path: str = MATCH_REPORT_PATH) -> Dict:
+    groups: Dict[str, List[ItemRecord]] = {}
+    for item in items:
+        key = normalize_product_key(item.name or item.title)
+        groups.setdefault(key, []).append(item)
+
+    suspicious_groups: List[Dict] = []
+    low_confidence_items: List[Dict] = []
+    official_unmatched_items: List[Dict] = []
+    alias_candidates: List[Dict] = []
+    blocked_warnings: List[Dict] = []
+
+    for key, group in groups.items():
+        names = sorted({standardize_product_name(i.name or i.title) or i.name for i in group})
+        sellers = sorted({i.mall_name for i in group})
+        prices = [price_to_int(i.price) for i in group if price_to_int(i.price) is not None]
+        confidences = [calculate_match_confidence_for_name(i.name or i.title, i.price, i.status)["score"] for i in group]
+        min_conf = min(confidences) if confidences else 0
+        max_price = max(prices) if prices else None
+        min_price = min(prices) if prices else None
+        price_spread_ratio = round(max_price / min_price, 2) if min_price and max_price and min_price > 0 else None
+
+        blocked_pairs = []
+        for idx, left in enumerate(names):
+            for right in names[idx + 1:]:
+                if is_blocked_match(left, right):
+                    blocked_pairs.append([left, right])
+                    blocked_warnings.append({"productKey": key, "left": left, "right": right, "sellers": sellers})
+
+        reasons = []
+        if key.endswith("|"):
+            reasons.append("empty_product_key")
+        if min_conf < 0.72:
+            reasons.append("low_confidence")
+        if blocked_pairs:
+            reasons.append("blocked_match_violation")
+        if price_spread_ratio is not None and price_spread_ratio >= 3.0 and len(group) >= 2:
+            reasons.append("price_spread_large")
+
+        if reasons:
+            suspicious_groups.append({
+                "productKey": key,
+                "count": len(group),
+                "sellers": sellers,
+                "names": names[:12],
+                "minConfidence": min_conf,
+                "priceRange": [min_price, max_price],
+                "priceSpreadRatio": price_spread_ratio,
+                "blockedPairs": blocked_pairs,
+                "reasons": reasons,
+            })
+
+        for item in group:
+            original_name = item.name or item.title
+            c = calculate_match_confidence_for_name(original_name, item.price, item.status)
+            if c["score"] < 0.72:
+                low_confidence_items.append({
+                    "name": item.name,
+                    "mallName": item.mall_name,
+                    "price": item.price,
+                    "status": item.status,
+                    "productKey": c["productKey"],
+                    "confidence": c["score"],
+                    "reasons": c["reasons"],
+                    "url": item.url,
+                })
+            if not lookup_official_product_name(original_name):
+                official_unmatched_items.append({
+                    "name": item.name,
+                    "standardizedName": standardize_product_name(original_name),
+                    "mallName": item.mall_name,
+                    "grade": extract_grade(original_name),
+                    "price": item.price,
+                    "url": item.url,
+                    "suggestedOfficialKey": normalize_product_key(original_name),
+                })
+
+    by_core: Dict[str, List[str]] = {}
+    for key in groups.keys():
+        parts = key.split("|", 1)
+        core = parts[1] if len(parts) > 1 else key
+        if core:
+            by_core.setdefault(core, []).append(key)
+    for core, keys in by_core.items():
+        unique_keys = sorted(set(keys))
+        if len(unique_keys) >= 2:
+            alias_candidates.append({"canonicalCore": core, "productKeys": unique_keys, "reason": "same_core_different_grade_or_key"})
+
+    report = {
+        "generatedAt": datetime.now(timezone.utc).isoformat(),
+        "totalItems": len(items),
+        "totalGroups": len(groups),
+        "suspiciousGroupCount": len(suspicious_groups),
+        "lowConfidenceItemCount": len(low_confidence_items),
+        "officialUnmatchedItemCount": len(official_unmatched_items),
+        "aliasCandidateCount": len(alias_candidates),
+        "blockedWarningCount": len(blocked_warnings),
+        "suspiciousGroups": suspicious_groups[:200],
+        "lowConfidenceItems": low_confidence_items[:300],
+        "officialUnmatchedItems": official_unmatched_items[:300],
+        "aliasCandidates": alias_candidates[:200],
+        "blockedWarnings": blocked_warnings[:200],
+        "howToUse": {
+            "official_products.json": "공식명으로 확정하고 싶은 상품을 추가하세요. officialName이 앱 표시명으로 우선 적용됩니다.",
+            "aliases.json": "같은 상품으로 강제 통일하고 싶은 이름을 추가하세요.",
+            "blocked_matches.json": "절대 같은 상품으로 묶으면 안 되는 조합을 추가하세요.",
+            "matchConfidence": "0.72 미만이면 검토 권장, official_master reason이 있으면 공식명 DB로 매칭된 것입니다."
+        }
+    }
+    try:
+        Path(path).write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
+        print(f"[매칭 리포트 저장] {path} / 의심 그룹 {len(suspicious_groups)}개 / 공식명 미매칭 {len(official_unmatched_items)}개")
+    except Exception as e:
+        print(f"[매칭 리포트 저장 실패] {path} / {type(e).__name__}: {e}")
+    return report
 
 def main():
     print("=== KR 통합 크롤링 시작 ===")
+    print("[패치 버전] board_noise_filter_v1")
+    print("[패치 버전] joyhobby_filter_final_v2 / official_master 유지 / health 차단 완화")
+    print("[패치 버전] low_count_upload_guard_v1 / 50개 덮어쓰기 방지")
+    print(f"[실행 모드] FAST_TEST_MODE={FAST_TEST_MODE} / MAX_LINKS_PER_SITE={MAX_LINKS_PER_SITE}")
+    print(f"[업로드 보호] MIN_TOTAL_UPLOAD={MIN_TOTAL_UPLOAD} / ABSOLUTE_MIN_UPLOAD={ABSOLUTE_MIN_UPLOAD} / FORCE_UPLOAD_LOW_COUNT={FORCE_UPLOAD_LOW_COUNT} / ALLOW_TEST_UPLOAD={ALLOW_TEST_UPLOAD}")
+    load_manual_aliases()
+    load_blocked_matches()
+    load_official_products()
 
     try:
         db = init_firestore()
@@ -2572,81 +3662,44 @@ def main():
     print("[초기화] requests 세션 생성 성공")
     print("[활성 사이트] 건담샵, 하비팩토리, 건담시티, 모델세일, 조이하비, 건담붐, 프라모델매니아, 지온샵, 건담몰, BNKR")
 
-    modelsale_items = crawl_modelsale(session)
-    print(f"[모델세일 결과] {len(modelsale_items)}개")
+    site_results: Dict[str, List[ItemRecord]] = {}
+    site_results["모델세일"] = run_crawler_safely("모델세일", crawl_modelsale, session)
+    site_results["하비팩토리"] = run_crawler_safely("하비팩토리", crawl_hobbyfactory, session)
+    site_results["건담시티"] = run_crawler_safely("건담시티", crawl_gundamcity, session)
+    site_results["조이하비"] = run_crawler_safely("조이하비", crawl_joyhobby, session)
+    site_results["건담붐"] = run_crawler_safely("건담붐", crawl_gundamboom, session)
+    site_results["프라모델매니아"] = run_crawler_safely("프라모델매니아", crawl_plamodelmania, session)
+    site_results["지온샵"] = run_crawler_safely("지온샵", crawl_zeonshop, session)
+    site_results["건담몰"] = run_crawler_safely("건담몰", crawl_gundamall, session)
+    site_results["건담샵"] = run_crawler_safely("건담샵", crawl_gundamshop, session)
+    site_results["반다이남코코리아몰"] = crawl_bnkrmall_resilient(session)
+    print(f"[사이트 완료] 반다이남코코리아몰: {len(site_results['반다이남코코리아몰'])}개")
 
-    #gundambase_items = crawl_gundambase(session)
-    #print(f"[건담베이스 결과] {len(gundambase_items)}개")
+    merged: List[ItemRecord] = []
+    for items in site_results.values():
+        merged.extend(items)
 
-    hobbyfactory_items = crawl_hobbyfactory(session)
-    print(f"[하비팩토리 결과] {len(hobbyfactory_items)}개")
+    print_site_counts("===== 사이트별 병합 개수 =====", merged)
 
-    gundamcity_items = crawl_gundamcity(session)
-    print(f"[건담시티 결과] {len(gundamcity_items)}개")
-
-    joyhobby_items = crawl_joyhobby(session)
-    print(f"[조이하비 결과] {len(joyhobby_items)}개")
-
-    gundamboom_items = crawl_gundamboom(session)
-    print(f"[건담붐 결과] {len(gundamboom_items)}개")
-
-    plamodelmania_items = crawl_plamodelmania(session)
-    print(f"[프라모델매니아 결과] {len(plamodelmania_items)}개")
-
-    zeonshop_items = crawl_zeonshop(session)
-    print(f"[지온샵 결과] {len(zeonshop_items)}개")
-
-    gundamall_items = crawl_gundamall(session)
-    print(f"[건담몰 결과] {len(gundamall_items)}개")
-
-    gundamshop_items = crawl_gundamshop(session)
-    print(f"[건담샵 결과] {len(gundamshop_items)}개")
-
-    bnkr_items = crawl_bnkrmall_selenium()
-    print(f"[BNKR 결과] {len(bnkr_items)}개")
-
-    merged = (
-        gundamshop_items
-        + hobbyfactory_items
-        + gundamcity_items
-        + modelsale_items
-        + bnkr_items
-        + joyhobby_items
-        + gundamboom_items
-        + plamodelmania_items
-        + zeonshop_items
-        + gundamall_items
-    )
-
-    from collections import Counter
-
-    site_counter = Counter(item.mall_name for item in merged)
-
-    print("===== 사이트별 병합 개수 =====")
-    for mall, count in sorted(site_counter.items()):
-        print(f"{mall}: {count}")
-    print("==========================")
-
-    # A단계 품질 개선: 잡데이터 제거 + 판매처 내부 중복 제거
     merged = filter_bad_records(merged)
-    site_counter_after_filter = Counter(item.mall_name for item in merged)
-    print("===== 품질 필터 후 사이트별 개수 =====")
-    for mall, count in sorted(site_counter_after_filter.items()):
-        print(f"{mall}: {count}")
-    print("==================================")
+    print_site_counts("===== 품질 필터 후 사이트별 개수 =====", merged)
 
     merged = dedupe_records(merged)
-    site_counter_after_dedupe = Counter(item.mall_name for item in merged)
-    print("===== 중복 제거 후 사이트별 개수 =====")
-    for mall, count in sorted(site_counter_after_dedupe.items()):
-        print(f"{mall}: {count}")
-    print("==================================")
+    print_site_counts("===== 중복 제거 후 사이트별 개수 =====", merged)
 
-    # 최저가 비교를 위해 판매처별 문서는 유지하고 정렬만 수행
     merged = sort_records(merged)
     print(f"[정렬 후] 총 {len(merged)}개")
 
+    build_match_report(merged)
     save_local_backup(merged)
+    save_failed_events_report()
+
+    upload_allowed = validate_crawl_health(merged)
+    save_health_history(merged, upload_allowed)
+
+    if not upload_allowed:
+        raise RuntimeError("크롤링 건강 상태가 기준 미달이라 Firestore 업로드를 중단했습니다.")
+
     upload_to_firestore(db, merged)
 
     print("=== 완료 ===")
