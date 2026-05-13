@@ -40,6 +40,8 @@ class ItemRecord:
     url: str
     product_url: str
     detail_url: str
+    image_url: str = ""
+    image_source: str = ""
 
 def crawl_bnkrmall_selenium() -> List[ItemRecord]:
     if webdriver is None or Service is None or ChromeDriverManager is None or By is None:
@@ -157,6 +159,8 @@ def crawl_bnkrmall_selenium() -> List[ItemRecord]:
                         url=link,
                         product_url=link,
                         detail_url=link,
+                        image_url=parse_image_from_soup(soup, link),
+                        image_source="bnkrmall_selenium",
                     )
                 )
 
@@ -698,6 +702,93 @@ def parse_status_from_soup(soup: BeautifulSoup) -> str:
     page_text = soup.get_text(" ", strip=True)
     return normalize_status(page_text)
 
+
+def _looks_like_product_image_url(url: str) -> bool:
+    lower = (url or "").lower()
+    if not lower or lower.startswith("data:"):
+        return False
+    bad_parts = [
+        "logo", "icon", "ico_", "btn_", "banner", "loading", "blank", "noimage",
+        "spacer", "sns", "kakao", "naver", "facebook", "instagram", "youtube",
+        "common/", "/skin/", "/layout/", "/board/", "/event/", "review", "star",
+    ]
+    if any(x in lower for x in bad_parts):
+        return False
+    good_parts = [
+        "product", "goods", "item", "shopimages", "web/product", "big", "detail",
+        "thumbnail", "thumb", ".jpg", ".jpeg", ".png", ".webp",
+    ]
+    return any(x in lower for x in good_parts)
+
+
+def parse_image_from_soup(soup: BeautifulSoup, base_url: str) -> str:
+    """상세 페이지에서 대표 상품 이미지를 추출한다.
+    실제 이미지 다운로드/검증은 하지 않고 URL 기반으로 안전하게 후보를 고른다.
+    """
+    candidates: List[str] = []
+
+    meta_selectors = [
+        ('meta[property="og:image"]', 'content'),
+        ('meta[property="og:image:secure_url"]', 'content'),
+        ('meta[name="twitter:image"]', 'content'),
+        ('meta[itemprop="image"]', 'content'),
+    ]
+    for selector, attr in meta_selectors:
+        for el in soup.select(selector):
+            value = normalize_space(el.get(attr) or "")
+            if value:
+                candidates.append(value)
+
+    img_selectors = [
+        ".keyImg img", ".thumbnail img", ".thumb img", ".prdImg img", ".product_image img",
+        ".xans-product-image img", ".detailArea img", ".goods_img img", ".goodsImg img",
+        "img[src]",
+    ]
+    for selector in img_selectors:
+        for img in soup.select(selector):
+            for attr in ["data-origin", "data-original", "data-src", "ec-data-src", "src"]:
+                value = normalize_space(img.get(attr) or "")
+                if value:
+                    candidates.append(value)
+
+    html = str(soup)
+    for raw in re.findall(r'https?://[^\'"\\s<>]+(?:jpg|jpeg|png|webp)(?:\\?[^\'"\\s<>]*)?', html, re.IGNORECASE):
+        candidates.append(raw)
+
+    normalized: List[str] = []
+    seen: Set[str] = set()
+    for raw in candidates:
+        full = urljoin(base_url, raw.strip())
+        full = full.replace("&amp;", "&")
+        if full in seen:
+            continue
+        seen.add(full)
+        if _looks_like_product_image_url(full):
+            normalized.append(full)
+
+    if not normalized:
+        return ""
+
+    def score(u: str) -> int:
+        l = u.lower()
+        sc = 0
+        if "og:image" in l or "big" in l or "detail" in l:
+            sc += 12
+        if "shopimages" in l or "web/product" in l or "/product/" in l or "/goods/" in l:
+            sc += 10
+        if "thumb" in l or "thumbnail" in l:
+            sc += 4
+        if re.search(r"(500|600|700|800|900|1000|1200)", l):
+            sc += 5
+        if re.search(r"(80x80|100x100|120x120|small|tiny)", l):
+            sc -= 12
+        if l.endswith(".webp"):
+            sc += 3
+        return sc
+
+    normalized.sort(key=score, reverse=True)
+    return normalized[0]
+
 MODELSALE_SEEDS = [
     "https://www.modelsale.co.kr/modelsale/poprec/cat_detail.php?idx1=3&idx2=1&idx3=2&idx4=1",   # Master Grade
     "https://www.modelsale.co.kr/modelsale/poprec/cat_detail.php?idx1=3&idx2=1&idx3=4&idx4=1",   # Real Grade
@@ -1214,6 +1305,8 @@ def parse_generic_shop_detail(
             url=url,
             product_url=url,
             detail_url=url,
+            image_url=image_url if 'image_url' in locals() else "",
+            image_source=site if 'site' in locals() else "",
         )
     except requests.exceptions.HTTPError as e:
         record_failure(mall_name, url, e)
@@ -1436,6 +1529,7 @@ def parse_modelsale_detail(session: requests.Session, url: str) -> Optional[Item
         price = parse_price_from_soup(soup)
         status = parse_status_from_soup(soup)
         stock_text = status
+        image_url = parse_image_from_soup(soup, url)
 
         parsed = urlparse(url)
         qs = parse_qs(parsed.query)
@@ -1456,6 +1550,8 @@ def parse_modelsale_detail(session: requests.Session, url: str) -> Optional[Item
             url=url,
             product_url=url,
             detail_url=url,
+            image_url=image_url if 'image_url' in locals() else "",
+            image_source=site if 'site' in locals() else "",
         )
     except Exception as e:
         record_failure("모델세일", url, e)
@@ -1482,6 +1578,7 @@ def parse_gundambase_detail(session: requests.Session, url: str) -> Optional[Ite
         price = parse_price_from_soup(soup)
         status = parse_status_from_soup(soup)
         stock_text = status
+        image_url = parse_image_from_soup(soup, url)
 
         parsed = urlparse(url)
         qs = parse_qs(parsed.query)
@@ -1502,6 +1599,8 @@ def parse_gundambase_detail(session: requests.Session, url: str) -> Optional[Ite
             url=url,
             product_url=url,
             detail_url=url,
+            image_url=image_url if 'image_url' in locals() else "",
+            image_source=site if 'site' in locals() else "",
         )
     except Exception as e:
         record_failure("건담베이스", url, e)
@@ -1532,6 +1631,7 @@ def parse_hobbyfactory_detail(session: requests.Session, url: str) -> Optional[I
         price = parse_price_from_soup(soup)
         status = parse_status_from_soup(soup)
         stock_text = status
+        image_url = parse_image_from_soup(soup, url)
 
         parsed = urlparse(url)
         qs = parse_qs(parsed.query)
@@ -1555,6 +1655,8 @@ def parse_hobbyfactory_detail(session: requests.Session, url: str) -> Optional[I
             url=url,
             product_url=url,
             detail_url=url,
+            image_url=image_url if 'image_url' in locals() else "",
+            image_source=site if 'site' in locals() else "",
         )
     except Exception as e:
         record_failure("하비팩토리", url, e)
@@ -1585,6 +1687,7 @@ def parse_gundamcity_detail(session: requests.Session, url: str) -> Optional[Ite
         price = parse_price_from_soup(soup) or ""
         status = parse_status_from_soup(soup) or "상태 확인중"
         stock_text = status
+        image_url = parse_image_from_soup(soup, url)
 
         parsed = urlparse(url)
         qs = parse_qs(parsed.query)
@@ -1626,6 +1729,8 @@ def parse_gundamcity_detail(session: requests.Session, url: str) -> Optional[Ite
             url=url,
             product_url=url,
             detail_url=url,
+            image_url=image_url if 'image_url' in locals() else "",
+            image_source=site if 'site' in locals() else "",
         )
     except Exception as e:
         record_failure("건담시티", url, e)
@@ -1768,6 +1873,8 @@ def parse_joyhobby_detail(session: requests.Session, url: str) -> Optional[ItemR
             url=url,
             product_url=url,
             detail_url=url,
+            image_url=image_url if 'image_url' in locals() else "",
+            image_source=site if 'site' in locals() else "",
         )
     except requests.exceptions.HTTPError as e:
         record_failure("조이하비", url, e)
@@ -1801,6 +1908,7 @@ def parse_gundamshop_detail(session: requests.Session, url: str) -> Optional[Ite
         price = parse_price_from_soup(soup)
         status = parse_status_from_soup(soup)
         stock_text = status
+        image_url = parse_image_from_soup(soup, url)
 
         parsed = urlparse(url)
         qs = parse_qs(parsed.query)
@@ -1834,6 +1942,8 @@ def parse_gundamshop_detail(session: requests.Session, url: str) -> Optional[Ite
             url=url,
             product_url=url,
             detail_url=url,
+            image_url=image_url if 'image_url' in locals() else "",
+            image_source=site if 'site' in locals() else "",
         )
     except Exception as e:
         record_failure("건담샵", url, e)
@@ -1919,6 +2029,8 @@ def parse_bnkr_detail(session: requests.Session, url: str) -> Optional[ItemRecor
             url=url,
             product_url=url,
             detail_url=url,
+            image_url=image_url if 'image_url' in locals() else "",
+            image_source=site if 'site' in locals() else "",
         )
     except Exception as e:
         record_failure("반다이남코코리아몰", url, e)
@@ -2187,6 +2299,9 @@ def crawl_bnkrmall(session: requests.Session) -> List[ItemRecord]:
 
             gno = item.get("goodsNo", "")
             url = f"https://m.bnkrmall.co.kr/mw/goods/detail.do?gno={gno}"
+            image_url = item.get("goodsImg") or item.get("imageUrl") or item.get("imgUrl") or item.get("listImg") or ""
+            if image_url:
+                image_url = urljoin(url, str(image_url))
 
             item_id = f"bnkr_{sha_id(str(gno))}"
 
@@ -2204,6 +2319,8 @@ def crawl_bnkrmall(session: requests.Session) -> List[ItemRecord]:
                     url=url,
                     product_url=url,
                     detail_url=url,
+                    image_url=image_url if 'image_url' in locals() else "",
+                    image_source="bnkrmall_api",
                 )
             )
 
@@ -2576,6 +2693,81 @@ def _is_restock_transition(old_status: str, new_status: str) -> bool:
     new = normalize_status(new_status)
     return new == "판매중" and old in {"품절", "입고예정", "상태 확인중"}
 
+
+
+
+def calculate_image_quality(item: ItemRecord, *, quality: Dict, type_info: Dict) -> Dict:
+    image_url = normalize_space(getattr(item, "image_url", "") or "")
+    flags: List[str] = []
+    reasons: List[str] = []
+
+    if not image_url:
+        score = 25
+        flags.append("image_missing")
+    else:
+        score = 58
+        reasons.append("image_url_present")
+        lower = image_url.lower()
+
+        if lower.startswith("https://"):
+            score += 7
+            reasons.append("https_image")
+        elif lower.startswith("http://"):
+            flags.append("http_image")
+
+        if any(ext in lower for ext in [".jpg", ".jpeg", ".png", ".webp"]):
+            score += 8
+            reasons.append("valid_image_extension")
+        else:
+            flags.append("unknown_image_extension")
+
+        if any(x in lower for x in ["shopimages", "web/product", "/product/", "/goods/", "big", "detail"]):
+            score += 12
+            reasons.append("likely_product_image")
+
+        if any(x in lower for x in ["thumb", "thumbnail"]):
+            score += 3
+            reasons.append("thumbnail_image")
+
+        if any(x in lower for x in ["logo", "icon", "banner", "noimage", "blank", "loading"]):
+            score -= 35
+            flags.append("possible_non_product_image")
+
+        if re.search(r"(80x80|100x100|120x120|small|tiny)", lower):
+            score -= 18
+            flags.append("possible_low_resolution")
+
+    if quality.get("score", 0) >= 80:
+        score += 5
+        reasons.append("high_data_quality")
+    if type_info.get("typeCategory") == "gunpla":
+        score += 5
+        reasons.append("main_gunpla_item")
+    if type_info.get("typeCategory") in {"decal", "tool", "paint", "option_parts"}:
+        score -= 8
+        flags.append("non_main_item_image")
+
+    score = int(max(0, min(100, score)))
+    if score >= 85:
+        grade = "A"
+    elif score >= 70:
+        grade = "B"
+    elif score >= 50:
+        grade = "C"
+    else:
+        grade = "REVIEW"
+
+    return {
+        "imageUrl": image_url,
+        "imageSource": getattr(item, "image_source", "") or item.site,
+        "hasImage": bool(image_url),
+        "imageQualityScore": score,
+        "imageQualityGrade": grade,
+        "imageQualityReasons": sorted(set(reasons))[:20],
+        "imageQualityFlags": sorted(set(flags))[:20],
+        "isImageQualityLow": score < 50,
+        "isImageQualityHigh": score >= 80,
+    }
 
 def to_firestore_doc(item: ItemRecord, previous: Optional[Dict] = None) -> Dict:
     price_int = price_to_int(item.price)
@@ -4140,6 +4332,7 @@ def to_firestore_doc(item: ItemRecord, previous: Optional[Dict] = None) -> Dict:
         stock_info=stock_info,
         model_identity=model_identity,
     )
+    image_info = calculate_image_quality(item, quality=quality, type_info=type_info)
 
     old_status = _doc_get_str(previous, ["status", "stockText", "stock_text"])
     old_price_int = _doc_get_int(previous, ["priceInt", "price_int", "price"])
@@ -4215,6 +4408,15 @@ def to_firestore_doc(item: ItemRecord, previous: Optional[Dict] = None) -> Dict:
         "recommendationLevel": recommendation_info["recommendationLevel"],
         "recommendationTags": recommendation_info["recommendationTags"],
         "recommendationReasons": recommendation_info["recommendationReasons"],
+        "imageUrl": image_info["imageUrl"],
+        "imageSource": image_info["imageSource"],
+        "hasImage": image_info["hasImage"],
+        "imageQualityScore": image_info["imageQualityScore"],
+        "imageQualityGrade": image_info["imageQualityGrade"],
+        "imageQualityReasons": image_info["imageQualityReasons"],
+        "imageQualityFlags": image_info["imageQualityFlags"],
+        "isImageQualityLow": image_info["isImageQualityLow"],
+        "isImageQualityHigh": image_info["isImageQualityHigh"],
         "isNew": is_new,
         "isRestock": is_restock,
         "isRestocked": is_restock,
@@ -4359,6 +4561,7 @@ def main():
     print("[패치 버전] model_identity_engine_v3 / masterModelId·modelGroupKey 추가")
     print("[패치 버전] data_engine_stage4_6 / 가격·재고·추천 분석 필드 추가")
     print("[패치 버전] ci_secret_and_optional_selenium_guard_v1 / CI 인증·선택 의존성 안정화")
+    print("[패치 버전] image_quality_v1 / 대표 이미지 URL·이미지 품질 점수 추가")
     print(f"[실행 모드] FAST_TEST_MODE={FAST_TEST_MODE} / MAX_LINKS_PER_SITE={MAX_LINKS_PER_SITE}")
     print(f"[업로드 보호] MIN_TOTAL_UPLOAD={MIN_TOTAL_UPLOAD} / ABSOLUTE_MIN_UPLOAD={ABSOLUTE_MIN_UPLOAD} / FORCE_UPLOAD_LOW_COUNT={FORCE_UPLOAD_LOW_COUNT} / ALLOW_TEST_UPLOAD={ALLOW_TEST_UPLOAD}")
     load_manual_aliases()
