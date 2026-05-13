@@ -13,11 +13,18 @@ import firebase_admin
 import requests
 from bs4 import BeautifulSoup
 from firebase_admin import credentials, firestore
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from webdriver_manager.chrome import ChromeDriverManager
-from selenium.webdriver.common.by import By
-import time
+# Selenium은 BNKR 보조 수집에서만 사용한다.
+# GitHub Actions 환경에 selenium/webdriver_manager가 없더라도 스크립트 전체가 import 단계에서 죽지 않도록 선택 의존성으로 둔다.
+try:
+    from selenium import webdriver
+    from selenium.webdriver.chrome.service import Service
+    from webdriver_manager.chrome import ChromeDriverManager
+    from selenium.webdriver.common.by import By
+except Exception:
+    webdriver = None
+    Service = None
+    ChromeDriverManager = None
+    By = None
 
 @dataclass
 class ItemRecord:
@@ -35,10 +42,9 @@ class ItemRecord:
     detail_url: str
 
 def crawl_bnkrmall_selenium() -> List[ItemRecord]:
-    from selenium import webdriver
-    from selenium.webdriver.chrome.service import Service
-    from selenium.webdriver.common.by import By
-    from webdriver_manager.chrome import ChromeDriverManager
+    if webdriver is None or Service is None or ChromeDriverManager is None or By is None:
+        print("[BNKR Selenium 건너뜀] selenium/webdriver_manager 미설치 - API fallback으로 진행")
+        return []
 
     results: List[ItemRecord] = []
     seen_ids: Set[str] = set()
@@ -511,14 +517,38 @@ def soup_from_url(session: requests.Session, url: str, encoding: Optional[str] =
 
 
 def init_firestore():
+    """Firestore 초기화.
+
+    우선순위:
+    1) serviceAccountKey.json 파일
+    2) GitHub Actions/Railway Secret의 FIREBASE_SERVICE_ACCOUNT_JSON 값
+
+    기존 파일 방식은 그대로 유지하고, CI 환경에서 secret만 있는 경우도 안전하게 지원한다.
+    """
+    service_account_source = SERVICE_ACCOUNT_PATH
+
     if not os.path.exists(SERVICE_ACCOUNT_PATH):
-        raise FileNotFoundError(
-            f"{SERVICE_ACCOUNT_PATH} 파일이 없습니다. "
-            f"merge_kr_crosscheck.py 와 같은 폴더에 넣어줘."
-        )
+        raw_secret = os.getenv("FIREBASE_SERVICE_ACCOUNT_JSON", "").strip()
+        if raw_secret:
+            try:
+                parsed = json.loads(raw_secret)
+                temp_path = Path("serviceAccountKey.from_env.json")
+                temp_path.write_text(json.dumps(parsed, ensure_ascii=False), encoding="utf-8")
+                service_account_source = str(temp_path)
+                print("[초기화] FIREBASE_SERVICE_ACCOUNT_JSON secret으로 Firestore 인증 파일 생성")
+            except Exception as e:
+                raise RuntimeError(
+                    "FIREBASE_SERVICE_ACCOUNT_JSON secret을 JSON으로 읽지 못했습니다. "
+                    "GitHub Secrets 값이 서비스 계정 JSON 전체인지 확인하세요."
+                ) from e
+        else:
+            raise FileNotFoundError(
+                f"{SERVICE_ACCOUNT_PATH} 파일이 없고 FIREBASE_SERVICE_ACCOUNT_JSON secret도 비어 있습니다. "
+                f"로컬에서는 {SERVICE_ACCOUNT_PATH}를 같은 폴더에 넣고, GitHub Actions에서는 secret을 설정해줘."
+            )
 
     if not firebase_admin._apps:
-        cred = credentials.Certificate(SERVICE_ACCOUNT_PATH)
+        cred = credentials.Certificate(service_account_source)
         firebase_admin.initialize_app(cred)
 
     return firestore.client()
@@ -1346,6 +1376,43 @@ def extract_bnkr_candidate_links(soup: BeautifulSoup, base_url: str) -> Set[str]
 
     return links
 
+
+def extract_gundambase_candidate_links(soup: BeautifulSoup, base_url: str) -> Set[str]:
+    """건담베이스 상품 상세 링크 추출.
+
+    현재 main에서는 건담베이스를 기본 실행하지 않지만, 함수가 없으면 나중에 다시 활성화했을 때
+    NameError로 해당 사이트 전체가 0개 처리될 수 있어 호환용으로 보강한다.
+    """
+    links: Set[str] = set()
+
+    exclude_patterns = [
+        "/board/", "/member/", "/order/", "/cart/", "/myshop/",
+        "/article/", "/notice/", "/faq/", "/event/", "javascript:", "mailto:",
+        "basket.html", "login", "review", "qna", "search.html?",
+    ]
+
+    def try_add(raw: str):
+        raw = (raw or "").strip()
+        if not raw or raw.startswith("#"):
+            return
+        full = urljoin(base_url, raw)
+        lower = full.lower()
+        if "thegundambase.co.kr" not in lower:
+            return
+        if any(x in lower for x in exclude_patterns):
+            return
+        if "/product/detail.html" in lower or "product_no=" in lower:
+            links.add(full)
+
+    for a in soup.select("a[href]"):
+        try_add(a.get("href") or "")
+
+    html = str(soup)
+    for raw in re.findall(r"(?:href|data-url|ec-data-href)=['\"]([^'\"]+)['\"]", html, re.IGNORECASE):
+        try_add(raw)
+
+    return links
+
 def parse_modelsale_detail(session: requests.Session, url: str) -> Optional[ItemRecord]:
     try:
         soup = soup_from_url(session, url)
@@ -2094,9 +2161,13 @@ def crawl_bnkrmall(session: requests.Session) -> List[ItemRecord]:
         print("[BNKR API 호출 시작]")
 
         resp = session.get(url, params=params, timeout=TIMEOUT)
-        data = resp.json()
+        resp.raise_for_status()
+        try:
+            data = resp.json()
+        except Exception as e:
+            raise RuntimeError(f"BNKR API 응답이 JSON이 아닙니다: {resp.text[:200]}") from e
 
-        items = data.get("list", [])
+        items = data.get("list", []) if isinstance(data, dict) else []
 
         print(f"[BNKR API 결과] {len(items)}개")
 
@@ -3466,6 +3537,589 @@ def calculate_match_confidence_for_name(name: str, price: Optional[str] = None, 
     return {"score": round(score, 2), "reasons": reasons, "core": core, "productKey": product_key}
 
 
+
+
+# ===== 데이터 품질 시스템 v2/v3: 상품 타입 분류 + 모델 중심 통합 키 =====
+# v1 qualityScore를 유지하면서 Firestore에 추가 필드만 얹는다.
+# 기존 앱이 이 필드를 아직 읽지 않아도 동작은 변하지 않는다.
+
+EXTRA_NICKNAME_ALIAS_RULES = [
+    (r"스프덤|스트프|STRIKE\s*FREE", "스트라이크 프리덤 건담"),
+    (r"마프덤|마이티\s*프리덤|MIGHTY\s*FREE", "마이티 스트라이크 프리덤 건담"),
+    (r"라프덤|라이징\s*프리덤|RISING\s*FREE", "라이징 프리덤 건담"),
+    (r"임저|임모탈\s*저스티스|IMMORTAL\s*JUSTICE", "임모탈 저스티스 건담"),
+    (r"뉴건담|뉴\s*건|NU\s*GUNDAM|RX[-\s]*93", "뉴 건담"),
+    (r"하이뉴|하이\s*뉴|HI[-\s]*NU|HI\s*ν", "하이 뉴 건담"),
+    (r"에어리얼\s*개수|AERIAL\s*REBUILD", "건담 에어리얼 개수형"),
+    (r"캘리번|CALIBARN", "건담 캘리번"),
+    (r"발바토스\s*루프스\s*렉스|BARBATOS\s*LUPUS\s*REX", "건담 발바토스 루프스 렉스"),
+    (r"발바토스\s*루프스|BARBATOS\s*LUPUS", "건담 발바토스 루프스"),
+    (r"발바토스|BARBATOS", "건담 발바토스"),
+    (r"사자비|SAZABI|MSN[-\s]*04", "사자비"),
+    (r"시난주\s*스타인|SINANJU\s*STEIN", "시난주 스타인"),
+    (r"시난주|SINANJU", "시난주"),
+    (r"유니콘.*밴시|밴시\s*노른|BANSHEE\s*NORN", "유니콘 건담 2호기 밴시 노른"),
+    (r"유니콘|UNICORN", "유니콘 건담"),
+]
+
+_PRE_STAGE3_CANONICAL_CORE_NAME = canonical_core_name
+
+
+def canonical_core_name(name: str) -> str:
+    """기존 공식명/alias 시스템 위에 약칭 alias만 얇게 추가한다."""
+    source = normalize_space(name or "")
+    probe = source.upper().replace("ν", "NU")
+    for pattern, replacement in EXTRA_NICKNAME_ALIAS_RULES:
+        if re.search(pattern, source, flags=re.IGNORECASE) or re.search(pattern, probe, flags=re.IGNORECASE):
+            return replacement
+    return _PRE_STAGE3_CANONICAL_CORE_NAME(source)
+
+
+def detect_brand(name: str) -> str:
+    t = (name or "").upper()
+    if any(k in t for k in ["BANDAI SPIRITS", "반다이 스피리츠", "반다이스피리츠"]):
+        return "BANDAI SPIRITS"
+    if any(k in t for k in ["BANDAI", "반다이"]):
+        return "BANDAI"
+    if any(k in t for k in ["KOTOBUKIYA", "코토부키야"]):
+        return "KOTOBUKIYA"
+    return "UNKNOWN"
+
+
+def extract_scale(name: str) -> str:
+    t = name or ""
+    m = re.search(r"1\s*/\s*(60|72|100|144|220|400|550)", t, flags=re.IGNORECASE)
+    if m:
+        return f"1/{m.group(1)}"
+    grade = extract_grade(t)
+    if grade in {"PG"}:
+        return "1/60"
+    if grade in {"MG", "MGEX", "MGSD", "RE/100", "FULL MECHANICS"}:
+        return "1/100"
+    if grade in {"RG", "HG", "EG"}:
+        return "1/144"
+    return "UNKNOWN"
+
+
+def extract_series(name: str) -> str:
+    t = (name or "").upper()
+    series_rules = [
+        ("WITCH_FROM_MERCURY", ["수성의 마녀", "수성의마녀", "AERIAL", "CALIBARN", "SCHWARZETTE", "LFRITH", "르브리스", "에어리얼", "캘리번", "슈바르제테"]),
+        ("SEED", ["SEED", "시드", "STRIKE", "FREEDOM", "JUSTICE", "스트라이크", "프리덤", "저스티스"]),
+        ("UC", ["UNICORN", "유니콘", "BANSHEE", "밴시", "SINANJU", "시난주"]),
+        ("CCA", ["NU GUNDAM", "뉴 건담", "뉴건담", "SAZABI", "사자비", "하이 뉴", "HI-NU"]),
+        ("IBO", ["BARBATOS", "발바토스", "LUPUS", "루프스", "GUSION", "구시온"]),
+        ("00", ["EXIA", "엑시아", "더블오", "00 GUNDAM", "DYNAMES", "듀나메스"]),
+        ("WING", ["WING", "윙 건담", "DEATHSCYTHE", "데스사이즈", "HEAVYARMS", "헤비암즈"]),
+        ("ZETA_ZZ", ["ZETA", "제타", "ZZ", "더블제타", "백식"]),
+        ("FIRST", ["RX-78", "퍼스트", "GUNCANNON", "건캐논", "GUNTANK", "건탱크", "ZAKU", "자쿠", "DOM", " 돔"]),
+    ]
+    raw = name or ""
+    for series, keys in series_rules:
+        if any(k.upper() in t or k in raw for k in keys):
+            return series
+    return "UNKNOWN"
+
+
+def classify_product_type(name: str, *, price: Optional[str] = None) -> Dict:
+    """상품 타입 분류. 삭제/차단이 아니라 Firestore 분류 필드와 qualityFlags에 사용한다."""
+    raw = normalize_space(name or "")
+    t = raw.upper()
+    flags: List[str] = []
+    confidence = 0.55
+
+    rules = [
+        ("decal", "water_decal", ["데칼", "습식데칼", "WATER DECAL", "DECAL"]),
+        ("paint", "paint_marker", ["도료", "마커", "스프레이", "서페이서", "신너", "PANEL LINE", "MARKER", "PAINT"]),
+        ("tool", "build_tool", ["니퍼", "공구", "사포", "핀셋", "접착제", "커터", "TOOL", "NIPPER"]),
+        ("option_parts", "display_base", ["액션베이스", "ACTION BASE", "스탠드", "DISPLAY BASE", "베이스"]),
+        ("option_parts", "effect_parts", ["이펙트", "EFFECT", "LED", "확장", "EXPANSION", "옵션", "OPTION PARTS", "파츠 세트", "무장", "웨폰"]),
+        ("figure", "completed_toy", ["메탈빌드", "METAL BUILD", "로봇혼", "ROBOT魂", "초합금", "완성품", "피규어", "FIGURE", "S.H.FIGUARTS", "피규아츠"]),
+    ]
+    for category, subtype, keywords in rules:
+        if any(k.upper() in t for k in keywords):
+            flags.append(f"type_{category}")
+            return {
+                "typeCategory": category,
+                "subType": subtype,
+                "typeConfidence": 0.9,
+                "typeFlags": flags,
+                "isGunplaMainItem": False,
+            }
+
+    grade = extract_grade(raw)
+    looks_gunpla = looks_like_gundam(raw) and grade != "UNKNOWN"
+    price_int = price_to_int(price or "")
+    if looks_gunpla:
+        confidence = 0.84
+        if price_int is not None and price_int >= 3000:
+            confidence += 0.06
+        return {
+            "typeCategory": "gunpla",
+            "subType": "main_kit",
+            "typeConfidence": round(min(0.98, confidence), 2),
+            "typeFlags": flags,
+            "isGunplaMainItem": True,
+        }
+
+    if looks_like_gundam(raw):
+        flags.append("type_gundam_related_uncertain")
+        return {
+            "typeCategory": "gundam_related",
+            "subType": "uncertain",
+            "typeConfidence": 0.58,
+            "typeFlags": flags,
+            "isGunplaMainItem": False,
+        }
+
+    flags.append("type_unknown")
+    return {
+        "typeCategory": "etc",
+        "subType": "unknown",
+        "typeConfidence": 0.35,
+        "typeFlags": flags,
+        "isGunplaMainItem": False,
+    }
+
+
+def _safe_key_fragment(text: str) -> str:
+    key = _official_probe(text)
+    key = key.lower()
+    key = re.sub(r"[^0-9a-z가-힣]+", "_", key)
+    key = re.sub(r"_+", "_", key).strip("_")
+    return key[:80] or "unknown"
+
+
+def build_model_identity(name: str, official_hit: Optional[Dict] = None) -> Dict:
+    """사이트 상품을 모델 중심으로 묶기 위한 통합 키."""
+    display = standardize_product_name(name) or clean_product_name(name)
+    official_name = normalize_space(official_hit.get("officialName", "")) if official_hit else ""
+    model_name = official_name or display
+    grade = extract_grade(model_name or name)
+    core = _strip_grade_prefix(model_name or canonical_core_name(name))
+    series = official_hit.get("series", "") if official_hit else ""
+    if not series:
+        series = extract_series(model_name or name)
+    scale = extract_scale(model_name or name)
+    brand = detect_brand(name)
+
+    core_key = _safe_key_fragment(core)
+    grade_key = grade.lower().replace("/", "_").replace(" ", "_") if grade else "unknown"
+    master_model_id = f"{grade_key}_{core_key}" if core_key else f"{grade_key}_unknown"
+    model_group_key = normalize_product_key(model_name or name)
+
+    return {
+        "masterModelId": master_model_id,
+        "modelGroupKey": model_group_key,
+        "modelCoreName": normalize_space(core),
+        "modelDisplayName": normalize_space(model_name),
+        "series": series or "UNKNOWN",
+        "scale": scale,
+        "brand": brand,
+    }
+
+
+# ===== 데이터 품질 점수 시스템 v1 =====
+# 기존 matchConfidence는 "상품명/공식명 매칭 신뢰도"에 가깝고,
+# qualityScore는 앱에서 바로 쓸 수 있는 "종합 데이터 품질 점수"다.
+# 크롤링/필터/업로드 구조는 건드리지 않고 Firestore 필드만 추가한다.
+SITE_QUALITY_BONUS = {
+    "gundamshop": 4,
+    "modelsale": 4,
+    "joyhobby": 2,
+    "hobbyfactory": 2,
+    "gundamcity": 1,
+    "zeonshop": 1,
+    "plamodelmania": 0,
+    "bnkrmall": 3,
+    "gundamboom": 0,
+    "gundamall": 0,
+}
+
+
+def calculate_quality_score(
+    item: ItemRecord,
+    *,
+    display_name: str,
+    official_hit: Optional[Dict],
+    confidence: Dict,
+) -> Dict:
+    """Firestore/앱 표시용 종합 품질 점수.
+
+    점수 기준:
+    - 80~100: 안정적
+    - 60~79 : 사용 가능하지만 일부 검토 권장
+    - 0~59  : 검토 필요
+
+    이 함수는 데이터를 삭제하지 않는다. 점수와 이유만 남긴다.
+    """
+    reasons: List[str] = []
+    flags: List[str] = []
+
+    score = 35.0
+
+    confidence_score = float(confidence.get("score", 0) or 0)
+    score += confidence_score * 35.0
+    reasons.append(f"match_confidence_{confidence_score:.2f}")
+
+    if official_hit:
+        score += 12
+        reasons.append("official_matched")
+    else:
+        score -= 4
+        flags.append("official_unmatched")
+
+    grade = extract_grade(display_name or item.name or item.title)
+    if grade != "UNKNOWN":
+        score += 7
+        reasons.append("grade_detected")
+    else:
+        score -= 5
+        flags.append("grade_unknown")
+
+    price_int = price_to_int(item.price)
+    if price_int is None:
+        score -= 7
+        flags.append("price_missing")
+    elif price_int < 3000:
+        score -= 25
+        flags.append("price_too_low")
+    elif price_int > 500000:
+        score -= 6
+        flags.append("price_too_high")
+    else:
+        score += 8
+        reasons.append("price_valid")
+
+    status = normalize_status(item.status or item.stock_text)
+    if status != "상태 확인중":
+        score += 6
+        reasons.append("status_known")
+    else:
+        score -= 4
+        flags.append("status_unknown")
+
+    if item.product_url or item.detail_url or item.url:
+        score += 4
+        reasons.append("url_present")
+    else:
+        score -= 10
+        flags.append("url_missing")
+
+    site_bonus = SITE_QUALITY_BONUS.get((item.site or "").lower(), 0)
+    if site_bonus:
+        score += site_bonus
+        reasons.append(f"site_bonus_{site_bonus}")
+
+    name_probe = normalize_space(display_name or item.name or item.title)
+    if is_bad_title(name_probe):
+        score -= 35
+        flags.append("bad_title")
+    if is_board_or_qna_noise(f"{name_probe} {item.url}"):
+        score -= 35
+        flags.append("board_or_qna_noise")
+    if is_non_gundam_figure_like(name_probe):
+        score -= 25
+        flags.append("non_gundam_or_figure_like")
+
+    if confidence_score < 0.72:
+        flags.append("low_match_confidence")
+    if confidence.get("productKey", "").endswith("|"):
+        flags.append("empty_product_key")
+
+    type_info = classify_product_type(display_name or item.name or item.title, price=item.price)
+    type_category = type_info.get("typeCategory", "etc")
+    if type_category == "gunpla" and type_info.get("isGunplaMainItem"):
+        score += 8
+        reasons.append("type_gunpla_main_item")
+    elif type_category in {"decal", "option_parts", "tool", "paint", "figure"}:
+        score -= 18
+        flags.append(f"type_{type_category}")
+    elif type_category != "gunpla":
+        score -= 5
+        flags.append(f"type_{type_category}")
+
+    score_int = int(round(max(0, min(100, score))))
+
+    if score_int >= 80:
+        grade_label = "A"
+    elif score_int >= 70:
+        grade_label = "B"
+    elif score_int >= 60:
+        grade_label = "C"
+    else:
+        grade_label = "REVIEW"
+
+    return {
+        "score": score_int,
+        "grade": grade_label,
+        "reasons": reasons[:20],
+        "flags": flags[:20],
+    }
+
+
+
+# ===== 데이터 엔진 4~6단계: 가격 인텔리전스 / 재고 변화 / 추천 분석 =====
+# 원칙: 기존 크롤링/필터/업로드 구조는 건드리지 않고 Firestore 필드만 추가한다.
+DATA_ENGINE_CONTEXT: Dict[str, Dict] = {}
+
+
+def _avg_int(values: List[int]) -> Optional[int]:
+    clean = [v for v in values if isinstance(v, int) and v > 0]
+    if not clean:
+        return None
+    return int(round(sum(clean) / len(clean)))
+
+
+def _median_int(values: List[int]) -> Optional[int]:
+    clean = sorted(v for v in values if isinstance(v, int) and v > 0)
+    if not clean:
+        return None
+    mid = len(clean) // 2
+    if len(clean) % 2:
+        return clean[mid]
+    return int(round((clean[mid - 1] + clean[mid]) / 2))
+
+
+def _is_available_status(status: str) -> bool:
+    return normalize_status(status) in {"판매중", "예약중", "입고예정"}
+
+
+def _price_state(price_int: Optional[int], lowest: Optional[int], avg: Optional[int], median: Optional[int]) -> str:
+    if price_int is None or price_int <= 0:
+        return "unknown"
+    ref = median or avg
+    if lowest and price_int == lowest:
+        return "lowest"
+    if ref and price_int <= int(ref * 0.90):
+        return "good_deal"
+    if ref and price_int >= int(ref * 1.25):
+        return "expensive"
+    return "normal"
+
+
+def _price_score(price_int: Optional[int], lowest: Optional[int], avg: Optional[int], median: Optional[int]) -> int:
+    if price_int is None or price_int <= 0:
+        return 0
+    ref = median or avg or price_int
+    if not ref or ref <= 0:
+        return 50
+    # 낮을수록 좋지만 비정상 저가는 이미 qualityFlags에서 다룬다.
+    ratio = price_int / ref
+    if lowest and price_int == lowest:
+        base = 95
+    elif ratio <= 0.90:
+        base = 88
+    elif ratio <= 1.05:
+        base = 76
+    elif ratio <= 1.20:
+        base = 58
+    elif ratio <= 1.40:
+        base = 42
+    else:
+        base = 25
+    return int(max(0, min(100, base)))
+
+
+def build_data_engine_context(items: List[ItemRecord]) -> Dict[str, Dict]:
+    """현재 크롤링 결과 전체를 모델 중심으로 묶어 가격/재고/추천 계산에 필요한 집계를 만든다."""
+    global DATA_ENGINE_CONTEXT
+    grouped: Dict[str, List[ItemRecord]] = {}
+
+    for item in items:
+        display = apply_official_product_name(item.name or item.title) or item.name
+        official_hit = lookup_official_product_name(item.name or item.title) or lookup_official_product_name(display)
+        identity = build_model_identity(display or item.name or item.title, official_hit=official_hit)
+        grouped.setdefault(identity["masterModelId"], []).append(item)
+
+    context: Dict[str, Dict] = {}
+    for master_model_id, group in grouped.items():
+        prices = [price_to_int(i.price) for i in group]
+        prices = [p for p in prices if p is not None and p > 0]
+        lowest = min(prices) if prices else None
+        highest = max(prices) if prices else None
+        avg = _avg_int(prices)
+        median = _median_int(prices)
+        sellers = sorted({i.mall_name for i in group if i.mall_name})
+        available_items = [i for i in group if _is_available_status(i.status or i.stock_text)]
+        in_stock_items = [i for i in group if normalize_status(i.status or i.stock_text) == "판매중"]
+        preorder_items = [i for i in group if normalize_status(i.status or i.stock_text) == "예약중"]
+
+        # 모델 단위 희소성: 판매처가 적고 판매중이 적으면 더 높게 본다.
+        seller_count = len(sellers)
+        available_count = len(available_items)
+        rarity_score = 100
+        rarity_score -= min(50, seller_count * 8)
+        rarity_score -= min(35, available_count * 10)
+        rarity_score = int(max(0, min(100, rarity_score)))
+
+        context[master_model_id] = {
+            "marketLowestPrice": lowest,
+            "marketHighestPrice": highest,
+            "marketAveragePrice": avg,
+            "marketMedianPrice": median,
+            "marketPriceCount": len(prices),
+            "sellerCountForModel": seller_count,
+            "availableSellerCount": len({i.mall_name for i in available_items if i.mall_name}),
+            "inStockSellerCount": len({i.mall_name for i in in_stock_items if i.mall_name}),
+            "preorderSellerCount": len({i.mall_name for i in preorder_items if i.mall_name}),
+            "rarityScore": rarity_score,
+            "modelSellers": sellers[:20],
+        }
+
+    DATA_ENGINE_CONTEXT = context
+    print(f"[데이터 엔진 집계] 모델 그룹 {len(context)}개 / 가격·재고·추천 컨텍스트 생성")
+    return context
+
+
+def calculate_price_intelligence(item: ItemRecord, model_identity: Dict) -> Dict:
+    master_model_id = model_identity.get("masterModelId", "")
+    ctx = DATA_ENGINE_CONTEXT.get(master_model_id, {})
+    price_int = price_to_int(item.price)
+    lowest = ctx.get("marketLowestPrice")
+    avg = ctx.get("marketAveragePrice")
+    median = ctx.get("marketMedianPrice")
+
+    price_state = _price_state(price_int, lowest, avg, median)
+    price_score = _price_score(price_int, lowest, avg, median)
+    discount_rate_vs_avg = None
+    if price_int and avg and avg > 0:
+        discount_rate_vs_avg = round((avg - price_int) / avg * 100, 1)
+
+    return {
+        "marketLowestPrice": lowest,
+        "marketHighestPrice": ctx.get("marketHighestPrice"),
+        "marketAveragePrice": avg,
+        "marketMedianPrice": median,
+        "marketPriceCount": ctx.get("marketPriceCount", 0),
+        "sellerCountForModel": ctx.get("sellerCountForModel", 0),
+        "availableSellerCount": ctx.get("availableSellerCount", 0),
+        "inStockSellerCount": ctx.get("inStockSellerCount", 0),
+        "preorderSellerCount": ctx.get("preorderSellerCount", 0),
+        "isLowestPrice": bool(price_int and lowest and price_int == lowest),
+        "priceScore": price_score,
+        "priceState": price_state,
+        "discountRateVsAverage": discount_rate_vs_avg,
+        "modelSellers": ctx.get("modelSellers", []),
+        "rarityScore": ctx.get("rarityScore", 0),
+    }
+
+
+def calculate_stock_intelligence(item: ItemRecord, previous: Optional[Dict], *, price_info: Dict, quality: Dict) -> Dict:
+    status = normalize_status(item.status or item.stock_text)
+    old_status = _doc_get_str(previous, ["status", "stockText", "stock_text", "stockState"])
+    old_stock_state = _doc_get_str(previous, ["stockState"])
+    old_restock_count = _doc_get_int(previous, ["restockCount"]) or 0
+
+    if status == "판매중":
+        if old_status in {"품절", "입고예정", "상태 확인중"}:
+            stock_state = "restocked"
+            restock_count = old_restock_count + 1
+        elif old_status == "판매중" or old_stock_state == "in_stock":
+            stock_state = "in_stock"
+            restock_count = old_restock_count
+        else:
+            stock_state = "in_stock"
+            restock_count = old_restock_count
+    elif status == "예약중":
+        stock_state = "preorder"
+        restock_count = old_restock_count
+    elif status == "입고예정":
+        stock_state = "coming_soon"
+        restock_count = old_restock_count
+    elif status == "품절":
+        stock_state = "sold_out"
+        restock_count = old_restock_count
+    else:
+        stock_state = "unknown"
+        restock_count = old_restock_count
+
+    confidence = 45
+    if status != "상태 확인중":
+        confidence += 25
+    if quality.get("score", 0) >= 70:
+        confidence += 15
+    if price_info.get("sellerCountForModel", 0) >= 2:
+        confidence += 8
+    if stock_state == "restocked":
+        confidence += 7
+    if quality.get("score", 0) < 60:
+        confidence -= 20
+    confidence = int(max(0, min(100, confidence)))
+
+    return {
+        "stockState": stock_state,
+        "stockConfidence": confidence,
+        "restockCount": restock_count,
+        "wasPreviouslyAvailable": normalize_status(old_status) == "판매중",
+        "isCurrentlyAvailable": status in {"판매중", "예약중", "입고예정"},
+        "isReliableRestock": stock_state == "restocked" and confidence >= 70,
+    }
+
+
+def calculate_recommendation_intelligence(item: ItemRecord, *, quality: Dict, type_info: Dict, price_info: Dict, stock_info: Dict, model_identity: Dict) -> Dict:
+    score = 0.0
+    tags: List[str] = []
+    reasons: List[str] = []
+
+    score += quality.get("score", 0) * 0.42
+    score += price_info.get("priceScore", 0) * 0.28
+    score += stock_info.get("stockConfidence", 0) * 0.18
+    score += max(0, min(100, price_info.get("rarityScore", 0))) * 0.12
+
+    if type_info.get("isGunplaMainItem"):
+        score += 6
+        tags.append("main_kit")
+    if price_info.get("isLowestPrice"):
+        score += 8
+        tags.append("lowest_price")
+    if price_info.get("priceState") == "good_deal":
+        score += 5
+        tags.append("good_deal")
+    if stock_info.get("stockState") == "restocked":
+        score += 8
+        tags.append("restocked")
+    if stock_info.get("stockState") == "in_stock":
+        tags.append("in_stock")
+    if quality.get("score", 0) >= 80:
+        tags.append("high_quality")
+    if price_info.get("rarityScore", 0) >= 65:
+        tags.append("rare_or_low_supply")
+
+    if type_info.get("typeCategory") not in {"gunpla", "gundam_related"}:
+        score -= 25
+        reasons.append("not_main_gunpla")
+    if quality.get("score", 0) < 60:
+        score -= 20
+        reasons.append("low_quality")
+    if stock_info.get("stockState") in {"sold_out", "unknown"}:
+        score -= 8
+        reasons.append("not_available_now")
+
+    if price_info.get("priceState") in {"lowest", "good_deal"}:
+        reasons.append("price_attractive")
+    if stock_info.get("stockConfidence", 0) >= 75:
+        reasons.append("stock_reliable")
+    if model_identity.get("series") and model_identity.get("series") != "UNKNOWN":
+        reasons.append("series_detected")
+
+    recommendation_score = int(round(max(0, min(100, score))))
+    if recommendation_score >= 82:
+        level = "strong_recommend"
+    elif recommendation_score >= 68:
+        level = "recommend"
+    elif recommendation_score >= 50:
+        level = "normal"
+    else:
+        level = "review_first"
+
+    return {
+        "recommendationScore": recommendation_score,
+        "recommendationLevel": level,
+        "recommendationTags": sorted(set(tags))[:20],
+        "recommendationReasons": sorted(set(reasons))[:20],
+    }
+
 def to_firestore_doc(item: ItemRecord, previous: Optional[Dict] = None) -> Dict:
     price_int = price_to_int(item.price)
     display_name = apply_official_product_name(item.name or item.title) or item.name
@@ -3473,6 +4127,19 @@ def to_firestore_doc(item: ItemRecord, previous: Optional[Dict] = None) -> Dict:
     product_key = normalize_product_key(display_name)
     grade = extract_grade(display_name)
     confidence = calculate_match_confidence_for_name(display_name, item.price, item.status)
+    quality = calculate_quality_score(item, display_name=display_name, official_hit=official_hit, confidence=confidence)
+    type_info = classify_product_type(display_name or item.name or item.title, price=item.price)
+    model_identity = build_model_identity(display_name or item.name or item.title, official_hit=official_hit)
+    price_info = calculate_price_intelligence(item, model_identity)
+    stock_info = calculate_stock_intelligence(item, previous, price_info=price_info, quality=quality)
+    recommendation_info = calculate_recommendation_intelligence(
+        item,
+        quality=quality,
+        type_info=type_info,
+        price_info=price_info,
+        stock_info=stock_info,
+        model_identity=model_identity,
+    )
 
     old_status = _doc_get_str(previous, ["status", "stockText", "stock_text"])
     old_price_int = _doc_get_int(previous, ["priceInt", "price_int", "price"])
@@ -3504,7 +4171,50 @@ def to_firestore_doc(item: ItemRecord, previous: Optional[Dict] = None) -> Dict:
         "matchConfidence": confidence["score"],
         "matchConfidenceReasons": confidence["reasons"],
         "canonicalCore": confidence["core"],
-        "needsReview": confidence["score"] < 0.72,
+        "masterModelId": model_identity["masterModelId"],
+        "modelGroupKey": model_identity["modelGroupKey"],
+        "modelCoreName": model_identity["modelCoreName"],
+        "modelDisplayName": model_identity["modelDisplayName"],
+        "series": model_identity["series"],
+        "scale": model_identity["scale"],
+        "brand": model_identity["brand"],
+        "typeCategory": type_info["typeCategory"],
+        "subType": type_info["subType"],
+        "typeConfidence": type_info["typeConfidence"],
+        "typeFlags": type_info["typeFlags"],
+        "isGunplaMainItem": type_info["isGunplaMainItem"],
+        "needsReview": confidence["score"] < 0.72 or quality["score"] < 60 or type_info["typeCategory"] not in {"gunpla", "gundam_related"},
+        "qualityScore": quality["score"],
+        "qualityGrade": quality["grade"],
+        "qualityReasons": quality["reasons"],
+        "qualityFlags": quality["flags"],
+        "isQualityLow": quality["score"] < 60,
+        "isQualityHigh": quality["score"] >= 80,
+        "marketLowestPrice": price_info["marketLowestPrice"],
+        "marketHighestPrice": price_info["marketHighestPrice"],
+        "marketAveragePrice": price_info["marketAveragePrice"],
+        "marketMedianPrice": price_info["marketMedianPrice"],
+        "marketPriceCount": price_info["marketPriceCount"],
+        "sellerCountForModel": price_info["sellerCountForModel"],
+        "availableSellerCount": price_info["availableSellerCount"],
+        "inStockSellerCount": price_info["inStockSellerCount"],
+        "preorderSellerCount": price_info["preorderSellerCount"],
+        "isLowestPrice": price_info["isLowestPrice"],
+        "priceScore": price_info["priceScore"],
+        "priceState": price_info["priceState"],
+        "discountRateVsAverage": price_info["discountRateVsAverage"],
+        "modelSellers": price_info["modelSellers"],
+        "rarityScore": price_info["rarityScore"],
+        "stockState": stock_info["stockState"],
+        "stockConfidence": stock_info["stockConfidence"],
+        "restockCount": stock_info["restockCount"],
+        "wasPreviouslyAvailable": stock_info["wasPreviouslyAvailable"],
+        "isCurrentlyAvailable": stock_info["isCurrentlyAvailable"],
+        "isReliableRestock": stock_info["isReliableRestock"],
+        "recommendationScore": recommendation_info["recommendationScore"],
+        "recommendationLevel": recommendation_info["recommendationLevel"],
+        "recommendationTags": recommendation_info["recommendationTags"],
+        "recommendationReasons": recommendation_info["recommendationReasons"],
         "isNew": is_new,
         "isRestock": is_restock,
         "isRestocked": is_restock,
@@ -3644,6 +4354,11 @@ def main():
     print("[패치 버전] board_noise_filter_v1")
     print("[패치 버전] joyhobby_filter_final_v2 / official_master 유지 / health 차단 완화")
     print("[패치 버전] low_count_upload_guard_v1 / 50개 덮어쓰기 방지")
+    print("[패치 버전] quality_score_v1 / Firestore qualityScore 추가")
+    print("[패치 버전] product_type_classifier_v2 / typeCategory·subType 추가")
+    print("[패치 버전] model_identity_engine_v3 / masterModelId·modelGroupKey 추가")
+    print("[패치 버전] data_engine_stage4_6 / 가격·재고·추천 분석 필드 추가")
+    print("[패치 버전] ci_secret_and_optional_selenium_guard_v1 / CI 인증·선택 의존성 안정화")
     print(f"[실행 모드] FAST_TEST_MODE={FAST_TEST_MODE} / MAX_LINKS_PER_SITE={MAX_LINKS_PER_SITE}")
     print(f"[업로드 보호] MIN_TOTAL_UPLOAD={MIN_TOTAL_UPLOAD} / ABSOLUTE_MIN_UPLOAD={ABSOLUTE_MIN_UPLOAD} / FORCE_UPLOAD_LOW_COUNT={FORCE_UPLOAD_LOW_COUNT} / ALLOW_TEST_UPLOAD={ALLOW_TEST_UPLOAD}")
     load_manual_aliases()
@@ -3689,6 +4404,8 @@ def main():
 
     merged = sort_records(merged)
     print(f"[정렬 후] 총 {len(merged)}개")
+
+    build_data_engine_context(merged)
 
     build_match_report(merged)
     save_local_backup(merged)
